@@ -12,7 +12,7 @@ type DistributedRate = {
   percent: number;
 };
 export default function Home() {
-  const query = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: [ENDPOINT.probabilityRate],
     queryFn: async () =>
       await workerFetch<ProbabilityRateResponse>(ENDPOINT.probabilityRate, {
@@ -21,13 +21,11 @@ export default function Home() {
       }),
   });
 
+  if (isLoading || isError) return <p>loading</p>;
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      {query.isLoading || query.isError ? (
-        <>loading</>
-      ) : (
-        <>api data: {query.data.rolls}</>
-      )}
+      <>api data: {data.rolls}</>
     </main>
   );
 }
