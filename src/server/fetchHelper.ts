@@ -1,7 +1,7 @@
 "use server";
 import { EndpointValue } from "./endpoints";
 
-export async function workerFetch<T>(
+export async function workerFetch<TReq, TRes>(
   endpoint: EndpointValue,
   {
     payload,
@@ -12,12 +12,14 @@ export async function workerFetch<T>(
         method?: "GET" | "DELETE";
       }
     | {
-        payload?: any;
+        payload?: TReq;
         method?: "POST" | "DELETE";
       }
-): Promise<T> {
+): Promise<TRes> {
   const body = JSON.stringify(payload);
-  const res = await fetch(process.env.WORKER_API + endpoint, {
+  const url = process.env.WORKER_API + endpoint;
+  console.warn(url);
+  const res = await fetch(url, {
     body,
     method,
     headers: {
@@ -26,6 +28,6 @@ export async function workerFetch<T>(
   });
 
   if (res.ok) {
-    return res.json() as T;
+    return res.json() as TRes;
   } else return Promise.reject(`unknown error ${res.text()}`);
 }
