@@ -1,5 +1,5 @@
 export const ENDPOINT = {
-  gachaCfg: "honkai/gacha_cfg",
+  jadeEstimate: "honkai/jade_estimate",
   probabilityRate: "honkai/probability_rate",
 } as const;
 export type EndpointValue = (typeof ENDPOINT)[keyof typeof ENDPOINT];

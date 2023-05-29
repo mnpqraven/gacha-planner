@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ReactECharts } from "./components/ReactEcharts";
 import { EChartsOption } from "echarts";
 import { ChangeEvent, useState } from "react";
+import { JadeEstimate } from "./components/JadeEstimate";
 
 type ProbabilityRateResponse = {
   rolls: number;
@@ -14,7 +15,7 @@ type DistributedRate = {
   draw_number: number;
   percent: number;
 };
-type Payload = {
+type ProbabilityRatePayload = {
   rolls: number;
   nextGuaranteed: boolean;
   simulateResult: boolean;
@@ -22,7 +23,7 @@ type Payload = {
 export default function Home() {
   const [rolls, setRolls] = useState(90);
   const [nextGuaranteed, setNextGuaranteed] = useState(false);
-  const payload: Payload = {
+  const payload: ProbabilityRatePayload = {
     rolls,
     nextGuaranteed,
     simulateResult: false,
@@ -31,7 +32,7 @@ export default function Home() {
   const { data: probabilityRate } = useQuery({
     queryKey: [ENDPOINT.probabilityRate, rolls],
     queryFn: async () =>
-      await workerFetch<Payload, ProbabilityRateResponse>(
+      await workerFetch<ProbabilityRatePayload, ProbabilityRateResponse>(
         ENDPOINT.probabilityRate,
         { payload, method: "POST" }
       ),
@@ -107,12 +108,7 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
-      <input
-        type="number"
-        onChange={updateRolls}
-        defaultValue={rolls}
-        style={{ color: "black" }}
-      />
+      <JadeEstimate />
       <label>
         Next Guaranteed{" "}
         <input
@@ -120,6 +116,12 @@ export default function Home() {
           onClick={(e) => setNextGuaranteed(e.currentTarget.checked)}
         />
       </label>
+      <input
+        type="number"
+        onChange={updateRolls}
+        defaultValue={rolls}
+        style={{ color: "black" }}
+      />
       <ReactECharts option={chartOptions} style={{ height: "700px" }} />
     </main>
   );
