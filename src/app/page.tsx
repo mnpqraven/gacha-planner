@@ -41,21 +41,6 @@ export default function Home() {
   // if (isLoading || isError) return <p>loading</p>;
 
   const chartOptions: EChartsOption = {
-    color: ["#80FFA5", "#00DDFF", "#37A2FF", "#FF0087", "#FFBF00"],
-    tooltip: {
-      trigger: "axis",
-      axisPointer: {
-        type: "cross",
-        label: {
-          backgroundColor: "#6a7985",
-          formatter: ({ value, axisDimension }) => {
-            if (axisDimension == "x") return `Roll ${value}`;
-            else return `${Number(value).toFixed(2)} %`;
-          },
-        },
-      },
-      valueFormatter: (value) => `${value} %`,
-    },
     xAxis: {
       type: "category",
       boundaryGap: false,
@@ -100,15 +85,34 @@ export default function Home() {
         ),
       },
     ],
+    color: ["#80FFA5", "#00DDFF", "#37A2FF", "#FF0087", "#FFBF00"],
+    tooltip: {
+      trigger: "axis",
+      axisPointer: {
+        type: "cross",
+        label: {
+          backgroundColor: "#6a7985",
+          formatter: ({ value, axisDimension }) => {
+            if (axisDimension == "x") return `Roll ${value}`;
+            else return `${Number(value).toFixed(2)} %`;
+          },
+        },
+      },
+      valueFormatter: (value) => `${value} %`,
+    },
   };
 
   function updateRolls(e: ChangeEvent<HTMLInputElement>) {
     setRolls(Number(e.target.value));
   }
 
+  function updateAvailableRolls(amount: number) {
+    setRolls(amount);
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
-      <JadeEstimate />
+      <JadeEstimate updateAvailableRoles={updateAvailableRolls} />
       <label>
         Next Guaranteed{" "}
         <input

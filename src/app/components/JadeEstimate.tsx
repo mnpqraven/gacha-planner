@@ -25,6 +25,7 @@ import { useMutation } from "@tanstack/react-query";
 import { workerFetch } from "@/server/fetchHelper";
 import { ENDPOINT } from "@/server/endpoints";
 import { useEffect, useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/Tabs";
 
 const formSchema = z.object({
   untilDate: z.date({
@@ -48,7 +49,28 @@ const formSchema = z.object({
         invalid_type_error: "Must be a number",
         required_error: "Required field",
       })
+      .positive()
       .max(75)
+  ),
+  currentRolls: z.preprocess(
+    (args) => (args === "" ? undefined : args),
+    z.coerce
+      .number({
+        invalid_type_error: "Must be a number",
+        required_error: "Required field",
+      })
+      .nonnegative()
+      .optional()
+  ),
+  currentJades: z.preprocess(
+    (args) => (args === "" ? undefined : args),
+    z.coerce
+      .number({
+        invalid_type_error: "Must be a number",
+        required_error: "Required field",
+      })
+      .nonnegative()
+      .optional()
   ),
 });
 
@@ -58,7 +80,10 @@ const dateToISO = z.date().transform((e) => ({
   year: e.getUTCFullYear(),
 }));
 
-export const JadeEstimate = () => {
+type Props = {
+  updateAvailableRoles: (amount: number) => void;
+};
+export const JadeEstimate = ({ updateAvailableRoles }: Props) => {
   const [usingRailPass, setUsingRailPass] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -71,6 +96,7 @@ export const JadeEstimate = () => {
         daysLeft: 30,
       },
       level: 50,
+      currentRolls: 0,
     },
   });
 
@@ -82,10 +108,9 @@ export const JadeEstimate = () => {
   } & Omitted;
 
   type BackendReturn = {
-    from_battle_pass: number;
-    from_rail_pass: number;
-    from_su: number;
+    sources: { source: string; value: number }[];
     total_jades: number;
+    rolls: number;
     days: number;
   };
   const query = useMutation({
@@ -94,15 +119,19 @@ export const JadeEstimate = () => {
         payload,
         method: "POST",
       }),
+    onSuccess: (data) => updateAvailableRoles(data.rolls),
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const untilDate = dateToISO.parse(values.untilDate);
+    const { level, railPass, battlePass, currentRolls, currentJades } = values;
     const payload: Payload = {
       untilDate,
-      level: values.level,
-      railPass: values.railPass,
-      battlePass: values.battlePass,
+      level,
+      railPass,
+      battlePass,
+      currentRolls,
+      currentJades,
     };
     console.log(payload);
     query.mutate(payload);
@@ -188,6 +217,56 @@ export const JadeEstimate = () => {
               </FormItem>
             )}
           />
+          <Tabs defaultValue="currentRolls">
+            <TabsList>
+              <TabsTrigger value="currentRolls">Rolls</TabsTrigger>
+              <TabsTrigger value="currentJades">Jades</TabsTrigger>
+            </TabsList>
+            <TabsContent value="currentRolls">
+              <FormField
+                control={form.control}
+                name="currentRolls"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Current rolls</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Current rolls"
+                        type="number"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Amount of rolls you currently possess
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </TabsContent>
+            <TabsContent value="currentJades">
+              <FormField
+                control={form.control}
+                name="currentJades"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Current jades</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Current jades"
+                        type="number"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Amount of jades you currently possess
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </TabsContent>
+          </Tabs>
           <FormField
             control={form.control}
             name="untilDate"
@@ -231,10 +310,19 @@ export const JadeEstimate = () => {
           <Button type="submit">Calculate</Button>
         </form>
       </Form>
-      <div>value: {query.data?.total_jades ?? 0}</div>
-      <div>from SU: {query.data?.from_su ?? 0}</div>
-      <div>from Rail pass: {query.data?.from_rail_pass ?? 0}</div>
-      <div>from Battle pass: {query.data?.from_battle_pass ?? 0}</div>
+      {query.data && (
+        <>
+          {query.data.sources.map((e, index) => (
+            <div key={index}>
+              From {e.source}: {e.value}
+            </div>
+          ))}
+          <p>
+            <b>Total jades: {query.data.total_jades}</b> <br />
+            <b>Total rolls: {query.data.rolls}</b>
+          </p>
+        </>
+      )}
     </>
   );
 };
