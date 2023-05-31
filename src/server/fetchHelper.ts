@@ -1,33 +1,54 @@
 "use server";
-import { EndpointValue } from "./endpoints";
 
-export async function workerFetch<TReq, TRes>(
-  endpoint: EndpointValue,
-  {
-    payload,
-    method = "GET",
-  }:
-    | {
-        payload: never;
-        method?: "GET" | "DELETE";
-      }
-    | {
-        payload?: TReq;
-        method?: "POST" | "DELETE";
-      }
-): Promise<TRes> {
-  const body = JSON.stringify(payload);
-  const url = process.env.WORKER_API + endpoint;
-  console.warn(url);
-  const res = await fetch(url, {
-    body,
-    method,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+import * as z from "zod";
+import { ENDPOINT } from "./endpoints";
 
-  if (res.ok) {
-    return res.json() as TRes;
-  } else return Promise.reject(`unknown error ${res.text()}`);
+export async function workerFetch<
+  TEndpoint extends (typeof ENDPOINT)[keyof typeof ENDPOINT]
+>(
+  endpoint: TEndpoint,
+  opt?: {
+    payload?: z.infer<
+      TEndpoint["payload"] extends z.ZodTypeAny ? TEndpoint["payload"] : never
+    >;
+    method: "POST" | "DELETE";
+  }
+): Promise<z.infer<TEndpoint["response"]>> {
+  const url = process.env.WORKER_API + endpoint.path;
+
+  // POST
+  if (opt) {
+    const { payload, method } = opt;
+    const body = JSON.stringify(payload);
+    const res = await fetch(url, {
+      body,
+      method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (res.ok) {
+      return res.json();
+    } else {
+      console.error("api fetch failed, code:", res.status);
+      const errText = await res.text();
+      console.error("unknown error", errText);
+      return Promise.reject(`unknown error ${errText}`);
+    }
+  } else {
+    // GET
+    const res = await fetch(url, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (res.ok) {
+      return res.json();
+    } else {
+      console.error("api fetch failed, code:", res.status);
+      return Promise.reject(`unknown error ${res.text()}`);
+    }
+  }
 }

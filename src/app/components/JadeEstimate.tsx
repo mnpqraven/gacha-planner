@@ -21,11 +21,18 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { Switch } from "./ui/Switch";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { workerFetch } from "@/server/fetchHelper";
-import { ENDPOINT } from "@/server/endpoints";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/Tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/Select";
+import { ENDPOINT } from "@/server/endpoints";
 
 const formSchema = z.object({
   untilDate: z.date({
@@ -83,7 +90,7 @@ const dateToISO = z.date().transform((e) => ({
 type Props = {
   updateAvailableRoles: (amount: number) => void;
 };
-export const JadeEstimate = ({ updateAvailableRoles }: Props) => {
+export const JadeEstimate = () => {
   const [usingRailPass, setUsingRailPass] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -107,19 +114,19 @@ export const JadeEstimate = ({ updateAvailableRoles }: Props) => {
     untilDate: z.infer<typeof dateToISO>;
   } & Omitted;
 
-  type BackendReturn = {
-    sources: { source: string; value: number }[];
-    total_jades: number;
-    rolls: number;
-    days: number;
-  };
-  const query = useMutation({
+  const query = useQuery({
+    queryKey: [ENDPOINT.listFuturePatchDate],
+    queryFn: async () => await workerFetch(ENDPOINT.listFuturePatchDate),
+  });
+  if (query.data) console.warn(query.data);
+
+  const jadeEstimateQuery = useMutation({
     mutationFn: async (payload: Payload) =>
-      await workerFetch<Payload, BackendReturn>(ENDPOINT.jadeEstimate, {
+      await workerFetch(ENDPOINT.jadeEstimate, {
         payload,
         method: "POST",
       }),
-    onSuccess: (data) => updateAvailableRoles(data.rolls),
+    // onSuccess: (data) => updateAvailableRoles(data.rolls),
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -134,22 +141,13 @@ export const JadeEstimate = ({ updateAvailableRoles }: Props) => {
       currentJades,
     };
     console.log(payload);
-    query.mutate(payload);
+    jadeEstimateQuery.mutate(payload);
   }
-
-  useEffect(() => {
-    console.log(query.data);
-  }, [query.data]);
 
   return (
     <>
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8"
-          // if using debounce form submission
-          // onChange={debounceOnChange}
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
             control={form.control}
             name="railPass.useRailPass"
@@ -292,7 +290,22 @@ export const JadeEstimate = ({ updateAvailableRoles }: Props) => {
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
+                  <PopoverContent
+                    className="flex w-auto flex-col space-y-2 p-2"
+                    align="start"
+                  >
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        <SelectItem value="0">Today</SelectItem>
+                        <SelectItem value="1">Tomorrow</SelectItem>
+                        <SelectItem value="3">In 3 days</SelectItem>
+                        <SelectItem value="7">In a week</SelectItem>
+                      </SelectContent>
+                    </Select>
+
                     <Calendar
                       mode="single"
                       selected={field.value}
@@ -310,16 +323,16 @@ export const JadeEstimate = ({ updateAvailableRoles }: Props) => {
           <Button type="submit">Calculate</Button>
         </form>
       </Form>
-      {query.data && (
+      {jadeEstimateQuery.data && (
         <>
-          {query.data.sources.map((e, index) => (
+          {jadeEstimateQuery.data.sources.map((e, index) => (
             <div key={index}>
               From {e.source}: {e.value}
             </div>
           ))}
           <p>
-            <b>Total jades: {query.data.total_jades}</b> <br />
-            <b>Total rolls: {query.data.rolls}</b>
+            <b>Total jades: {jadeEstimateQuery.data.total_jades}</b> <br />
+            <b>Total rolls: {jadeEstimateQuery.data.rolls}</b>
           </p>
         </>
       )}
