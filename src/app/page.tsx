@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/Tabs";
-import { JadeEstimate } from "./components/JadeEstimate";
 import EstimateGraph from "./components/EstimateGraph";
+import JadeEstimate from "./components/JadeEstimate";
 
 export default function Home() {
   const [rolls, setRolls] = useState(90);
@@ -20,7 +20,7 @@ export default function Home() {
           <TabsTrigger value="estimateGraph">Roll Probability</TabsTrigger>
         </TabsList>
         <TabsContent value="estimateForm">
-          <JadeEstimate />
+          <JadeEstimate updateAvailableRoles={updateAvailableRolls} />
         </TabsContent>
         <TabsContent value="estimateGraph">
           <EstimateGraph rolls={rolls} updateRolls={updateAvailableRolls} />

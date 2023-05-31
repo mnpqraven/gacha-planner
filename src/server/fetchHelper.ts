@@ -1,7 +1,7 @@
-"use server";
+"use client";
 
 import * as z from "zod";
-import { ENDPOINT } from "./endpoints";
+import { ENDPOINT, ENV } from "./endpoints";
 
 export async function workerFetch<
   TEndpoint extends (typeof ENDPOINT)[keyof typeof ENDPOINT]
@@ -14,7 +14,7 @@ export async function workerFetch<
     method: "POST" | "DELETE";
   }
 ): Promise<z.infer<TEndpoint["response"]>> {
-  const url = process.env.WORKER_API + endpoint.path;
+  const url = ENV.WORKER_API + endpoint.path;
 
   // POST
   if (opt) {

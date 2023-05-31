@@ -1,5 +1,9 @@
 import * as z from "zod";
 
+export const ENV = {
+  WORKER_API: process.env.NEXT_PUBLIC_WORKER_API,
+};
+
 export const ENDPOINT = {
   jadeEstimate: {
     path: "honkai/jade_estimate",

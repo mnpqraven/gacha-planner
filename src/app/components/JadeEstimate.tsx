@@ -1,9 +1,13 @@
-"use client";
-
-import { Calendar } from "./ui/Calendar";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { workerFetch } from "@/server/fetchHelper";
+import { ENDPOINT } from "@/server/endpoints";
 import {
   Form,
   FormControl,
@@ -12,27 +16,30 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/Form";
-import { Button } from "./ui/Button";
-import { Input } from "./ui/Input";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/Popover";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { Switch } from "./ui/Switch";
-import { useDebounce } from "@/hooks/useDebounce";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { workerFetch } from "@/server/fetchHelper";
-import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/Tabs";
+} from "../components/ui/Form";
+import { Switch } from "../components/ui/Switch";
+import { Input } from "../components/ui/Input";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/Tabs";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "../components/ui/Popover";
+import { Button } from "../components/ui/Button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/Select";
-import { ENDPOINT } from "@/server/endpoints";
+} from "../components/ui/Select";
+import { Calendar } from "../components/ui/Calendar";
+import { useState } from "react";
 
 const formSchema = z.object({
   untilDate: z.date({
@@ -90,9 +97,8 @@ const dateToISO = z.date().transform((e) => ({
 type Props = {
   updateAvailableRoles: (amount: number) => void;
 };
-export const JadeEstimate = () => {
+export default function JadeEstimate({ updateAvailableRoles }: Props) {
   const [usingRailPass, setUsingRailPass] = useState(false);
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -113,12 +119,13 @@ export const JadeEstimate = () => {
   type Payload = {
     untilDate: z.infer<typeof dateToISO>;
   } & Omitted;
+  console.log("render");
 
   const query = useQuery({
     queryKey: [ENDPOINT.listFuturePatchDate],
     queryFn: async () => await workerFetch(ENDPOINT.listFuturePatchDate),
   });
-  if (query.data) console.warn(query.data);
+  if (query.data) console.log(query.data);
 
   const jadeEstimateQuery = useMutation({
     mutationFn: async (payload: Payload) =>
@@ -126,7 +133,7 @@ export const JadeEstimate = () => {
         payload,
         method: "POST",
       }),
-    // onSuccess: (data) => updateAvailableRoles(data.rolls),
+    onSuccess: (data) => updateAvailableRoles(data.rolls),
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -300,9 +307,11 @@ export const JadeEstimate = () => {
                       </SelectTrigger>
                       <SelectContent position="popper">
                         <SelectItem value="0">Today</SelectItem>
-                        <SelectItem value="1">Tomorrow</SelectItem>
-                        <SelectItem value="3">In 3 days</SelectItem>
-                        <SelectItem value="7">In a week</SelectItem>
+                        {query.data?.patches.map((e) => (
+                          <SelectItem value={e.dateStart} key={e.version}>
+                            {e.name} - {e.version}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
 
@@ -338,4 +347,4 @@ export const JadeEstimate = () => {
       )}
     </>
   );
-};
+}
