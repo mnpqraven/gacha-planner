@@ -40,67 +40,15 @@ import {
 } from "../components/ui/Select";
 import { Calendar } from "../components/ui/Calendar";
 import { useState } from "react";
-
-const formSchema = z.object({
-  untilDate: z.date({
-    required_error: "a date is required",
-  }),
-  battlePass: z.boolean(),
-  railPass: z.object({
-    useRailPass: z.boolean(),
-    daysLeft: z.preprocess(
-      (args) => (args === "" ? undefined : args),
-      z.coerce.number({
-        invalid_type_error: "Must be a number",
-        required_error: "Required field",
-      })
-    ),
-  }),
-  level: z.preprocess(
-    (args) => (args === "" ? undefined : args),
-    z.coerce
-      .number({
-        invalid_type_error: "Must be a number",
-        required_error: "Required field",
-      })
-      .positive()
-      .max(75)
-  ),
-  currentRolls: z.preprocess(
-    (args) => (args === "" ? undefined : args),
-    z.coerce
-      .number({
-        invalid_type_error: "Must be a number",
-        required_error: "Required field",
-      })
-      .nonnegative()
-      .optional()
-  ),
-  currentJades: z.preprocess(
-    (args) => (args === "" ? undefined : args),
-    z.coerce
-      .number({
-        invalid_type_error: "Must be a number",
-        required_error: "Required field",
-      })
-      .nonnegative()
-      .optional()
-  ),
-});
-
-const dateToISO = z.date().transform((e) => ({
-  day: e.getDate(),
-  month: e.getMonth() + 1,
-  year: e.getUTCFullYear(),
-}));
+import { dateToISO, jadeEstimateFormSchema } from "./schemas";
 
 type Props = {
   updateAvailableRoles: (amount: number) => void;
 };
 export default function JadeEstimate({ updateAvailableRoles }: Props) {
   const [usingRailPass, setUsingRailPass] = useState(false);
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof jadeEstimateFormSchema>>({
+    resolver: zodResolver(jadeEstimateFormSchema),
     defaultValues: {
       untilDate: new Date(),
       battlePass: false,
@@ -115,17 +63,15 @@ export default function JadeEstimate({ updateAvailableRoles }: Props) {
 
   const debounceOnChange = useDebounce(form.handleSubmit(onSubmit), 1000);
 
-  type Omitted = Omit<z.infer<typeof formSchema>, "untilDate">;
+  type Omitted = Omit<z.infer<typeof jadeEstimateFormSchema>, "untilDate">;
   type Payload = {
     untilDate: z.infer<typeof dateToISO>;
   } & Omitted;
-  console.log("render");
 
   const query = useQuery({
     queryKey: [ENDPOINT.listFuturePatchDate],
     queryFn: async () => await workerFetch(ENDPOINT.listFuturePatchDate),
   });
-  if (query.data) console.log(query.data);
 
   const jadeEstimateQuery = useMutation({
     mutationFn: async (payload: Payload) =>
@@ -136,7 +82,8 @@ export default function JadeEstimate({ updateAvailableRoles }: Props) {
     onSuccess: (data) => updateAvailableRoles(data.rolls),
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: z.infer<typeof jadeEstimateFormSchema>) {
+    console.warn("onSubmit");
     const untilDate = dateToISO.parse(values.untilDate);
     const { level, railPass, battlePass, currentRolls, currentJades } = values;
     const payload: Payload = {
@@ -151,10 +98,21 @@ export default function JadeEstimate({ updateAvailableRoles }: Props) {
     jadeEstimateQuery.mutate(payload);
   }
 
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  function onSelectDatePreset(date: string) {
+    // today
+    if (date === "0") setDate(new Date());
+    else setDate(new Date(date));
+  }
+
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-8"
+          onChange={debounceOnChange}
+        >
           <FormField
             control={form.control}
             name="railPass.useRailPass"
@@ -301,7 +259,7 @@ export default function JadeEstimate({ updateAvailableRoles }: Props) {
                     className="flex w-auto flex-col space-y-2 p-2"
                     align="start"
                   >
-                    <Select>
+                    <Select onValueChange={onSelectDatePreset}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
