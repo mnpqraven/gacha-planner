@@ -59,7 +59,9 @@ export const ENDPOINT = {
       sources: z
         .object({
           source: z.string(),
-          value: z.number(),
+          jades_amount: z.number().nullable(),
+          rolls_amount: z.number().nullable(),
+          source_type: z.string(),
         })
         .array(),
       total_jades: z.number(),

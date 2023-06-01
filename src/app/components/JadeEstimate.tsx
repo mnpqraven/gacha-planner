@@ -39,27 +39,30 @@ import {
   SelectValue,
 } from "../components/ui/Select";
 import { Calendar } from "../components/ui/Calendar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { dateToISO, jadeEstimateFormSchema } from "./schemas";
 
 type Props = {
   updateAvailableRoles: (amount: number) => void;
 };
 export default function JadeEstimate({ updateAvailableRoles }: Props) {
+  const defaultFormValues: z.infer<typeof jadeEstimateFormSchema> = {
+    untilDate: new Date(),
+    battlePass: false,
+    railPass: {
+      useRailPass: false,
+      daysLeft: 30,
+    },
+    level: 50,
+    currentRolls: 0,
+  };
   const [usingRailPass, setUsingRailPass] = useState(false);
+
   const form = useForm<z.infer<typeof jadeEstimateFormSchema>>({
     resolver: zodResolver(jadeEstimateFormSchema),
-    defaultValues: {
-      untilDate: new Date(),
-      battlePass: false,
-      railPass: {
-        useRailPass: false,
-        daysLeft: 30,
-      },
-      level: 50,
-      currentRolls: 0,
-    },
+    defaultValues: defaultFormValues,
   });
+  const untilDateSubscription = form.watch("untilDate");
 
   const debounceOnChange = useDebounce(form.handleSubmit(onSubmit), 1000);
 
@@ -82,19 +85,15 @@ export default function JadeEstimate({ updateAvailableRoles }: Props) {
     onSuccess: (data) => updateAvailableRoles(data.rolls),
   });
 
+  // NOTE: bandaid to manually trigger date
+  useEffect(() => {
+    debounceOnChange(() => {});
+  }, [untilDateSubscription]);
+
   function onSubmit(values: z.infer<typeof jadeEstimateFormSchema>) {
-    console.warn("onSubmit");
     const untilDate = dateToISO.parse(values.untilDate);
-    const { level, railPass, battlePass, currentRolls, currentJades } = values;
-    const payload: Payload = {
-      untilDate,
-      level,
-      railPass,
-      battlePass,
-      currentRolls,
-      currentJades,
-    };
-    console.log(payload);
+    const payload: Payload = { ...values, untilDate };
+    console.warn("onSubmit", payload);
     jadeEstimateQuery.mutate(payload);
   }
 
@@ -277,7 +276,7 @@ export default function JadeEstimate({ updateAvailableRoles }: Props) {
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
-                      disabled={(date) => date < new Date()}
+                      disabled={beforeToday}
                       initialFocus
                     />
                   </PopoverContent>
@@ -294,7 +293,9 @@ export default function JadeEstimate({ updateAvailableRoles }: Props) {
         <>
           {jadeEstimateQuery.data.sources.map((e, index) => (
             <div key={index}>
-              From {e.source}: {e.value}
+              From {e.source}:{" "}
+              {e.jades_amount ? `${e.jades_amount} Jades` : null}
+              {e.rolls_amount ? `${e.rolls_amount} Special passes` : null}
             </div>
           ))}
           <p>
@@ -305,4 +306,13 @@ export default function JadeEstimate({ updateAvailableRoles }: Props) {
       )}
     </>
   );
+}
+
+function beforeToday(date: Date): boolean {
+  const b = new Date();
+  b.setHours(0);
+  b.setMinutes(0);
+  b.setSeconds(0);
+  b.setMilliseconds(0);
+  return date < b;
 }
