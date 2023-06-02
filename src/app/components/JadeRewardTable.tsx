@@ -14,7 +14,6 @@ type Props = {
   data: z.infer<typeof ENDPOINT.jadeEstimate.response> | undefined;
 };
 const JadeRewardTable = ({ data }: Props) => {
-  if (!data) return null;
   return (
     <Table>
       <TableCaption>Breakdown of where you're getting the jades</TableCaption>
@@ -22,12 +21,12 @@ const JadeRewardTable = ({ data }: Props) => {
         <TableRow>
           <TableHead>Source</TableHead>
           <TableHead>Recurring</TableHead>
-          <TableHead className="text-right">Jades</TableHead>
-          <TableHead className="text-right">Rolls</TableHead>
+          <TableHead>Jades</TableHead>
+          <TableHead>Rolls</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data.sources.map((source) => (
+        {data?.sources.map((source) => (
           <TableRow key={source.source}>
             <TableCell>{source.source}</TableCell>
             <TableCell>{source.source_type}</TableCell>
@@ -38,8 +37,8 @@ const JadeRewardTable = ({ data }: Props) => {
         <TableRow>
           <TableCell className="font-bold">Total</TableCell>
           <TableCell></TableCell>
-          <TableCell className="font-bold">{data.total_jades}</TableCell>
-          <TableCell className="font-bold">{data.rolls}</TableCell>
+          <TableCell className="font-bold">{data?.total_jades ?? 0}</TableCell>
+          <TableCell className="font-bold">{data?.rolls ?? 0}</TableCell>
         </TableRow>
       </TableBody>
     </Table>

@@ -4,6 +4,10 @@ import { workerFetch } from "@/server/fetchHelper";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ENDPOINT } from "@/server/endpoints";
+import { Input } from "./ui/Input";
+import { Switch } from "./ui/Switch";
+import { Label } from "./ui/Label";
+import { Separator } from "./ui/separator";
 
 type Props = {
   rolls: number | undefined;
@@ -14,7 +18,6 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
 
   const { data: probabilityRate } = useQuery({
     queryKey: [ENDPOINT.probabilityRate, rolls],
-    // FIX: server side code
     queryFn: async () =>
       await workerFetch(ENDPOINT.probabilityRate, {
         payload: {
@@ -88,22 +91,27 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
     },
   };
 
-  if (!rolls) return null;
   return (
     <>
-      <label>
-        Next Guaranteed{" "}
-        <input
-          type="checkbox"
-          onClick={(e) => setNextGuaranteed(e.currentTarget.checked)}
-        />
-      </label>
-      <input
-        type="number"
-        onChange={(e) => updateRolls(Number(e.target.value))}
-        defaultValue={rolls}
-        style={{ color: "black" }}
-      />
+      <Separator className="my-4" />
+      <div className="flex gap-2">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="rolls">Total Rolls</Label>
+          <Input
+            id="rolls"
+            type="number"
+            onChange={(e) => updateRolls(Number(e.target.value))}
+            defaultValue={rolls ?? 0}
+            style={{ color: "black" }}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="isGuaranteed">Next Guaranteed</Label>
+          <div className="flex grow items-center">
+            <Switch onCheckedChange={setNextGuaranteed} id="isGuaranteed" />
+          </div>
+        </div>
+      </div>
       <ReactECharts option={chartOptions} style={{ height: "700px" }} />
     </>
   );

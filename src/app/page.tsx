@@ -25,9 +25,13 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
-      <div className="flex">
-        <JadeEstimateForm jadeEstimateMutate={jadeEstimateQuery.mutate} />
-        <JadeRewardTable data={jadeEstimateQuery.data} />
+      <div className="flex gap-4 mt-4">
+        <div className="">
+          <JadeEstimateForm jadeEstimateMutate={jadeEstimateQuery.mutate} />
+        </div>
+        <div className="">
+          <JadeRewardTable data={jadeEstimateQuery.data} />
+        </div>
       </div>
       <EstimateGraph rolls={rolls} updateRolls={updateAvailableRolls} />
     </main>

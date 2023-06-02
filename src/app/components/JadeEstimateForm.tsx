@@ -44,9 +44,13 @@ import { dateToISO, jadeEstimateFormSchema } from "./schemas";
 
 type Props = {
   jadeEstimateMutate: (payload: z.infer<typeof jadeEstimateFormSchema>) => void;
+  submitButton?: boolean;
 };
 
-export default function JadeEstimateForm({ jadeEstimateMutate }: Props) {
+export default function JadeEstimateForm({
+  jadeEstimateMutate,
+  submitButton = false,
+}: Props) {
   const defaultFormValues: z.infer<typeof jadeEstimateFormSchema> = {
     untilDate: dateToISO.parse(new Date()),
     battlePass: false,
@@ -99,26 +103,94 @@ export default function JadeEstimateForm({ jadeEstimateMutate }: Props) {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8"
+          className="space-y-4"
           onChange={debounceOnChange}
         >
+          <FormField
+            control={form.control}
+            name="untilDate"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <div className="flex items-center space-x-4 rounded-md border p-4">
+                  <div className="flex-1 space-y-1">
+                    <FormLabel>Goal Date</FormLabel>
+                    <FormDescription>The date that you'll pull</FormDescription>
+                  </div>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-[240px] pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {date ? (
+                            format(date, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="flex w-auto flex-col space-y-2 p-2"
+                      align="start"
+                    >
+                      <Select onValueChange={onSelectDatePreset}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent position="popper">
+                          <SelectItem value="0">Today</SelectItem>
+                          {query.data?.patches.map((e) => (
+                            <SelectItem value={e.dateStart} key={e.version}>
+                              {e.name} - {e.version}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={(e) => {
+                          setDate(e);
+                          field.onChange(dateToISO.parse(e));
+                        }}
+                        disabled={beforeToday}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="railPass.useRailPass"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Rail Pass</FormLabel>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={(e) => {
-                      setUsingRailPass(e);
-                      field.onChange(e);
-                    }}
-                  />
-                </FormControl>
-                <FormDescription>railpass description</FormDescription>
-                <FormMessage />
+                <div className="flex items-center space-x-4 rounded-md border p-4">
+                  <div className="flex-1 space-y-1">
+                    <FormLabel>Rail Pass</FormLabel>
+                    <FormDescription>Opt-in</FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={(e) => {
+                        setUsingRailPass(e);
+                        field.onChange(e);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </div>
               </FormItem>
             )}
           />
@@ -128,10 +200,17 @@ export default function JadeEstimateForm({ jadeEstimateMutate }: Props) {
               name="railPass.daysLeft"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Days Left</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Days Left" type="number" {...field} />
-                  </FormControl>
+                  <div className="flex items-center space-x-4 rounded-md border p-4">
+                    <div className="flex-1 space-y-1">
+                      <FormLabel>Days Left</FormLabel>
+                      <FormDescription>
+                        You'll receive 300 jades for renewing the subscription
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Input type="number" {...field} className="w-20" />
+                    </FormControl>
+                  </div>
                 </FormItem>
               )}
             />
@@ -141,15 +220,21 @@ export default function JadeEstimateForm({ jadeEstimateMutate }: Props) {
             name="battlePass"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Battle Pass</FormLabel>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <FormDescription>battlepass description</FormDescription>
-                <FormMessage />
+                <div className="flex items-center space-x-4 rounded-md border p-4">
+                  <div className="flex-1 space-y-1">
+                    <FormLabel>Nameless Honor</FormLabel>
+                    <FormDescription>
+                      Opt-in(the premium option)
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </div>
               </FormItem>
             )}
           />
@@ -158,124 +243,79 @@ export default function JadeEstimateForm({ jadeEstimateMutate }: Props) {
             name="level"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Trailblazer Level</FormLabel>
-                <FormControl>
-                  <Input placeholder="Level" type="number" {...field} />
-                </FormControl>
-                <FormDescription>
-                  You get more rewards the higher your Equilibrum level is
-                </FormDescription>
-                <FormMessage />
+                <div className="flex items-center space-x-4 rounded-md border p-4">
+                  <div className="flex-1 space-y-1">
+                    <FormLabel>Trailblazer Level</FormLabel>
+                    <FormDescription>
+                      You get more rewards the higher your Equilibrum level is
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Input type="number" {...field} className="w-20" />
+                  </FormControl>
+                  <FormMessage />
+                </div>
               </FormItem>
             )}
           />
-          <Tabs defaultValue="currentRolls">
-            <TabsList>
-              <TabsTrigger value="currentRolls">Rolls</TabsTrigger>
-              <TabsTrigger value="currentJades">Jades</TabsTrigger>
-            </TabsList>
-            <TabsContent value="currentRolls">
-              <FormField
-                control={form.control}
-                name="currentRolls"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Current rolls</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Current rolls"
-                        type="number"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Amount of rolls you currently possess
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </TabsContent>
-            <TabsContent value="currentJades">
-              <FormField
-                control={form.control}
-                name="currentJades"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Current jades</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Current jades"
-                        type="number"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Amount of jades you currently possess
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </TabsContent>
-          </Tabs>
-          <FormField
-            control={form.control}
-            name="untilDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Goal Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-[240px] pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {date ? format(date, "PPP") : <span>Pick a date</span>}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className="flex w-auto flex-col space-y-2 p-2"
-                    align="start"
-                  >
-                    <Select onValueChange={onSelectDatePreset}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent position="popper">
-                        <SelectItem value="0">Today</SelectItem>
-                        {query.data?.patches.map((e) => (
-                          <SelectItem value={e.dateStart} key={e.version}>
-                            {e.name} - {e.version}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
 
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={(e) => {
-                        setDate(e);
-                        field.onChange(dateToISO.parse(e));
-                      }}
-                      disabled={beforeToday}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormDescription>The date that you'll pull</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit">Calculate</Button>
+          <div className="flex items-center space-x-4 rounded-md border p-4">
+            <Tabs defaultValue="currentRolls" className="w-full">
+              <TabsList className="w-full">
+                <TabsTrigger value="currentRolls" className="w-full">
+                  Rolls
+                </TabsTrigger>
+                <TabsTrigger value="currentJades" className="w-full">
+                  Jades
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="currentRolls">
+                <FormField
+                  control={form.control}
+                  name="currentRolls"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex">
+                        <div className="flex-1 space-y-1">
+                          <FormLabel>Current rolls</FormLabel>
+                          <FormDescription>
+                            Amount of rolls you currently possess
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Input className="w-20" type="number" {...field} />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </TabsContent>
+              <TabsContent value="currentJades">
+                <FormField
+                  control={form.control}
+                  name="currentJades"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex">
+                        <div className="flex-1 space-y-1">
+                          <FormLabel>Current jades</FormLabel>
+                          <FormDescription>
+                            Amount of jades you currently possess
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Input className="w-20" type="number" {...field} />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </TabsContent>
+            </Tabs>
+          </div>
+          {submitButton && <Button type="submit">Calculate</Button>}
         </form>
       </Form>
     </>
