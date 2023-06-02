@@ -6,7 +6,7 @@ const nextConfig = {
         {
           source: "/:path*",
           destination:
-            `${process.env.WORKER_API}/:path*`,
+            `${process.env.NEXT_PUBLIC_WORKER_API}/:path*`,
         },
       ],
     };
