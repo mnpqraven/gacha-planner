@@ -14,7 +14,7 @@ export async function workerFetch<
     method: "POST" | "DELETE";
   }
 ): Promise<z.infer<TEndpoint["response"]>> {
-  const url = ENV.WORKER_API + endpoint.path;
+  const url = 'https://worker-dev.othi.dev/api/' + endpoint.path;
 
   // POST
   if (opt) {
@@ -24,13 +24,8 @@ export async function workerFetch<
       body,
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, PUT, POST",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept",
       },
       method,
-      mode: "cors",
     });
 
     if (res.ok) {
@@ -46,13 +41,8 @@ export async function workerFetch<
     const res = await fetch(url, {
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, PUT, POST",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept",
       },
       method: "GET",
-      mode: "cors",
     });
 
     if (res.ok) {
