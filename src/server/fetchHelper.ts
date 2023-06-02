@@ -22,7 +22,13 @@ export async function workerFetch<
     const body = JSON.stringify(payload);
     const res = await fetch(url, {
       body,
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, PUT, POST",
+        "Access-Control-Allow-Headers":
+          "Origin, X-Requested-With, Content-Type, Accept",
+      },
       method,
     });
 
@@ -37,7 +43,13 @@ export async function workerFetch<
   } else {
     // GET
     const res = await fetch(url, {
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, PUT, POST",
+        "Access-Control-Allow-Headers":
+          "Origin, X-Requested-With, Content-Type, Accept",
+      },
       method: "GET",
     });
 
