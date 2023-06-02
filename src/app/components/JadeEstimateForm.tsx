@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { workerFetch } from "@/server/fetchHelper";
 import { ENDPOINT } from "@/server/endpoints";
 import {
@@ -43,11 +43,12 @@ import { useEffect, useState } from "react";
 import { dateToISO, jadeEstimateFormSchema } from "./schemas";
 
 type Props = {
-  updateAvailableRoles: (amount: number) => void;
+  jadeEstimateMutate: (payload: z.infer<typeof jadeEstimateFormSchema>) => void;
 };
-export default function JadeEstimate({ updateAvailableRoles }: Props) {
+
+export default function JadeEstimateForm({ jadeEstimateMutate }: Props) {
   const defaultFormValues: z.infer<typeof jadeEstimateFormSchema> = {
-    untilDate: new Date(),
+    untilDate: dateToISO.parse(new Date()),
     battlePass: false,
     railPass: {
       useRailPass: false,
@@ -57,6 +58,7 @@ export default function JadeEstimate({ updateAvailableRoles }: Props) {
     currentRolls: 0,
   };
   const [usingRailPass, setUsingRailPass] = useState(false);
+  const [date, setDate] = useState<Date | undefined>(new Date());
 
   const form = useForm<z.infer<typeof jadeEstimateFormSchema>>({
     resolver: zodResolver(jadeEstimateFormSchema),
@@ -66,38 +68,26 @@ export default function JadeEstimate({ updateAvailableRoles }: Props) {
 
   const debounceOnChange = useDebounce(form.handleSubmit(onSubmit), 1000);
 
-  type Omitted = Omit<z.infer<typeof jadeEstimateFormSchema>, "untilDate">;
-  type Payload = {
-    untilDate: z.infer<typeof dateToISO>;
-  } & Omitted;
-
   const query = useQuery({
     queryKey: [ENDPOINT.listFuturePatchDate],
     queryFn: async () => await workerFetch(ENDPOINT.listFuturePatchDate),
   });
 
-  const jadeEstimateQuery = useMutation({
-    mutationFn: async (payload: Payload) =>
-      await workerFetch(ENDPOINT.jadeEstimate, {
-        payload,
-        method: "POST",
-      }),
-    onSuccess: (data) => updateAvailableRoles(data.rolls),
-  });
-
   // NOTE: bandaid to manually trigger date
   useEffect(() => {
     debounceOnChange(() => {});
-  }, [untilDateSubscription]);
+  }, [untilDateSubscription, date]);
 
   function onSubmit(values: z.infer<typeof jadeEstimateFormSchema>) {
-    const untilDate = dateToISO.parse(values.untilDate);
-    const payload: Payload = { ...values, untilDate };
-    console.warn("onSubmit", payload);
-    jadeEstimateQuery.mutate(payload);
+    const untilDate = dateToISO.parse(date);
+    const payload: z.infer<typeof jadeEstimateFormSchema> = {
+      ...values,
+      untilDate,
+    };
+    // console.warn("onSubmit", payload);
+    jadeEstimateMutate(payload);
   }
 
-  const [date, setDate] = useState<Date | undefined>(new Date());
   function onSelectDatePreset(date: string) {
     // today
     if (date === "0") setDate(new Date());
@@ -245,11 +235,7 @@ export default function JadeEstimate({ updateAvailableRoles }: Props) {
                           !field.value && "text-muted-foreground"
                         )}
                       >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
+                        {date ? format(date, "PPP") : <span>Pick a date</span>}
                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                       </Button>
                     </FormControl>
@@ -274,8 +260,11 @@ export default function JadeEstimate({ updateAvailableRoles }: Props) {
 
                     <Calendar
                       mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
+                      selected={date}
+                      onSelect={(e) => {
+                        setDate(e);
+                        field.onChange(e);
+                      }}
                       disabled={beforeToday}
                       initialFocus
                     />
@@ -289,21 +278,6 @@ export default function JadeEstimate({ updateAvailableRoles }: Props) {
           <Button type="submit">Calculate</Button>
         </form>
       </Form>
-      {jadeEstimateQuery.data && (
-        <>
-          {jadeEstimateQuery.data.sources.map((e, index) => (
-            <div key={index}>
-              From {e.source}:{" "}
-              {e.jades_amount ? `${e.jades_amount} Jades` : null}
-              {e.rolls_amount ? `${e.rolls_amount} Special passes` : null}
-            </div>
-          ))}
-          <p>
-            <b>Total jades: {jadeEstimateQuery.data.total_jades}</b> <br />
-            <b>Total rolls: {jadeEstimateQuery.data.rolls}</b>
-          </p>
-        </>
-      )}
     </>
   );
 }

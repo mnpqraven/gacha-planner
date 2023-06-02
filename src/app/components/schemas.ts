@@ -1,8 +1,10 @@
 import * as z from "zod";
 
 export const jadeEstimateFormSchema = z.object({
-  untilDate: z.date({
-    required_error: "a date is required",
+  untilDate: z.object({
+    day: z.number(),
+    month: z.number(),
+    year: z.number(),
   }),
   battlePass: z.boolean(),
   railPass: z.object({

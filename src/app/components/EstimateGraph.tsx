@@ -1,5 +1,3 @@
-"use client";
-
 import { EChartsOption } from "echarts";
 import { ReactECharts } from "./ReactEcharts";
 import { workerFetch } from "@/server/fetchHelper";
@@ -8,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ENDPOINT } from "@/server/endpoints";
 
 type Props = {
-  rolls: number;
+  rolls: number | undefined;
   updateRolls: (to: number) => void;
 };
 const EstimateGraph = ({ rolls, updateRolls }: Props) => {
@@ -20,7 +18,7 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
     queryFn: async () =>
       await workerFetch(ENDPOINT.probabilityRate, {
         payload: {
-          rolls,
+          rolls: rolls ?? 0,
           nextGuaranteed,
           simulateResult: false,
         },
@@ -89,6 +87,8 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
       valueFormatter: (value) => `${value} %`,
     },
   };
+
+  if (!rolls) return null;
   return (
     <>
       <label>
