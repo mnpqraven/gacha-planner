@@ -23,7 +23,9 @@ export async function workerFetch<
     const body = JSON.stringify(payload);
     const res = await fetch(url, {
       body,
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       method,
     });
 
@@ -38,7 +40,9 @@ export async function workerFetch<
   } else {
     // GET
     const res = await fetch(url, {
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       method: "GET",
     });
 

@@ -263,7 +263,7 @@ export default function JadeEstimateForm({ jadeEstimateMutate }: Props) {
                       selected={date}
                       onSelect={(e) => {
                         setDate(e);
-                        field.onChange(e);
+                        field.onChange(dateToISO.parse(e));
                       }}
                       disabled={beforeToday}
                       initialFocus
