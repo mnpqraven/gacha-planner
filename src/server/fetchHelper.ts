@@ -30,6 +30,7 @@ export async function workerFetch<
           "Origin, X-Requested-With, Content-Type, Accept",
       },
       method,
+      mode: "cors",
     });
 
     if (res.ok) {
@@ -51,6 +52,7 @@ export async function workerFetch<
           "Origin, X-Requested-With, Content-Type, Accept",
       },
       method: "GET",
+      mode: "cors",
     });
 
     if (res.ok) {
