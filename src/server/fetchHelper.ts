@@ -14,7 +14,8 @@ export async function workerFetch<
     method: "POST" | "DELETE";
   }
 ): Promise<z.infer<TEndpoint["response"]>> {
-  const url = ENV.WORKER_API + endpoint.path;
+  // const url = ENV.WORKER_API + endpoint.path;
+  const url = endpoint.path;
 
   // POST
   if (opt) {
