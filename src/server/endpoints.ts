@@ -6,7 +6,7 @@ export const ENV = {
 
 export const ENDPOINT = {
   jadeEstimate: {
-    path: "/api/honkai/jade_estimate",
+    path: "/honkai/jade_estimate",
     payload: z.object({
       untilDate: z.date().transform((e) => ({
         day: e.getDate(),
@@ -70,7 +70,7 @@ export const ENDPOINT = {
     }),
   },
   probabilityRate: {
-    path: "/api/honkai/probability_rate",
+    path: "/honkai/probability_rate",
     payload: z.object({
       rolls: z.number(),
       nextGuaranteed: z.boolean(),
@@ -88,7 +88,7 @@ export const ENDPOINT = {
     }),
   },
   listFuturePatchDate: {
-    path: "/api/honkai/list_future_patch_date",
+    path: "/honkai/list_future_patch_date",
     payload: undefined,
     response: z.object({
       patches: z
