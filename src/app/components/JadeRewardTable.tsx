@@ -1,4 +1,4 @@
-import { ENDPOINT } from "@/server/endpoints";
+import ENDPOINT from "@/server/endpoints";
 import * as z from "zod";
 import {
   Table,
@@ -9,11 +9,14 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/Table";
+import { useQuery } from "@tanstack/react-query";
 
 type Props = {
   data: z.infer<typeof ENDPOINT.jadeEstimate.response> | undefined;
 };
 const JadeRewardTable = ({ data }: Props) => {
+  // FIX: with of table when there's no data is shorter,
+  // leading to sudden component movement
   return (
     <Table>
       <TableCaption>Breakdown of where you're getting the jades</TableCaption>

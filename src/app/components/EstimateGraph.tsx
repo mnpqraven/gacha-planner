@@ -3,11 +3,11 @@ import { ReactECharts } from "./ReactEcharts";
 import { workerFetch } from "@/server/fetchHelper";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ENDPOINT } from "@/server/endpoints";
+import ENDPOINT from "@/server/endpoints";
 import { Input } from "./ui/Input";
 import { Switch } from "./ui/Switch";
 import { Label } from "./ui/Label";
-import { Separator } from "./ui/separator";
+import { Separator } from "./ui/Separator";
 
 type Props = {
   rolls: number | undefined;
@@ -102,7 +102,6 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
             type="number"
             onChange={(e) => updateRolls(Number(e.target.value))}
             defaultValue={rolls ?? 0}
-            style={{ color: "black" }}
           />
         </div>
         <div className="flex flex-col gap-2">

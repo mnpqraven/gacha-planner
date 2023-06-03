@@ -4,7 +4,7 @@ export const ENV = {
   WORKER_API: process.env.NEXT_PUBLIC_WORKER_API,
 };
 
-export const ENDPOINT = {
+const ENDPOINT = {
   jadeEstimate: {
     path: "/honkai/jade_estimate",
     payload: z.object({
@@ -103,3 +103,5 @@ export const ENDPOINT = {
   },
 } as const;
 export type EndpointValue = (typeof ENDPOINT)[keyof typeof ENDPOINT]["path"];
+
+export default ENDPOINT

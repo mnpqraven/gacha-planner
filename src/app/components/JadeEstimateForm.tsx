@@ -7,7 +7,7 @@ import { CalendarIcon } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useQuery } from "@tanstack/react-query";
 import { workerFetch } from "@/server/fetchHelper";
-import { ENDPOINT } from "@/server/endpoints";
+import ENDPOINT from "@/server/endpoints";
 import {
   Form,
   FormControl,
@@ -41,14 +41,17 @@ import {
 import { Calendar } from "../components/ui/Calendar";
 import { useEffect, useState } from "react";
 import { dateToISO, jadeEstimateFormSchema } from "./schemas";
+import { placeholderTableData } from "./tableData";
+import { Separator } from "./ui/Separator";
 
 type Props = {
-  jadeEstimateMutate: (payload: z.infer<typeof jadeEstimateFormSchema>) => void;
+  // jadeEstimateMutate: (payload: z.infer<typeof jadeEstimateFormSchema>) => void;
   submitButton?: boolean;
+  updateTable: (to: z.infer<typeof ENDPOINT.jadeEstimate.response>) => void;
 };
 
 export default function JadeEstimateForm({
-  jadeEstimateMutate,
+  updateTable,
   submitButton = false,
 }: Props) {
   const defaultFormValues: z.infer<typeof jadeEstimateFormSchema> = {
@@ -82,14 +85,28 @@ export default function JadeEstimateForm({
     debounceOnChange(() => {});
   }, [untilDateSubscription, date]);
 
+  const [payload, setPayload] = useState(defaultFormValues);
+
+  const _jadeEstimateQuery = useQuery({
+    queryKey: ["jadeEstimate", payload],
+    queryFn: async () =>
+      await workerFetch(ENDPOINT.jadeEstimate, {
+        payload,
+        method: "POST",
+      }),
+    onSuccess: updateTable,
+    placeholderData: placeholderTableData,
+  });
+
   function onSubmit(values: z.infer<typeof jadeEstimateFormSchema>) {
+    console.log("onSubmit");
     const untilDate = dateToISO.parse(date);
     const payload: z.infer<typeof jadeEstimateFormSchema> = {
       ...values,
       untilDate,
     };
-    // console.warn("onSubmit", payload);
-    jadeEstimateMutate(payload);
+    setPayload(payload);
+    // jadeEstimateMutate(payload);
   }
 
   function onSelectDatePreset(date: string) {
@@ -170,51 +187,57 @@ export default function JadeEstimateForm({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="railPass.useRailPass"
-            render={({ field }) => (
-              <FormItem>
-                <div className="flex items-center space-x-4 rounded-md border p-4">
-                  <div className="flex-1 space-y-1">
-                    <FormLabel>Rail Pass</FormLabel>
-                    <FormDescription>Opt-in</FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={(e) => {
-                        setUsingRailPass(e);
-                        field.onChange(e);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-          {usingRailPass && (
+          <div className="rounded-md border p-4">
             <FormField
               control={form.control}
-              name="railPass.daysLeft"
+              name="railPass.useRailPass"
               render={({ field }) => (
                 <FormItem>
-                  <div className="flex items-center space-x-4 rounded-md border p-4">
-                    <div className="flex-1 space-y-1">
-                      <FormLabel>Days Left</FormLabel>
-                      <FormDescription>
-                        You'll receive 300 jades for renewing the subscription
-                      </FormDescription>
+                  <div className="flex items-center">
+                    <div className="flex-1">
+                      <FormLabel>Rail Pass</FormLabel>
+                      <FormDescription>Opt-in</FormDescription>
                     </div>
                     <FormControl>
-                      <Input type="number" {...field} className="w-20" />
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={(e) => {
+                          setUsingRailPass(e);
+                          field.onChange(e);
+                        }}
+                      />
                     </FormControl>
                   </div>
+                  <FormMessage />
                 </FormItem>
               )}
             />
-          )}
+            {usingRailPass && (
+              <>
+                <Separator className="my-4" />
+                <FormField
+                  control={form.control}
+                  name="railPass.daysLeft"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center">
+                        <div className="flex-1">
+                          <FormLabel>Days Left</FormLabel>
+                          <FormDescription>
+                            You'll receive 300 jades for renewing the
+                            subscription
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Input type="number" {...field} className="w-20" />
+                        </FormControl>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
+          </div>
           <FormField
             control={form.control}
             name="battlePass"

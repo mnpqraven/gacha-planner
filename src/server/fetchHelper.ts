@@ -1,7 +1,7 @@
 "use client";
 
 import * as z from "zod";
-import { ENDPOINT, ENV } from "./endpoints";
+import ENDPOINT, { ENV } from "./endpoints";
 
 export async function workerFetch<
   TEndpoint extends (typeof ENDPOINT)[keyof typeof ENDPOINT]

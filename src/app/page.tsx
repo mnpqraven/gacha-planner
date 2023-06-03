@@ -2,13 +2,11 @@
 
 import * as z from "zod";
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { workerFetch } from "@/server/fetchHelper";
-import { ENDPOINT } from "@/server/endpoints";
-import { jadeEstimateFormSchema } from "./components/schemas";
+import ENDPOINT from "@/server/endpoints";
 import EstimateGraph from "./components/EstimateGraph";
 import JadeEstimateForm from "./components/JadeEstimateForm";
 import JadeRewardTable from "./components/JadeRewardTable";
+import { placeholderTableData } from "./components/tableData";
 
 export default function Home() {
   const [rolls, setRolls] = useState<number | undefined>(undefined);
@@ -17,20 +15,23 @@ export default function Home() {
     setRolls(amount);
   }
 
-  const jadeEstimateQuery = useMutation({
-    mutationFn: async (payload: z.infer<typeof jadeEstimateFormSchema>) =>
-      await workerFetch(ENDPOINT.jadeEstimate, { payload, method: "POST" }),
-    onSuccess: (data) => setRolls(data.rolls),
-  });
+  const [tableData, setTableData] =
+    useState<z.infer<typeof ENDPOINT.jadeEstimate.response>>(
+      placeholderTableData
+    );
+
+  function updateTableData(to: z.infer<typeof ENDPOINT.jadeEstimate.response>) {
+    setTableData(to);
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between">
-      <div className="flex gap-4 mt-4">
-        <div className="">
-          <JadeEstimateForm jadeEstimateMutate={jadeEstimateQuery.mutate} />
+      <div className="flex w-screen gap-4 mt-4 justify-evenly">
+        <div className="w-2/5">
+          <JadeEstimateForm updateTable={updateTableData} />
         </div>
-        <div className="">
-          <JadeRewardTable data={jadeEstimateQuery.data} />
+        <div className="w-2/5">
+          <JadeRewardTable data={tableData} />
         </div>
       </div>
       <EstimateGraph rolls={rolls} updateRolls={updateAvailableRolls} />
