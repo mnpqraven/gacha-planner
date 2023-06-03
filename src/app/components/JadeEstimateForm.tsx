@@ -61,7 +61,7 @@ export default function JadeEstimateForm({
       useRailPass: false,
       daysLeft: 30,
     },
-    level: 50,
+    eq: "Zero",
     currentRolls: 0,
   };
   const [usingRailPass, setUsingRailPass] = useState(false);
@@ -263,19 +263,35 @@ export default function JadeEstimateForm({
           />
           <FormField
             control={form.control}
-            name="level"
+            name="eq"
             render={({ field }) => (
               <FormItem>
                 <div className="flex items-center space-x-4 rounded-md border p-4">
                   <div className="flex-1 space-y-1">
-                    <FormLabel>Trailblazer Level</FormLabel>
+                    <FormLabel>Equilibrum Level</FormLabel>
                     <FormDescription>
                       You get more rewards the higher your Equilibrum level is
                     </FormDescription>
                   </div>
-                  <FormControl>
-                    <Input type="number" {...field} className="w-20" />
-                  </FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-fit">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Zero">0 (TL 20-)</SelectItem>
+                      <SelectItem value="One">1 (TL 20+)</SelectItem>
+                      <SelectItem value="Two">2 (TL 30+)</SelectItem>
+                      <SelectItem value="Three">3 (TL 40+)</SelectItem>
+                      <SelectItem value="Four">4 (TL 50+)</SelectItem>
+                      <SelectItem value="Five">5 (TL 60+)</SelectItem>
+                      <SelectItem value="Six">6 (TL 65+)</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </div>
               </FormItem>
