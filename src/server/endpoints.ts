@@ -24,16 +24,7 @@ const ENDPOINT = {
           })
         ),
       }),
-      level: z.preprocess(
-        (args) => (args === "" ? undefined : args),
-        z.coerce
-          .number({
-            invalid_type_error: "Must be a number",
-            required_error: "Required field",
-          })
-          .positive()
-          .max(75)
-      ),
+      eq: z.enum(['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six']),
       currentRolls: z.preprocess(
         (args) => (args === "" ? undefined : args),
         z.coerce
