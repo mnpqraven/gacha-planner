@@ -1,13 +1,22 @@
-import { EChartsOption } from "echarts";
+import { EChartsOption, SeriesOption } from "echarts";
 import { ReactECharts } from "./ReactEcharts";
 import { workerFetch } from "@/server/fetchHelper";
-import { useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ENDPOINT from "@/server/endpoints";
 import { Input } from "./ui/Input";
 import { Switch } from "./ui/Switch";
 import { Label } from "./ui/Label";
 import { Separator } from "./ui/Separator";
+import * as z from "zod";
+import { useTheme } from "next-themes";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/Select";
 
 type Props = {
   rolls: number | undefined;
@@ -15,65 +24,86 @@ type Props = {
 };
 const EstimateGraph = ({ rolls, updateRolls }: Props) => {
   const [nextGuaranteed, setNextGuaranteed] = useState(false);
+  const [lastSSR, setLastSSR] = useState(0);
+  const [currentEidolon, setCurrentEidolon] = useState(-1);
+  const { theme } = useTheme();
 
-  const { data: probabilityRate } = useQuery({
-    queryKey: [ENDPOINT.probabilityRate, rolls],
+  const payload: z.infer<(typeof ENDPOINT)["probabilityRate"]["payload"]> = {
+    pulls: rolls ?? 0,
+    nextGuaranteed,
+    banner: "SSR",
+    currentEidolon,
+    enpitomizedPity: null,
+    pity: lastSSR,
+  };
+  const { data } = useQuery({
+    queryKey: [ENDPOINT.probabilityRate, payload],
     queryFn: async () =>
       await workerFetch(ENDPOINT.probabilityRate, {
-        payload: {
-          rolls: rolls ?? 0,
-          nextGuaranteed,
-          simulateResult: false,
-        },
+        payload,
         method: "POST",
       }),
   });
+
+  const probabilityRate: NonNullable<typeof data>["data"] = data
+    ? structuredClone(data).data.map((eidolonsByPull, index) => {
+        // DOGSHIT LANGUAGE AND ITS SHALLOW CLONING
+        const newEidsByPull = structuredClone(eidolonsByPull);
+        // appends eidolon pull if there's less than 7 entries
+        Array.from(Array(7).keys()).forEach((eidolonNumber) => {
+          const find = newEidsByPull.find((e) => e.eidolon == eidolonNumber);
+          if (!find) newEidsByPull.push({ eidolon: eidolonNumber, rate: 0 });
+        });
+
+        newEidsByPull.forEach((cell) => {
+          // gets cells with higher ei count
+          const higherEidCells = eidolonsByPull.filter(
+            (e) => e.eidolon > cell.eidolon
+          );
+          // append to current cell its rate sum
+          cell.rate += higherEidCells
+            .map((e) => e.rate)
+            .reduce((a, b) => a + b, 0);
+          if (cell.rate > 1) cell.rate = 1;
+        });
+        if (index == 360) {
+          console.log("dev", newEidsByPull);
+        }
+        return newEidsByPull;
+      })
+    : [];
+
+  function updateCurrentEidolon(value: string) {
+    setCurrentEidolon(Number(value));
+  }
+  function onChangeRolls(e: ChangeEvent<HTMLInputElement>) {
+    const num = Number(e.target.value);
+    if (num >= 0) updateRolls(num);
+  }
+  function updateLastSSR(e: ChangeEvent<HTMLInputElement>) {
+    const num = Number(e.target.value);
+    if (num >= 0 && num < 90) setLastSSR(num);
+  }
 
   const chartOptions: EChartsOption = {
     xAxis: {
       type: "category",
       boundaryGap: false,
-      data: probabilityRate?.rates.map((e) => e.draw_number),
+      data: data?.data.map((e, index) => index),
     },
     yAxis: {
       axisLabel: {
         formatter: (params: string) => `${params} %`,
       },
+      max: 100,
     },
-    series: [
-      {
-        name: "E0",
-        type: "line",
-        smooth: true,
-        lineStyle: { width: 0 },
-        showSymbol: false,
-        areaStyle: {
-          opacity: 0.8,
-          color: {
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              {
-                offset: 0,
-                color: "rgb(255, 191, 0)",
-              },
-              {
-                offset: 1,
-                color: "rgb(224, 62, 76)",
-              },
-            ],
-          },
-        },
-        emphasis: {
-          focus: "series",
-        },
-        data: probabilityRate?.rates.map((e) =>
-          Number(e.percent * 100).toFixed(2)
-        ),
-      },
-    ],
+    legend: {
+      show: true,
+      textStyle: { color: theme === "light" ? "black" : "white" },
+    },
+    series: Array.from(range(currentEidolon + 1, 6, 1)).map((eidolon) =>
+      createChartSeries(eidolon, probabilityRate)
+    ),
     color: ["#80FFA5", "#00DDFF", "#37A2FF", "#FF0087", "#FFBF00"],
     tooltip: {
       trigger: "axis",
@@ -94,25 +124,82 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
   return (
     <>
       <Separator className="my-4" />
-      <div className="flex gap-2">
+      <div className="flex gap-4 py-4">
         <div className="flex flex-col gap-2">
           <Label htmlFor="rolls">Total Rolls</Label>
           <Input
             id="rolls"
             type="number"
-            onChange={(e) => updateRolls(Number(e.target.value))}
-            defaultValue={rolls ?? 0}
+            onChange={onChangeRolls}
+            value={rolls ?? 0}
+          />
+          <Label htmlFor="lastSSR">Rolls since last SSR</Label>
+          <Input
+            id="lastSSR"
+            type="number"
+            onChange={updateLastSSR}
+            value={lastSSR}
           />
         </div>
         <div className="flex flex-col gap-2">
+          <Label htmlFor="currentEidolon">Current Eidolon</Label>
+          <Select onValueChange={updateCurrentEidolon} defaultValue="-1">
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent position="popper">
+              <SelectItem value="-1">Not Owned</SelectItem>
+              {Array.from(range(0, 6, 1)).map((e) => (
+                <SelectItem value={String(e)} key={e}>
+                  Eidolon {e}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Label htmlFor="isGuaranteed">Next Guaranteed</Label>
           <div className="flex grow items-center">
             <Switch onCheckedChange={setNextGuaranteed} id="isGuaranteed" />
           </div>
         </div>
       </div>
-      <ReactECharts option={chartOptions} style={{ height: "700px" }} />
+      <ReactECharts
+        option={chartOptions}
+        style={{ height: "700px" }}
+        settings={{ replaceMerge: ["series"] }}
+      />
     </>
   );
 };
+
+function createChartSeries(
+  eidolon: number,
+  queryData: { eidolon: number; rate: number }[][]
+): SeriesOption {
+  const data = queryData.map((eidsInRoll) => {
+    const currentEid = eidsInRoll.find((e) => e.eidolon == eidolon)?.rate ?? 0;
+    return Number(currentEid * 100).toFixed(2);
+  });
+  const opt: EChartsOption["series"] = {
+    name: `E${eidolon}`,
+    type: "line",
+    smooth: true,
+    lineStyle: { width: 0 },
+    showSymbol: false,
+    areaStyle: {
+      opacity: 0.8,
+    },
+    emphasis: {
+      focus: "series",
+    },
+    data: data,
+  };
+  return opt;
+}
+
+function* range(start: number, end: number, step: number) {
+  while (start <= end) {
+    yield start;
+    start += step;
+  }
+}
 export default EstimateGraph;
