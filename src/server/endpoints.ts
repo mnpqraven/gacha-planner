@@ -63,18 +63,21 @@ const ENDPOINT = {
   probabilityRate: {
     path: "/honkai/probability_rate",
     payload: z.object({
-      rolls: z.number(),
+      currentEidolon: z.number(),
+      pity: z.number(),
+      pulls: z.number(),
       nextGuaranteed: z.boolean(),
-      simulateResult: z.boolean(),
+      enpitomizedPity: z.number().nullable(),
+      banner: z.enum(['SSR', 'SR', 'LC']),
     }),
     response: z.object({
-      rolls: z.number(),
-      rates: z
+      roll_budget: z.number(),
+      data: z
         .object({
-          draw_number: z.number(),
-          percent: z.number(),
           eidolon: z.number(),
+          rate: z.number()
         })
+        .array()
         .array(),
     }),
   },
