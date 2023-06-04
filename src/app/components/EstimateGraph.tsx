@@ -146,7 +146,7 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
             </SelectTrigger>
             <SelectContent position="popper">
               <SelectItem value="-1">Not Owned</SelectItem>
-              {Array.from(range(0, 6, 1)).map((e) => (
+              {Array.from(range(0, 5, 1)).map((e) => (
                 <SelectItem value={String(e)} key={e}>
                   Eidolon {e}
                 </SelectItem>
