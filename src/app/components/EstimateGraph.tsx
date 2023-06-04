@@ -66,9 +66,6 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
             .reduce((a, b) => a + b, 0);
           if (cell.rate > 1) cell.rate = 1;
         });
-        if (index == 360) {
-          console.log("dev", newEidsByPull);
-        }
         return newEidsByPull;
       })
     : [];
