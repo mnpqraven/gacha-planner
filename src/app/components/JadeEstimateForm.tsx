@@ -43,9 +43,9 @@ import { useEffect, useState } from "react";
 import { dateToISO, jadeEstimateFormSchema } from "./schemas";
 import { placeholderTableData } from "./tableData";
 import { Separator } from "./ui/Separator";
+import { useFuturePatchDateList } from "@/hooks/queries/useFuturePatchDate";
 
 type Props = {
-  // jadeEstimateMutate: (payload: z.infer<typeof jadeEstimateFormSchema>) => void;
   submitButton?: boolean;
   updateTable: (to: z.infer<typeof ENDPOINT.jadeEstimate.response>) => void;
 };
@@ -67,19 +67,15 @@ export default function JadeEstimateForm({
   };
   const [usingRailPass, setUsingRailPass] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const { futurePatchDateList } = useFuturePatchDateList();
 
+  // form setup
   const form = useForm<z.infer<typeof jadeEstimateFormSchema>>({
     resolver: zodResolver(jadeEstimateFormSchema),
     defaultValues: defaultFormValues,
   });
-  const untilDateSubscription = form.watch("untilDate");
-
   const debounceOnChange = useDebounce(form.handleSubmit(onSubmit), 1000);
-
-  const query = useQuery({
-    queryKey: [ENDPOINT.listFuturePatchDate],
-    queryFn: async () => await workerFetch(ENDPOINT.listFuturePatchDate),
-  });
+  const untilDateSubscription = form.watch("untilDate");
 
   // NOTE: bandaid to manually trigger date
   useEffect(() => {
@@ -88,7 +84,7 @@ export default function JadeEstimateForm({
 
   const [payload, setPayload] = useState(defaultFormValues);
 
-  const _jadeEstimateQuery = useQuery({
+  useQuery({
     queryKey: ["jadeEstimate", payload],
     queryFn: async () =>
       await workerFetch(ENDPOINT.jadeEstimate, {
@@ -136,7 +132,7 @@ export default function JadeEstimateForm({
                     <FormDescription>The date that you'll pull</FormDescription>
                     <FormMessage />
                   </div>
-                  <div>
+                  <div className="flex flex-col md:flex-row gap-4">
                     <FormField
                       control={form.control}
                       name="server"
@@ -159,57 +155,57 @@ export default function JadeEstimateForm({
                         </FormItem>
                       )}
                     />
-                  </div>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-fit pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {date ? (
-                            format(date, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      className="flex w-auto flex-col space-y-2 p-2"
-                      align="start"
-                    >
-                      <Select onValueChange={onSelectDatePreset}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent position="popper">
-                          <SelectItem value="0">Today</SelectItem>
-                          {query.data?.patches.map((e) => (
-                            <SelectItem value={e.dateStart} key={e.version}>
-                              {e.name} - {e.version}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-fit pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {date ? (
+                              format(date, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        className="flex w-auto flex-col space-y-2 p-2"
+                        align="start"
+                      >
+                        <Select onValueChange={onSelectDatePreset}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select" />
+                          </SelectTrigger>
+                          <SelectContent position="popper">
+                            <SelectItem value="0">Today</SelectItem>
+                            {futurePatchDateList?.patches.map((e) => (
+                              <SelectItem value={e.dateStart} key={e.version}>
+                                {e.name} - {e.version}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
 
-                      <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={(e) => {
-                          setDate(e);
-                          if (e) field.onChange(dateToISO.parse(e));
-                          else field.onChange(undefined);
-                        }}
-                        disabled={beforeToday}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
+                        <Calendar
+                          mode="single"
+                          selected={date}
+                          onSelect={(e) => {
+                            setDate(e);
+                            if (e) field.onChange(dateToISO.parse(e));
+                            else field.onChange(undefined);
+                          }}
+                          disabled={beforeToday}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </div>
               </FormItem>
             )}
