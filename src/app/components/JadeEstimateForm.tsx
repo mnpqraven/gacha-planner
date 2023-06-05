@@ -55,6 +55,7 @@ export default function JadeEstimateForm({
   submitButton = false,
 }: Props) {
   const defaultFormValues: z.infer<typeof jadeEstimateFormSchema> = {
+    server: 'America',
     untilDate: dateToISO.parse(new Date()),
     battlePass: false,
     railPass: {
@@ -132,6 +133,30 @@ export default function JadeEstimateForm({
                   <div className="flex-1 space-y-1">
                     <FormLabel>Goal Date</FormLabel>
                     <FormDescription>The date that you'll pull</FormDescription>
+                  </div>
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name="server"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="Asia">Asia</SelectItem>
+                              <SelectItem value="America">America</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormItem>
+                      )}
+                    />
                   </div>
                   <Popover>
                     <PopoverTrigger asChild>

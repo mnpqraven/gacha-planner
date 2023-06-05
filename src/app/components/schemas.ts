@@ -1,6 +1,7 @@
 import * as z from "zod";
 
 export const jadeEstimateFormSchema = z.object({
+  server: z.enum(['Asia', 'America']),
   untilDate: z.object({
     day: z.number(),
     month: z.number(),
