@@ -46,7 +46,7 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
   });
 
   const probabilityRate: NonNullable<typeof data>["data"] = data
-    ? structuredClone(data).data.map((eidolonsByPull, index) => {
+    ? structuredClone(data).data.map((eidolonsByPull) => {
         // DOGSHIT LANGUAGE AND ITS SHALLOW CLONING
         const newEidsByPull = structuredClone(eidolonsByPull);
         // appends eidolon pull if there's less than 7 entries
@@ -55,6 +55,8 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
           if (!find) newEidsByPull.push({ eidolon: eidolonNumber, rate: 0 });
         });
 
+        // transform separate rate of each eidolon into accumulated rate for
+        // lower eidolons
         newEidsByPull.forEach((cell) => {
           // gets cells with higher ei count
           const higherEidCells = eidolonsByPull.filter(
@@ -64,7 +66,9 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
           cell.rate += higherEidCells
             .map((e) => e.rate)
             .reduce((a, b) => a + b, 0);
+          // ceiling
           if (cell.rate > 1) cell.rate = 1;
+          if (cell.rate < 0) cell.rate = 0;
         });
         return newEidsByPull;
       })
@@ -86,7 +90,7 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
     xAxis: {
       type: "category",
       boundaryGap: false,
-      data: data?.data.map((e, index) => index),
+      data: data?.data.map((_, index) => index),
     },
     yAxis: {
       axisLabel: {
@@ -101,7 +105,16 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
     series: Array.from(range(currentEidolon + 1, 6, 1)).map((eidolon) =>
       createChartSeries(eidolon, probabilityRate)
     ),
-    color: ["#80FFA5", "#00DDFF", "#37A2FF", "#FF0087", "#FFBF00"],
+    color: [
+      "#caffbf",
+      "#9bf6ff",
+      "#a0c4ff",
+      "#bdb2ff",
+      "#ffc6ff",
+      "#fdffb6",
+      // "#ffd6a5",
+      "#ffadad"
+    ],
     tooltip: {
       trigger: "axis",
       axisPointer: {
@@ -180,13 +193,12 @@ function createChartSeries(
     name: `E${eidolon}`,
     type: "line",
     smooth: true,
-    lineStyle: { width: 0 },
     showSymbol: false,
     areaStyle: {
-      opacity: 0.8,
+      opacity: 0.5,
     },
     emphasis: {
-      focus: "series",
+      disabled: true,
     },
     data: data,
   };

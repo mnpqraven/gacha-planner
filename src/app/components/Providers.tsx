@@ -7,7 +7,14 @@ type RootProps = {
   children: React.ReactNode;
 };
 export default function RQProvider({ children }: RootProps) {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: { refetchOnWindowFocus: false },
+        },
+      })
+  );
   return (
     <ThemeProvider attribute="class">
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
