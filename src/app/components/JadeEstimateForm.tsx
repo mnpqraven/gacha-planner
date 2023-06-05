@@ -43,9 +43,9 @@ import { useEffect, useState } from "react";
 import { dateToISO, jadeEstimateFormSchema } from "./schemas";
 import { placeholderTableData } from "./tableData";
 import { Separator } from "./ui/Separator";
+import { useFuturePatchDateList } from "@/hooks/queries/useFuturePatchDate";
 
 type Props = {
-  // jadeEstimateMutate: (payload: z.infer<typeof jadeEstimateFormSchema>) => void;
   submitButton?: boolean;
   updateTable: (to: z.infer<typeof ENDPOINT.jadeEstimate.response>) => void;
 };
@@ -67,19 +67,15 @@ export default function JadeEstimateForm({
   };
   const [usingRailPass, setUsingRailPass] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const { futurePatchDateList } = useFuturePatchDateList();
 
+  // form setup
   const form = useForm<z.infer<typeof jadeEstimateFormSchema>>({
     resolver: zodResolver(jadeEstimateFormSchema),
     defaultValues: defaultFormValues,
   });
-  const untilDateSubscription = form.watch("untilDate");
-
   const debounceOnChange = useDebounce(form.handleSubmit(onSubmit), 1000);
-
-  const query = useQuery({
-    queryKey: [ENDPOINT.listFuturePatchDate],
-    queryFn: async () => await workerFetch(ENDPOINT.listFuturePatchDate),
-  });
+  const untilDateSubscription = form.watch("untilDate");
 
   // NOTE: bandaid to manually trigger date
   useEffect(() => {
@@ -88,7 +84,7 @@ export default function JadeEstimateForm({
 
   const [payload, setPayload] = useState(defaultFormValues);
 
-  const _jadeEstimateQuery = useQuery({
+  useQuery({
     queryKey: ["jadeEstimate", payload],
     queryFn: async () =>
       await workerFetch(ENDPOINT.jadeEstimate, {
@@ -189,7 +185,7 @@ export default function JadeEstimateForm({
                         </SelectTrigger>
                         <SelectContent position="popper">
                           <SelectItem value="0">Today</SelectItem>
-                          {query.data?.patches.map((e) => (
+                          {futurePatchDateList?.patches.map((e) => (
                             <SelectItem value={e.dateStart} key={e.version}>
                               {e.name} - {e.version}
                             </SelectItem>

@@ -1,9 +1,5 @@
 import * as z from "zod";
 
-export const ENV = {
-  WORKER_API: process.env.NEXT_PUBLIC_WORKER_API,
-};
-
 const ENDPOINT = {
   jadeEstimate: {
     path: "/honkai/jade_estimate",
@@ -24,7 +20,7 @@ const ENDPOINT = {
           })
         ),
       }),
-      eq: z.enum(['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six']),
+      eq: z.enum(["Zero", "One", "Two", "Three", "Four", "Five", "Six"]),
       currentRolls: z.preprocess(
         (args) => (args === "" ? undefined : args),
         z.coerce
@@ -68,14 +64,14 @@ const ENDPOINT = {
       pulls: z.number(),
       nextGuaranteed: z.boolean(),
       enpitomizedPity: z.number().nullable(),
-      banner: z.enum(['SSR', 'SR', 'LC']),
+      banner: z.enum(["SSR", "SR", "LC"]),
     }),
     response: z.object({
       roll_budget: z.number(),
       data: z
         .object({
           eidolon: z.number(),
-          rate: z.number()
+          rate: z.number(),
         })
         .array()
         .array(),
@@ -95,7 +91,24 @@ const ENDPOINT = {
         .array(),
     }),
   },
+  gachaBannerList: {
+    path: "/honkai/gacha_banner_list",
+    payload: undefined,
+    response: z.array(
+      z.object({
+        bannerName: z.string(),
+        banner: z.number(),
+        guaranteed: z.number(),
+        guaranteedPity: z.number().nullable(),
+        minConst: z.number(),
+        maxConst: z.number(),
+        maxPity: z.number(),
+        constPrefix: z.string(),
+        bannerType: z.enum(['SSR', 'SR', 'LC'])
+      })
+    ),
+  },
 } as const;
-export type EndpointValue = (typeof ENDPOINT)[keyof typeof ENDPOINT]["path"];
+export type EndpointUrl = (typeof ENDPOINT)[keyof typeof ENDPOINT]["path"];
 
-export default ENDPOINT
+export default ENDPOINT;

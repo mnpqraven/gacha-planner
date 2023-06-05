@@ -17,6 +17,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/Select";
+import {
+  Banner,
+  defaultBanner,
+  useBannerList,
+} from "@/hooks/queries/useBannerList";
 
 type Props = {
   rolls: number | undefined;
@@ -25,17 +30,20 @@ type Props = {
 const EstimateGraph = ({ rolls, updateRolls }: Props) => {
   const [nextGuaranteed, setNextGuaranteed] = useState(false);
   const [lastSSR, setLastSSR] = useState(0);
+  const [currentBanner, setCurrentBanner] = useState<Banner>(defaultBanner);
   const [currentEidolon, setCurrentEidolon] = useState(-1);
   const { theme } = useTheme();
+  const { bannerList } = useBannerList();
 
   const payload: z.infer<(typeof ENDPOINT)["probabilityRate"]["payload"]> = {
     pulls: rolls ?? 0,
     nextGuaranteed,
-    banner: "SSR",
+    banner: currentBanner.bannerType,
     currentEidolon,
     enpitomizedPity: null,
     pity: lastSSR,
   };
+
   const { data } = useQuery({
     queryKey: [ENDPOINT.probabilityRate, payload],
     queryFn: async () =>
@@ -78,6 +86,13 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
     setCurrentEidolon(Number(value));
   }
 
+  function onChangeBanner(bannerType: string) {
+    const find = bannerList.find(
+      (z) => z.bannerType == (bannerType as typeof z.bannerType)
+    );
+    if (find) setCurrentBanner(find);
+  }
+
   function onChangeRolls(e: ChangeEvent<HTMLInputElement>) {
     const num = Number(e.target.value);
     if (num >= 0) updateRolls(num);
@@ -104,9 +119,9 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
       show: true,
       textStyle: { color: theme === "light" ? "black" : "white" },
     },
-    series: Array.from(range(currentEidolon + 1, 6, 1)).map((eidolon) =>
-      createChartSeries(eidolon, probabilityRate)
-    ),
+    series: Array.from(
+      range(currentEidolon + 1, currentBanner.maxConst, 1)
+    ).map((eidolon) => createChartSeries(eidolon, probabilityRate)),
     color: [
       "#caffbf",
       "#9bf6ff",
@@ -115,7 +130,7 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
       "#ffc6ff",
       "#fdffb6",
       // "#ffd6a5",
-      "#ffadad"
+      "#ffadad",
     ],
     tooltip: {
       trigger: "axis",
@@ -138,6 +153,21 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
       <Separator className="my-4" />
       <div className="flex gap-4 py-4">
         <div className="flex flex-col gap-2">
+          <Label>Banner</Label>
+          <Select defaultValue="SSR" onValueChange={onChangeBanner}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent position="popper">
+              {bannerList.map(({ bannerName, bannerType }, index) => (
+                <SelectItem value={bannerType} key={index}>
+                  {bannerName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex flex-col gap-2">
           <Label htmlFor="rolls">Total Rolls</Label>
           <Input
             id="rolls"
@@ -154,7 +184,9 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
           />
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="currentEidolon">Current Eidolon</Label>
+          <Label htmlFor="currentEidolon">
+            Current {currentBanner.constPrefix}
+          </Label>
           <Select onValueChange={updateCurrentEidolon} defaultValue="-1">
             <SelectTrigger>
               <SelectValue />
@@ -163,7 +195,7 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
               <SelectItem value="-1">Not Owned</SelectItem>
               {Array.from(range(0, 5, 1)).map((e) => (
                 <SelectItem value={String(e)} key={e}>
-                  Eidolon {e}
+                  {currentBanner.constPrefix} {e}
                 </SelectItem>
               ))}
             </SelectContent>
