@@ -1,7 +1,7 @@
 import { EChartsOption, SeriesOption } from "echarts";
 import { ReactECharts } from "./ReactEcharts";
 import { workerFetch } from "@/server/fetchHelper";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ENDPOINT from "@/server/endpoints";
 import { Input } from "./ui/Input";
@@ -77,10 +77,12 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
   function updateCurrentEidolon(value: string) {
     setCurrentEidolon(Number(value));
   }
+
   function onChangeRolls(e: ChangeEvent<HTMLInputElement>) {
     const num = Number(e.target.value);
     if (num >= 0) updateRolls(num);
   }
+
   function updateLastSSR(e: ChangeEvent<HTMLInputElement>) {
     const num = Number(e.target.value);
     if (num >= 0 && num < 90) setLastSSR(num);

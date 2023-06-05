@@ -55,7 +55,7 @@ export default function JadeEstimateForm({
   submitButton = false,
 }: Props) {
   const defaultFormValues: z.infer<typeof jadeEstimateFormSchema> = {
-    server: 'America',
+    server: "America",
     untilDate: dateToISO.parse(new Date()),
     battlePass: false,
     railPass: {
@@ -101,13 +101,14 @@ export default function JadeEstimateForm({
 
   function onSubmit(values: z.infer<typeof jadeEstimateFormSchema>) {
     console.log("onSubmit");
-    const untilDate = dateToISO.parse(date);
-    const payload: z.infer<typeof jadeEstimateFormSchema> = {
-      ...values,
-      untilDate,
-    };
-    setPayload(payload);
-    // jadeEstimateMutate(payload);
+    if (date) {
+      const untilDate = dateToISO.parse(date);
+      const payload: z.infer<typeof jadeEstimateFormSchema> = {
+        ...values,
+        untilDate,
+      };
+      setPayload(payload);
+    }
   }
 
   function onSelectDatePreset(date: string) {
@@ -133,6 +134,7 @@ export default function JadeEstimateForm({
                   <div className="flex-1 space-y-1">
                     <FormLabel>Goal Date</FormLabel>
                     <FormDescription>The date that you'll pull</FormDescription>
+                    <FormMessage />
                   </div>
                   <div>
                     <FormField
@@ -200,7 +202,8 @@ export default function JadeEstimateForm({
                         selected={date}
                         onSelect={(e) => {
                           setDate(e);
-                          field.onChange(dateToISO.parse(e));
+                          if (e) field.onChange(dateToISO.parse(e));
+                          else field.onChange(undefined);
                         }}
                         disabled={beforeToday}
                         initialFocus
@@ -208,7 +211,6 @@ export default function JadeEstimateForm({
                     </PopoverContent>
                   </Popover>
                 </div>
-                <FormMessage />
               </FormItem>
             )}
           />
