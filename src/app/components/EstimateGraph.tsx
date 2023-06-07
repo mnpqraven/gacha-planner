@@ -53,35 +53,6 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
       }),
   });
 
-  const probabilityRate: NonNullable<typeof data>["data"] = data
-    ? structuredClone(data).data.map((eidolonsByPull) => {
-        // DOGSHIT LANGUAGE AND ITS SHALLOW CLONING
-        const newEidsByPull = structuredClone(eidolonsByPull);
-        // appends eidolon pull if there's less than 7 entries
-        Array.from(Array(7).keys()).forEach((eidolonNumber) => {
-          const find = newEidsByPull.find((e) => e.eidolon == eidolonNumber);
-          if (!find) newEidsByPull.push({ eidolon: eidolonNumber, rate: 0 });
-        });
-
-        // transform separate rate of each eidolon into accumulated rate for
-        // lower eidolons
-        newEidsByPull.forEach((cell) => {
-          // gets cells with higher ei count
-          const higherEidCells = eidolonsByPull.filter(
-            (e) => e.eidolon > cell.eidolon
-          );
-          // append to current cell its rate sum
-          cell.rate += higherEidCells
-            .map((e) => e.rate)
-            .reduce((a, b) => a + b, 0);
-          // ceiling
-          if (cell.rate > 1) cell.rate = 1;
-          if (cell.rate < 0) cell.rate = 0;
-        });
-        return newEidsByPull;
-      })
-    : [];
-
   function updateCurrentEidolon(value: string) {
     setCurrentEidolon(Number(value));
   }
@@ -121,7 +92,7 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
     },
     series: Array.from(
       range(currentEidolon + 1, currentBanner.maxConst, 1)
-    ).map((eidolon) => createChartSeries(eidolon, probabilityRate)),
+    ).map((eidolon) => createChartSeries(eidolon, data)),
     color: [
       "#caffbf",
       "#9bf6ff",
@@ -217,9 +188,12 @@ const EstimateGraph = ({ rolls, updateRolls }: Props) => {
 
 function createChartSeries(
   eidolon: number,
-  queryData: { eidolon: number; rate: number }[][]
+  // queryData: { eidolon: number; rate: number }[][]
+  queryData:
+    | z.infer<(typeof ENDPOINT)["probabilityRate"]["response"]>
+    | undefined
 ): SeriesOption {
-  const data = queryData.map((eidsInRoll) => {
+  const data = queryData?.data.map((eidsInRoll) => {
     const currentEid = eidsInRoll.find((e) => e.eidolon == eidolon)?.rate ?? 0;
     return Number(currentEid * 100).toFixed(2);
   });
@@ -234,7 +208,7 @@ function createChartSeries(
     emphasis: {
       disabled: true,
     },
-    data: data,
+    data,
   };
   return opt;
 }
