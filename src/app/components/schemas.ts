@@ -10,7 +10,7 @@ export const jadeEstimateFormSchema = z.object({
     },
     { required_error: "Required field" }
   ),
-  battlePass: z.boolean(),
+  battlePass: z.enum(["None", "Basic", "Premium"]),
   railPass: z.object({
     useRailPass: z.boolean(),
     daysLeft: z.preprocess(

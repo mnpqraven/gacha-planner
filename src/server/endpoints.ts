@@ -9,7 +9,7 @@ const ENDPOINT = {
         month: e.getMonth() + 1,
         year: e.getUTCFullYear(),
       })),
-      battlePass: z.boolean(),
+      battlePass: z.enum(['None', 'Basic', 'Premium']),
       railPass: z.object({
         useRailPass: z.boolean(),
         daysLeft: z.preprocess(

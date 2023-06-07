@@ -57,7 +57,7 @@ export default function JadeEstimateForm({
   const defaultFormValues: z.infer<typeof jadeEstimateFormSchema> = {
     server: "America",
     untilDate: dateToISO.parse(new Date()),
-    battlePass: false,
+    battlePass: "None",
     railPass: {
       useRailPass: false,
       daysLeft: 30,
@@ -270,15 +270,24 @@ export default function JadeEstimateForm({
                   <div className="flex-1 space-y-1">
                     <FormLabel>Nameless Honor</FormLabel>
                     <FormDescription>
-                      Opt-in(the premium option)
+                      This assumes you get every rewards in the first day
                     </FormDescription>
                   </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-fit">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="None">None</SelectItem>
+                      <SelectItem value="Basic">Basic</SelectItem>
+                      <SelectItem value="Premium">Premium</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </div>
               </FormItem>
