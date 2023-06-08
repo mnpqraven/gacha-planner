@@ -22,6 +22,13 @@ export const jadeEstimateFormSchema = z.object({
     ),
   }),
   eq: z.enum(["Zero", "One", "Two", "Three", "Four", "Five", "Six"]),
+  moc: z.preprocess(
+    (args) => (args === "" ? undefined : args),
+    z.coerce.number({
+      invalid_type_error: "Must be a number",
+      required_error: "Required field",
+    })
+  ),
   currentRolls: z.preprocess(
     (args) => (args === "" ? undefined : args),
     z.coerce

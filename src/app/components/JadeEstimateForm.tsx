@@ -63,6 +63,7 @@ export default function JadeEstimateForm({
       daysLeft: 30,
     },
     eq: "Zero",
+    moc: 0,
     currentRolls: 0,
   };
   const [usingRailPass, setUsingRailPass] = useState(false);
@@ -329,6 +330,38 @@ export default function JadeEstimateForm({
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="moc"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-center space-x-4 rounded-md border p-4">
+                  <div className="flex-1 space-y-1">
+                    <FormLabel>Memory of Chaos</FormLabel>
+                    <FormDescription>
+                      Amount of stars you can clear in a MoC cycle
+                    </FormDescription>
+                  </div>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={String(field.value)}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-fit">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {mocStars().map((value) => (
+                        <SelectItem value={String(value)}>{value}*</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
 
           <div className="flex items-center space-x-4 rounded-md border p-4">
             <Tabs defaultValue="currentRolls" className="w-full">
@@ -400,4 +433,14 @@ function beforeToday(date: Date): boolean {
   b.setSeconds(0);
   b.setMilliseconds(0);
   return date < b;
+}
+
+function mocStars(): number[] {
+  function* range(start: number, end: number, step: number) {
+    while (start <= end) {
+      yield start;
+      start += step;
+    }
+  }
+  return Array.from(range(0, 30, 3));
 }
