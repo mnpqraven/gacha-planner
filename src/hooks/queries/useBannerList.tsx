@@ -5,7 +5,7 @@ import * as z from "zod";
 
 export type Banner = z.infer<
   (typeof ENDPOINT)["gachaBannerList"]["response"]
->[number];
+>["banners"][number];
 
 export const defaultBanner: Banner = {
   bannerName: "5* Banner character",
@@ -20,11 +20,11 @@ export const defaultBanner: Banner = {
 };
 
 export const useBannerList = () => {
-  const { data: bannerList } = useQuery({
-    queryKey: ["bannerList"],
+  const { data } = useQuery({
+    queryKey: ["gachaBannerList"],
     queryFn: async () => await workerFetch(ENDPOINT.gachaBannerList),
-    initialData: [defaultBanner],
+    initialData: { banners: [defaultBanner] },
   });
 
-  return { bannerList };
+  return { bannerList: data?.banners ?? [] };
 };
