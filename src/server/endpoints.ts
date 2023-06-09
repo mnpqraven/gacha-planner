@@ -4,12 +4,27 @@ const ENDPOINT = {
   jadeEstimate: {
     path: "/honkai/jade_estimate",
     payload: z.object({
-      untilDate: z.date().transform((e) => ({
-        day: e.getDate(),
-        month: e.getMonth() + 1,
-        year: e.getUTCFullYear(),
-      })),
-      battlePass: z.enum(["None", "Basic", "Premium"]),
+      untilDate: z.object(
+        {
+          day: z.number(),
+          month: z.number(),
+          year: z.number(),
+        },
+        { required_error: "Required field" }
+      ),
+      battlePass: z.object({
+        battlePassType: z.enum(["None", "Basic", "Premium"]),
+        currentLevel: z.preprocess(
+          (args) => (args === "" ? undefined : args),
+          z.coerce
+            // TODO: error for negative
+            .number({
+              invalid_type_error: "Must be a number",
+              required_error: "Required field",
+            })
+            .nonnegative({ message: "BP level must be positive" })
+        ),
+      }),
       railPass: z.object({
         useRailPass: z.boolean(),
         daysLeft: z.preprocess(
@@ -20,6 +35,7 @@ const ENDPOINT = {
           })
         ),
       }),
+      server: z.enum(["America", "Asia", "Europe"]),
       eq: z.enum(["Zero", "One", "Two", "Three", "Four", "Five", "Six"]),
       moc: z.preprocess(
         (args) => (args === "" ? undefined : args),

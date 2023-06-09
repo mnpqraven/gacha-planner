@@ -40,7 +40,7 @@ import {
 } from "../components/ui/Select";
 import { Calendar } from "../components/ui/Calendar";
 import { useEffect, useState } from "react";
-import { dateToISO, jadeEstimateFormSchema } from "./schemas";
+import { dateToISO } from "./schemas";
 import { placeholderTableData } from "./tableData";
 import { Separator } from "./ui/Separator";
 import { useFuturePatchDateList } from "@/hooks/queries/useFuturePatchDate";
@@ -50,14 +50,15 @@ type Props = {
   updateTable: (to: z.infer<typeof ENDPOINT.jadeEstimate.response>) => void;
 };
 
+type FormSchema = z.infer<typeof ENDPOINT.jadeEstimate.payload>;
 export default function JadeEstimateForm({
   updateTable,
   submitButton = false,
 }: Props) {
-  const defaultFormValues: z.infer<typeof jadeEstimateFormSchema> = {
+  const defaultFormValues: FormSchema = {
     server: "America",
     untilDate: dateToISO.parse(new Date()),
-    battlePass: "None",
+    battlePass: { battlePassType: "None", currentLevel: 0 },
     railPass: {
       useRailPass: false,
       daysLeft: 30,
@@ -71,8 +72,8 @@ export default function JadeEstimateForm({
   const { futurePatchDateList } = useFuturePatchDateList();
 
   // form setup
-  const form = useForm<z.infer<typeof jadeEstimateFormSchema>>({
-    resolver: zodResolver(jadeEstimateFormSchema),
+  const form = useForm<FormSchema>({
+    resolver: zodResolver(ENDPOINT.jadeEstimate.payload),
     defaultValues: defaultFormValues,
   });
   const debounceOnChange = useDebounce(form.handleSubmit(onSubmit), 1000);
@@ -96,11 +97,11 @@ export default function JadeEstimateForm({
     placeholderData: placeholderTableData,
   });
 
-  function onSubmit(values: z.infer<typeof jadeEstimateFormSchema>) {
+  function onSubmit(values: FormSchema) {
     console.log("onSubmit");
     if (date) {
       const untilDate = dateToISO.parse(date);
-      const payload: z.infer<typeof jadeEstimateFormSchema> = {
+      const payload: FormSchema = {
         ...values,
         untilDate,
       };
@@ -264,7 +265,7 @@ export default function JadeEstimateForm({
           </div>
           <FormField
             control={form.control}
-            name="battlePass"
+            name="battlePass.battlePassType"
             render={({ field }) => (
               <FormItem>
                 <div className="flex items-center space-x-4 rounded-md border p-4">
@@ -289,6 +290,26 @@ export default function JadeEstimateForm({
                       <SelectItem value="Premium">Premium</SelectItem>
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="battlePass.currentLevel"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-center space-x-4 rounded-md border p-4">
+                  <div className="flex-1 space-y-1">
+                    <FormLabel>Current Nameless Honor Level</FormLabel>
+                    <FormDescription>
+                      This assumes you max out the weekly rewards every Monday
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Input className="w-20" type="number" {...field} />
+                  </FormControl>
                   <FormMessage />
                 </div>
               </FormItem>
@@ -353,7 +374,9 @@ export default function JadeEstimateForm({
                     </FormControl>
                     <SelectContent>
                       {mocStars().map((value) => (
-                        <SelectItem value={String(value)}>{value}*</SelectItem>
+                        <SelectItem value={String(value)} key={value}>
+                          {value}*
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
