@@ -9,7 +9,7 @@ const ENDPOINT = {
         month: e.getMonth() + 1,
         year: e.getUTCFullYear(),
       })),
-      battlePass: z.enum(['None', 'Basic', 'Premium']),
+      battlePass: z.enum(["None", "Basic", "Premium"]),
       railPass: z.object({
         useRailPass: z.boolean(),
         daysLeft: z.preprocess(
@@ -101,19 +101,21 @@ const ENDPOINT = {
   gachaBannerList: {
     path: "/honkai/gacha_banner_list",
     payload: undefined,
-    response: z.array(
-      z.object({
-        bannerName: z.string(),
-        banner: z.number(),
-        guaranteed: z.number(),
-        guaranteedPity: z.number().nullable(),
-        minConst: z.number(),
-        maxConst: z.number(),
-        maxPity: z.number(),
-        constPrefix: z.string(),
-        bannerType: z.enum(['SSR', 'SR', 'LC'])
-      })
-    ),
+    response: z.object({
+      banners: z.array(
+        z.object({
+          bannerName: z.string(),
+          banner: z.number(),
+          guaranteed: z.number(),
+          guaranteedPity: z.number().nullable(),
+          minConst: z.number(),
+          maxConst: z.number(),
+          maxPity: z.number(),
+          constPrefix: z.string(),
+          bannerType: z.enum(["SSR", "SR", "LC"]),
+        })
+      ),
+    }),
   },
 } as const;
 export type EndpointUrl = (typeof ENDPOINT)[keyof typeof ENDPOINT]["path"];
