@@ -3,7 +3,6 @@
 import * as z from "zod";
 import { useState } from "react";
 import ENDPOINT from "@/server/endpoints";
-import EstimateGraph from "./components/EstimateGraph";
 import JadeEstimateForm from "./components/JadeEstimateForm";
 import JadeRewardTable from "./components/JadeRewardTable";
 import { placeholderTableData } from "./components/tableData";
@@ -34,7 +33,6 @@ export default function Home() {
           <JadeRewardTable data={tableData} />
         </div>
       </div>
-      <EstimateGraph rolls={rolls} updateRolls={updateAvailableRolls} />
     </main>
   );
 }

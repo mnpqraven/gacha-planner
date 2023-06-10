@@ -6,20 +6,34 @@ import { HTMLAttributes } from "react";
 import { Button } from "./ui/Button";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { usePathname } from "next/navigation";
 
+const menu = [
+  { path: "/", label: "Home" },
+  { path: "/gacha-graph", label: "Gacha Estimation" },
+];
 const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {
+  const pathname = usePathname();
+
+  const pathnameClass = (path: string) =>
+    cn(
+      "text-sm font-medium transition-colors hover:text-primary",
+      pathname !== path ? "text-muted-foreground" : ""
+    );
+
   return (
     <div className="flex items-center h-16 border-b px-4 justify-between">
       <nav
         className={cn("flex items-center space-x-4 lg:space-x-6", className)}
         {...props}
       >
-        <Link
-          href="/"
-          className="text-sm font-medium transition-colors hover:text-primary"
-        >
-          Home
-        </Link>
+        {menu.map(({ path, label }) => (
+          <Link href={path} className={pathnameClass(path)} key={path}>
+            {label}
+          </Link>
+        ))}
+      </nav>
+      <div className="flex items-center space-x-4 lg:space-x-6">
         <a
           href="https://github.com/mnpqraven/gacha-planner"
           target="_blank"
@@ -27,8 +41,8 @@ const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {
         >
           GitHub
         </a>
-      </nav>
-      <ThemeToggle />
+        <ThemeToggle />
+      </div>
     </div>
   );
 };
