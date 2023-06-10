@@ -51,6 +51,8 @@ type Props = {
 };
 
 type FormSchema = z.infer<typeof ENDPOINT.jadeEstimate.payload>;
+type BPType = FormSchema["battlePass"]["battlePassType"];
+
 export default function JadeEstimateForm({
   updateTable,
   submitButton = false,
@@ -68,6 +70,8 @@ export default function JadeEstimateForm({
     currentRolls: 0,
   };
   const [usingRailPass, setUsingRailPass] = useState(false);
+
+  const [usingBP, setUsingBP] = useState<BPType>("None");
   const [date, setDate] = useState<Date | undefined>(new Date());
   const { futurePatchDateList } = useFuturePatchDateList();
 
@@ -81,8 +85,8 @@ export default function JadeEstimateForm({
 
   // NOTE: bandaid to manually trigger date
   useEffect(() => {
-    debounceOnChange(() => {});
-  }, [untilDateSubscription, date]);
+    debounceOnChange(null);
+  }, [untilDateSubscription]);
 
   const [payload, setPayload] = useState(defaultFormValues);
 
@@ -98,21 +102,19 @@ export default function JadeEstimateForm({
   });
 
   function onSubmit(values: FormSchema) {
-    console.log("onSubmit");
-    if (date) {
-      const untilDate = dateToISO.parse(date);
-      const payload: FormSchema = {
-        ...values,
-        untilDate,
-      };
-      setPayload(payload);
-    }
+    const payload: FormSchema = { ...values };
+    console.log("onSubmit", payload);
+    setPayload(payload);
   }
 
   function onSelectDatePreset(date: string) {
     // today
     if (date === "0") setDate(new Date());
     else setDate(new Date(date));
+  }
+
+  function preventMinus(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.code === "Minus") e.preventDefault();
   }
 
   return (
@@ -263,58 +265,82 @@ export default function JadeEstimateForm({
               </>
             )}
           </div>
-          <FormField
-            control={form.control}
-            name="battlePass.battlePassType"
-            render={({ field }) => (
-              <FormItem>
-                <div className="flex items-center space-x-4 rounded-md border p-4">
-                  <div className="flex-1 space-y-1">
-                    <FormLabel>Nameless Honor</FormLabel>
-                    <FormDescription>
-                      This assumes you get every rewards in the first day
-                    </FormDescription>
+          <div className="rounded-md border p-4">
+            <FormField
+              control={form.control}
+              name="battlePass.battlePassType"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex items-center">
+                    <div className="flex-1 space-y-1">
+                      <FormLabel>Nameless Honor</FormLabel>
+                      <FormDescription>
+                        This assumes you get every rewards in the first day
+                        <br />
+                        If not selecting F2P, this will also assumes you've
+                        received the current patch's first time purchase rewards
+                        and those won't be calculated.
+                      </FormDescription>
+                    </div>
+                    <Select
+                      onValueChange={(e) => {
+                        field.onChange(e);
+                        setUsingBP(e as unknown as NonNullable<typeof usingBP>);
+                      }}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-fit">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="None">F2P</SelectItem>
+                        <SelectItem value="Basic">Nameless Glory</SelectItem>
+                        <SelectItem value="Premium">Nameless Medal</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
                   </div>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-fit">
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="None">None</SelectItem>
-                      <SelectItem value="Basic">Basic</SelectItem>
-                      <SelectItem value="Premium">Premium</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </div>
-              </FormItem>
+                </FormItem>
+              )}
+            />
+            {usingBP !== "None" && (
+              <>
+                <Separator className="my-4" />
+                <FormField
+                  control={form.control}
+                  name="battlePass.currentLevel"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <div className="flex items-center">
+                        <div className="flex-1 space-y-1">
+                          <FormLabel>Current Nameless Honor Level</FormLabel>
+                          <FormDescription>
+                            This assumes you level up by 10 every Monday.
+                            <br />
+                            If you select 'Nameless Medal' then keep in mind you
+                            also get 10 levels for free, please update the level
+                            accordingly.
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Input
+                            className="w-20"
+                            type="number"
+                            min={0}
+                            onKeyDown={preventMinus}
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
             )}
-          />
-          <FormField
-            control={form.control}
-            name="battlePass.currentLevel"
-            render={({ field }) => (
-              <FormItem>
-                <div className="flex items-center space-x-4 rounded-md border p-4">
-                  <div className="flex-1 space-y-1">
-                    <FormLabel>Current Nameless Honor Level</FormLabel>
-                    <FormDescription>
-                      This assumes you max out the weekly rewards every Monday
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Input className="w-20" type="number" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
+          </div>
           <FormField
             control={form.control}
             name="eq"
@@ -410,7 +436,12 @@ export default function JadeEstimateForm({
                           </FormDescription>
                         </div>
                         <FormControl>
-                          <Input className="w-20" type="number" {...field} />
+                          <Input
+                            className="w-20"
+                            type="number"
+                            min={0}
+                            {...field}
+                          />
                         </FormControl>
                       </div>
                       <FormMessage />
@@ -432,7 +463,12 @@ export default function JadeEstimateForm({
                           </FormDescription>
                         </div>
                         <FormControl>
-                          <Input className="w-20" type="number" {...field} />
+                          <Input
+                            className="w-20"
+                            type="number"
+                            min={0}
+                            {...field}
+                          />
                         </FormControl>
                       </div>
                       <FormMessage />

@@ -17,7 +17,6 @@ const ENDPOINT = {
         currentLevel: z.preprocess(
           (args) => (args === "" ? undefined : args),
           z.coerce
-            // TODO: error for negative
             .number({
               invalid_type_error: "Must be a number",
               required_error: "Required field",
