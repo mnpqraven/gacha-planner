@@ -25,7 +25,7 @@ const JadeRewardTable = ({ data }: Props) => {
           <TableHead>Source</TableHead>
           <TableHead>Recurring</TableHead>
           <TableHead>Jades</TableHead>
-          <TableHead>Rolls</TableHead>
+          <TableHead>Sp. Rail Pass</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
