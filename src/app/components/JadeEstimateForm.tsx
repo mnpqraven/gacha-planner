@@ -80,7 +80,7 @@ export default function JadeEstimateForm({
     resolver: zodResolver(ENDPOINT.jadeEstimate.payload),
     defaultValues: defaultFormValues,
   });
-  const debounceOnChange = useDebounce(form.handleSubmit(onSubmit), 1000);
+  const debounceOnChange = useDebounce(form.handleSubmit(onSubmit), 300);
   const untilDateSubscription = form.watch("untilDate");
 
   // NOTE: bandaid to manually trigger date
@@ -136,7 +136,7 @@ export default function JadeEstimateForm({
                     <FormDescription>The date that you'll pull</FormDescription>
                     <FormMessage />
                   </div>
-                  <div className="flex flex-col md:flex-row gap-4">
+                  <div className="flex flex-col lg:flex-row gap-4">
                     <FormField
                       control={form.control}
                       name="server"

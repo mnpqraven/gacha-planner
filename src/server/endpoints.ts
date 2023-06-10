@@ -82,7 +82,7 @@ const ENDPOINT = {
     path: "/honkai/probability_rate",
     payload: z.object({
       currentEidolon: z.number(),
-      pity: z.number(),
+      pity: z.number().max(89, { message: "Pity count must be less than 90" }),
       pulls: z.number(),
       nextGuaranteed: z.boolean(),
       enpitomizedPity: z.number().nullable(),
@@ -127,6 +127,7 @@ const ENDPOINT = {
           maxConst: z.number(),
           maxPity: z.number(),
           constPrefix: z.string(),
+          constShorthand: z.string().length(1),
           bannerType: z.enum(["SSR", "SR", "LC"]),
         })
       ),

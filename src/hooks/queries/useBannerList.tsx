@@ -16,6 +16,7 @@ export const defaultBanner: Banner = {
   maxConst: 6,
   maxPity: 90,
   constPrefix: "Eidolon",
+  constShorthand: 'E',
   bannerType: "SSR",
 };
 
