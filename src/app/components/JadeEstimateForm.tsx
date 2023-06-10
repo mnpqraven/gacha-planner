@@ -275,9 +275,7 @@ export default function JadeEstimateForm({
                     <div className="flex-1 space-y-1">
                       <FormLabel>Nameless Honor</FormLabel>
                       <FormDescription>
-                        This assumes you get every rewards in the first day
-                        <br />
-                        If not selecting F2P, this will also assumes you've
+                        If not selecting F2P, this assumes you've
                         received the current patch's first time purchase rewards
                         and those won't be calculated.
                       </FormDescription>
