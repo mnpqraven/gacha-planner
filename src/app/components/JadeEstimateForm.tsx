@@ -44,6 +44,17 @@ import { dateToISO } from "./schemas";
 import { placeholderTableData } from "./tableData";
 import { Separator } from "./ui/Separator";
 import { useFuturePatchDateList } from "@/hooks/queries/useFuturePatchDate";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandDialog,
+  CommandSeparator,
+  CommandShortcut,
+} from "./ui/Command";
 
 type Props = {
   submitButton?: boolean;
@@ -73,7 +84,30 @@ export default function JadeEstimateForm({
 
   const [usingBP, setUsingBP] = useState<BPType>("None");
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [monthController, setMonthController] = useState<Date | undefined>(
+    date
+  );
   const { futurePatchDateList } = useFuturePatchDateList();
+  const patchStartDays = futurePatchDateList.patches.map(
+    ({ dateStart }) => new Date(dateStart)
+  );
+
+  function getFooterInfo(date: Date | undefined): string | undefined {
+    if (date) {
+      const find = futurePatchDateList.patches.find((e) => {
+        const left = new Date(e.dateStart);
+        return (
+          left.getDate() === date.getDate() &&
+          left.getMonth() === date.getMonth() &&
+          left.getFullYear() === date.getFullYear()
+        );
+      });
+      if (find) {
+        return `Start of patch ${find.version}`;
+      }
+    }
+    return undefined;
+  }
 
   // form setup
   const form = useForm<FormSchema>({
@@ -109,13 +143,33 @@ export default function JadeEstimateForm({
 
   function onSelectDatePreset(date: string) {
     // today
-    if (date === "0") setDate(new Date());
-    else setDate(new Date(date));
+    if (date === "0") {
+      let nextDate = new Date();
+      setDate(nextDate);
+      setMonthController(nextDate);
+    } else {
+      setDate(new Date(date));
+      setMonthController(new Date(date));
+    }
+    setOpen(false);
   }
 
   function preventMinus(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.code === "Minus") e.preventDefault();
   }
+
+  // keybinds for jumper
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.altKey || e.metaKey)) {
+        setOpen((open) => !open);
+      }
+    };
+
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
 
   return (
     <>
@@ -182,21 +236,44 @@ export default function JadeEstimateForm({
                         className="flex w-auto flex-col space-y-2 p-2"
                         align="start"
                       >
-                        <Select onValueChange={onSelectDatePreset}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select" />
-                          </SelectTrigger>
-                          <SelectContent position="popper">
-                            <SelectItem value="0">Today</SelectItem>
-                            {futurePatchDateList?.patches.map((e) => (
-                              <SelectItem value={e.dateStart} key={e.version}>
-                                {e.name} - {e.version}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <Button
+                          variant={"outline"}
+                          className="justify-between"
+                          onClick={() => setOpen(true)}
+                        >
+                          <span>Jump to ...</span>
+                          <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                            <span className="text-xs">⌘/Alt + K</span>
+                          </kbd>
+                        </Button>
+                        <CommandDialog open={open} onOpenChange={setOpen}>
+                          <CommandInput placeholder="Click on a result or search..." />
+                          <CommandList>
+                            <CommandEmpty>No results found.</CommandEmpty>
+                            <CommandGroup>
+                              <CommandItem
+                                onSelect={() => onSelectDatePreset("0")}
+                              >
+                                Today
+                              </CommandItem>
+                              {futurePatchDateList.patches.map((e) => (
+                                <CommandItem
+                                  key={e.version}
+                                  onSelect={() =>
+                                    onSelectDatePreset(e.dateStart)
+                                  }
+                                >
+                                  {e.name} -{" "}
+                                  {new Date(e.dateStart).getUTCDate()}/
+                                  {new Date(e.dateStart).getUTCMonth() + 1}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </CommandDialog>
 
                         <Calendar
+                          className="py-0"
                           mode="single"
                           selected={date}
                           onSelect={(e) => {
@@ -205,6 +282,13 @@ export default function JadeEstimateForm({
                             else field.onChange(undefined);
                           }}
                           disabled={beforeToday}
+                          month={monthController}
+                          onMonthChange={setMonthController}
+                          modifiers={{ patchStart: patchStartDays }}
+                          modifiersStyles={{
+                            patchStart: { border: "2px solid white" },
+                          }}
+                          footer={getFooterInfo(date)}
                           initialFocus
                         />
                       </PopoverContent>
@@ -275,9 +359,9 @@ export default function JadeEstimateForm({
                     <div className="flex-1 space-y-1">
                       <FormLabel>Nameless Honor</FormLabel>
                       <FormDescription>
-                        If not selecting F2P, this assumes you've
-                        received the current patch's first time purchase rewards
-                        and those won't be calculated.
+                        If not selecting F2P, this assumes you've received the
+                        current patch's first time purchase rewards and those
+                        won't be calculated.
                       </FormDescription>
                     </div>
                     <Select
