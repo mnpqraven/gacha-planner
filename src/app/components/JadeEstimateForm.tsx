@@ -124,16 +124,19 @@ export default function JadeEstimateForm({
 
   const [payload, setPayload] = useState(defaultFormValues);
 
-  useQuery({
+  const { data } = useQuery({
     queryKey: ["jadeEstimate", payload],
     queryFn: async () =>
       await workerFetch(ENDPOINT.jadeEstimate, {
         payload,
         method: "POST",
       }),
-    onSuccess: updateTable,
     placeholderData: placeholderTableData,
   });
+
+  useEffect(() => {
+    if (data) updateTable(data);
+  }, [data]);
 
   function onSubmit(values: FormSchema) {
     const payload: FormSchema = { ...values };

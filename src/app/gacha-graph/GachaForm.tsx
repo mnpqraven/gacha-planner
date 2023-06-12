@@ -114,7 +114,7 @@ export function GachaForm({
             name="pity"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Pulls since last SSR</FormLabel>
+                <FormLabel>Pulls since last 5✦</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -173,9 +173,9 @@ export function GachaForm({
               <FormItem>
                 <div className="flex flex-col h-full">
                   <div>
-                    <FormLabel>Next SSR Guaranteed</FormLabel>
+                    <FormLabel>Next 5✦ Guaranteed</FormLabel>
                   </div>
-                  <div className="flex flex-col justify-center h-full">
+                  <div className="flex flex-col justify-center h-full mt-2">
                     <FormControl>
                       <Switch
                         checked={field.value}
