@@ -71,6 +71,7 @@ const ENDPOINT = {
           jades_amount: z.number().nullable(),
           rolls_amount: z.number().nullable(),
           source_type: z.string(),
+          description: z.string().nullable(),
         })
         .array(),
       total_jades: z.number(),
