@@ -134,6 +134,13 @@ const ENDPOINT = {
       ),
     }),
   },
+  mhy: {
+    path: "/honkai/mhy",
+    payload: z.object({
+      id: z.number(),
+    }),
+    response: z.any(),
+  },
 } as const;
 export type EndpointUrl = (typeof ENDPOINT)[keyof typeof ENDPOINT]["path"];
 
