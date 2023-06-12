@@ -24,7 +24,7 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between">
+    <main className="flex flex-col items-center justify-between">
       <div className="flex flex-col md:flex-row w-screen gap-4 mt-4 justify-evenly items-center">
         <div className="w-11/12 md:w-2/5 ">
           <JadeEstimateForm updateTable={updateTableData} />

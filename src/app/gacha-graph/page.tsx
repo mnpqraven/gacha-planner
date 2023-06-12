@@ -2,7 +2,7 @@
 
 import { EChartsOption, SeriesOption } from "echarts";
 import { workerFetch } from "@/server/fetchHelper";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ENDPOINT from "@/server/endpoints";
 import * as z from "zod";
@@ -70,7 +70,7 @@ export default function GachaGraph() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center">
+    <main className="flex flex-col items-center">
       <div className="py-4">
         <GachaForm
           updateQuery={updateQuery}

@@ -4,32 +4,39 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { HTMLAttributes } from "react";
 import { Button } from "./ui/Button";
-import { Moon, Sun } from "lucide-react";
+import { Github, LineChart, Moon, Sun, Ticket } from "lucide-react";
 import { useTheme } from "next-themes";
 import { usePathname } from "next/navigation";
 
 const menu = [
-  { path: "/", label: "Home" },
-  { path: "/gacha-graph", label: "Gacha Estimation" },
+  {
+    path: "/",
+    label: "Stellar Jade Tracker",
+    icon: <Ticket className="h-4 w-4" />,
+  },
+  {
+    path: "/gacha-graph",
+    label: "Gacha Estimation",
+    icon: <LineChart className="h-4 w-4" />,
+  },
 ];
 const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {
   const pathname = usePathname();
 
+  const defaultLinkClass =
+    "flex items-center space-x-1 text-sm font-medium transition-colors hover:text-primary";
   const pathnameClass = (path: string) =>
-    cn(
-      "text-sm font-medium transition-colors hover:text-primary",
-      pathname !== path ? "text-muted-foreground" : ""
-    );
+    cn(defaultLinkClass, pathname !== path ? "text-muted-foreground" : "");
 
   return (
-    <div className="flex items-center h-16 border-b px-4 justify-between">
+    <div className="flex items-center h-12 border-b px-4 justify-between">
       <nav
         className={cn("flex items-center space-x-4 lg:space-x-6", className)}
         {...props}
       >
-        {menu.map(({ path, label }) => (
+        {menu.map(({ path, label, icon }) => (
           <Link href={path} className={pathnameClass(path)} key={path}>
-            {label}
+            {icon} <span className="hidden sm:inline-block">{label}</span>
           </Link>
         ))}
       </nav>
@@ -37,9 +44,9 @@ const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {
         <a
           href="https://github.com/mnpqraven/gacha-planner"
           target="_blank"
-          className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+          className={cn(defaultLinkClass, "text-muted-foreground")}
         >
-          GitHub
+          <Github />
         </a>
         <ThemeToggle />
       </div>
