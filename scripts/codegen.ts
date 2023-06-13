@@ -7,17 +7,18 @@ import { compile } from "json-schema-to-typescript";
 const dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
 function jsonFileToTS(outputFile: string): string {
-  return outputFile.replace('.json', '.ts');
+  return outputFile.replace(".json", ".ts");
 }
 
-const fileExists = async (path: string) => !!(await fs.stat(path).catch(e => false))
+const fileExists = async (path: string) =>
+  !!(await fs.stat(path).catch((_) => false));
 
 async function main() {
+  console.log("executing TS type codegen...");
   let schemasPath = path.join(dirname, "..", ".schemas");
   let schemaFiles = (await fs.readdir(schemasPath)).filter((x) =>
     x.endsWith(".json")
   );
-
 
   for (let filename of schemaFiles) {
     let compiledTypes = new Set();
@@ -27,13 +28,20 @@ async function main() {
     let compiled = await compile(schema, schema.title, { bannerComment: "" });
     let eachType = compiled.split("export");
     for (let type of eachType) {
-      if (!type) { // blank strings like CRs, whitespaces
+      if (!type) {
+        // blank strings like CRs, whitespaces
         continue;
       }
       compiledTypes.add("export " + type.trim());
     }
     let output = Array.from(compiledTypes).join("\n\n");
-    let outputPath = path.join(dirname, "..", "src", "bindings", jsonFileToTS(filename));
+    let outputPath = path.join(
+      dirname,
+      "..",
+      "src",
+      "bindings",
+      jsonFileToTS(filename)
+    );
 
     try {
       if (await fileExists(outputPath)) {
@@ -57,7 +65,6 @@ async function main() {
     await fs.writeFile(outputPath, output);
     console.log(`Wrote Typescript types to ${outputPath}`);
   }
-
 }
 
 main().catch((e) => {

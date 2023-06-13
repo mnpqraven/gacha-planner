@@ -137,11 +137,13 @@ const ENDPOINT = {
   mhy: {
     path: "/honkai/mhy",
     payload: z.object({
-      id: z.number(),
+      id: z.string(),
     }),
     response: z.any(),
   },
 } as const;
 export type EndpointUrl = (typeof ENDPOINT)[keyof typeof ENDPOINT]["path"];
+
+export const IMAGE_URL = 'https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/'
 
 export default ENDPOINT;

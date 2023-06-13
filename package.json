@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "codegen": "npx tsx scripts/codegen.ts",
+    "codegen": "watch 'npx tsx scripts/codegen.ts' ./.schemas",
     "lint": "next lint"
   },
   "dependencies": {
@@ -46,6 +46,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
-    "json-schema-to-typescript": "^13.0.2"
+    "json-schema-to-typescript": "^13.0.2",
+    "watch": "^1.0.2"
   }
 }

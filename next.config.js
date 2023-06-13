@@ -5,11 +5,18 @@ const nextConfig = {
       fallback: [
         {
           source: "/:path*",
-          destination:
-            `${process.env.NEXT_PUBLIC_WORKER_API}/:path*`,
+          destination: `${process.env.NEXT_PUBLIC_WORKER_API}/:path*`,
         },
       ],
     };
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "raw.githubusercontent.com",
+      },
+    ],
   },
 };
 

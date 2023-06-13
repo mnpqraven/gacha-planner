@@ -11,7 +11,7 @@ export default function Dev() {
     mutationKey: ["dev"],
     mutationFn: async () =>
       await workerFetch(ENDPOINT.mhy, {
-        payload: { id: 805768477 },
+        payload: { id: '805768477' },
         method: "POST",
       }),
   });

@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { workerFetch } from "@/server/fetchHelper";
 import ENDPOINT from "@/server/endpoints";
 import {
@@ -55,6 +55,7 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "./ui/Command";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 type Props = {
   submitButton?: boolean;
@@ -64,22 +65,23 @@ type Props = {
 type FormSchema = z.infer<typeof ENDPOINT.jadeEstimate.payload>;
 type BPType = FormSchema["battlePass"]["battlePassType"];
 
+export const defaultFormValues: FormSchema = {
+  server: "America",
+  untilDate: dateToISO.parse(new Date()),
+  battlePass: { battlePassType: "None", currentLevel: 0 },
+  railPass: {
+    useRailPass: false,
+    daysLeft: 30,
+  },
+  eq: "Zero",
+  moc: 0,
+  currentRolls: 0,
+};
+
 export default function JadeEstimateForm({
   updateTable,
   submitButton = false,
 }: Props) {
-  const defaultFormValues: FormSchema = {
-    server: "America",
-    untilDate: dateToISO.parse(new Date()),
-    battlePass: { battlePassType: "None", currentLevel: 0 },
-    railPass: {
-      useRailPass: false,
-      daysLeft: 30,
-    },
-    eq: "Zero",
-    moc: 0,
-    currentRolls: 0,
-  };
   const [usingRailPass, setUsingRailPass] = useState(false);
 
   const [usingBP, setUsingBP] = useState<BPType>("None");
@@ -91,6 +93,33 @@ export default function JadeEstimateForm({
   const patchStartDays = futurePatchDateList.patches.map(
     ({ dateStart }) => new Date(dateStart)
   );
+
+  // form setup
+  const form = useForm<FormSchema>({
+    resolver: zodResolver(ENDPOINT.jadeEstimate.payload),
+    defaultValues: defaultFormValues,
+  });
+
+  const debounceOnChange = useDebounce(form.handleSubmit(onSubmit), 300);
+  const untilDateSubscription = form.watch("untilDate");
+
+  // NOTE: bandaid to manually trigger date
+  useEffect(() => {
+    debounceOnChange(null);
+  }, [untilDateSubscription]);
+
+  const { data, mutate } = useMutation({
+    mutationKey: ["jadeEstimate"],
+    mutationFn: async (payload: FormSchema) =>
+      await workerFetch(ENDPOINT.jadeEstimate, {
+        payload,
+        method: "POST",
+      }),
+  });
+
+  useEffect(() => {
+    if (data) updateTable(data);
+  }, [data]);
 
   function getFooterInfo(date: Date | undefined): string | undefined {
     if (date) {
@@ -109,39 +138,10 @@ export default function JadeEstimateForm({
     return undefined;
   }
 
-  // form setup
-  const form = useForm<FormSchema>({
-    resolver: zodResolver(ENDPOINT.jadeEstimate.payload),
-    defaultValues: defaultFormValues,
-  });
-  const debounceOnChange = useDebounce(form.handleSubmit(onSubmit), 300);
-  const untilDateSubscription = form.watch("untilDate");
-
-  // NOTE: bandaid to manually trigger date
-  useEffect(() => {
-    debounceOnChange(null);
-  }, [untilDateSubscription]);
-
-  const [payload, setPayload] = useState(defaultFormValues);
-
-  const { data } = useQuery({
-    queryKey: ["jadeEstimate", payload],
-    queryFn: async () =>
-      await workerFetch(ENDPOINT.jadeEstimate, {
-        payload,
-        method: "POST",
-      }),
-    placeholderData: placeholderTableData,
-  });
-
-  useEffect(() => {
-    if (data) updateTable(data);
-  }, [data]);
-
   function onSubmit(values: FormSchema) {
     const payload: FormSchema = { ...values };
     console.log("onSubmit", payload);
-    setPayload(payload);
+    mutate(payload);
   }
 
   function onSelectDatePreset(date: string) {

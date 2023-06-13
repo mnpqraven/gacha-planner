@@ -6,14 +6,9 @@ import ENDPOINT from "@/server/endpoints";
 import JadeEstimateForm from "./components/JadeEstimateForm";
 import JadeRewardTable from "./components/JadeRewardTable";
 import { placeholderTableData } from "./components/tableData";
+import { dateToISO } from "./components/schemas";
 
 export default function Home() {
-  const [rolls, setRolls] = useState<number | undefined>(undefined);
-
-  function updateAvailableRolls(amount: number) {
-    setRolls(amount);
-  }
-
   const [tableData, setTableData] =
     useState<z.infer<typeof ENDPOINT.jadeEstimate.response>>(
       placeholderTableData

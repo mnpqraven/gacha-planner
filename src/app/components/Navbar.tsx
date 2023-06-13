@@ -7,6 +7,7 @@ import { Button } from "./ui/Button";
 import { Github, LineChart, Moon, Sun, Ticket } from "lucide-react";
 import { useTheme } from "next-themes";
 import { usePathname } from "next/navigation";
+import { CommandCenter } from "./CommandCenter";
 
 const menu = [
   {
@@ -29,9 +30,12 @@ const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {
     cn(defaultLinkClass, pathname !== path ? "text-muted-foreground" : "");
 
   return (
-    <div className="flex items-center h-12 border-b px-4 justify-between">
+    <div className="flex items-center h-12 border-b px-4">
       <nav
-        className={cn("flex items-center space-x-4 lg:space-x-6", className)}
+        className={cn(
+          "flex flex-1 items-center space-x-4 lg:space-x-6",
+          className
+        )}
         {...props}
       >
         {menu.map(({ path, label, icon }) => (
@@ -40,7 +44,8 @@ const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {
           </Link>
         ))}
       </nav>
-      <div className="flex items-center space-x-4 lg:space-x-6">
+      <CommandCenter />
+      <div className="flex flex-1 items-center space-x-4 lg:space-x-6 justify-end">
         <a
           href="https://github.com/mnpqraven/gacha-planner"
           target="_blank"
