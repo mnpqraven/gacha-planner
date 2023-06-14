@@ -13,13 +13,10 @@ import { AlertCircle } from "lucide-react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/HoverCard";
 
 type Props = {
-  data: z.infer<typeof ENDPOINT.jadeEstimate.response> | undefined;
+  data: z.infer<typeof ENDPOINT.jadeEstimate.response>;
 };
 const JadeRewardTable = ({ data }: Props) => {
-  // FIX: with of table when there's no data is shorter,
-  // leading to sudden component movement
-  function getDayInfo() {
-    if (!data) return null;
+  function parseDayCount() {
     if (data.days <= 1) return `(${data.days} day)`;
     else return `(${data.days} days)`;
   }
@@ -36,7 +33,7 @@ const JadeRewardTable = ({ data }: Props) => {
                 <HoverCardTrigger>
                   <AlertCircle className="scale-75 mx-1 align-text-bottom rounded-md hover:bg-accent hover:text-accent-foreground" />
                 </HoverCardTrigger>
-                <HoverCardContent>
+                <HoverCardContent side="top">
                   These are repeatable rewards that are guaranteed to you and
                   does not include one-off rewards like events or redemption
                   codes/promotions. You're bound to receive more than the table
@@ -47,11 +44,11 @@ const JadeRewardTable = ({ data }: Props) => {
           </TableHead>
           <TableHead>Recurring</TableHead>
           <TableHead>Jades</TableHead>
-          <TableHead>Sp. Rail Pass</TableHead>
+          <TableHead>Sp. Pass</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data?.sources.map((source) => (
+        {data.sources.map((source) => (
           <TableRow key={source.source}>
             <TableCell>
               {!source.description ? (
@@ -63,7 +60,9 @@ const JadeRewardTable = ({ data }: Props) => {
                     <HoverCardTrigger className="inline-flex">
                       <AlertCircle className="scale-75 mx-1 align-text-bottom rounded-md hover:bg-accent hover:text-accent-foreground" />
                     </HoverCardTrigger>
-                    <HoverCardContent>{source.description}</HoverCardContent>
+                    <HoverCardContent side="top">
+                      {source.description}
+                    </HoverCardContent>
                   </HoverCard>
                 </div>
               )}
@@ -74,10 +73,10 @@ const JadeRewardTable = ({ data }: Props) => {
           </TableRow>
         ))}
         <TableRow>
-          <TableCell className="font-bold">Total {getDayInfo()}</TableCell>
-          <TableCell></TableCell>
-          <TableCell className="font-bold">{data?.total_jades ?? 0}</TableCell>
-          <TableCell className="font-bold">{data?.rolls ?? 0}</TableCell>
+          <TableCell className="font-bold">Total {parseDayCount()}</TableCell>
+          <TableCell />
+          <TableCell className="font-bold">{data.total_jades}</TableCell>
+          <TableCell className="font-bold">{data.rolls}</TableCell>
         </TableRow>
       </TableBody>
     </Table>

@@ -1,4 +1,4 @@
-import { Banner, useBannerList } from "@/hooks/queries/useBannerList";
+import { Banner, useBannerList } from "@/hooks/queries/useGachaBannerList";
 import {
   Select,
   SelectContent,
@@ -49,7 +49,6 @@ export function GachaForm({
       <form
         onSubmit={form.handleSubmit(updateQuery)}
         onInvalid={(e) => console.log(e)}
-        // className="space-y-4"
         onChange={debounceOnChange}
       >
         <div className="flex flex-col md:flex-row flex-wrap md:space-x-4 gap-y-4 rounded-md border p-4 justify-evenly">
@@ -130,7 +129,9 @@ export function GachaForm({
               <FormItem>
                 <FormLabel>Current {selectedBanner.constPrefix}</FormLabel>
                 <Select
-                  onValueChange={field.onChange}
+                  onValueChange={(e) => {
+                    field.onChange(parseInt(e));
+                  }}
                   value={String(field.value)}
                 >
                   <FormControl>
@@ -164,7 +165,9 @@ export function GachaForm({
               <FormItem>
                 <div className="flex flex-col h-full">
                   <div>
-                    <FormLabel>Next 5✦ Guaranteed</FormLabel>
+                    <FormLabel htmlFor="isGuaranteed">
+                      Next 5✦ Guaranteed
+                    </FormLabel>
                   </div>
                   <div className="flex flex-col justify-center h-full mt-2">
                     <FormControl>
