@@ -11,7 +11,7 @@ import {
   Banner,
   defaultBanner,
   useBannerList,
-} from "@/hooks/queries/useBannerList";
+} from "@/hooks/queries/useGachaBannerList";
 import { ReactECharts } from "../components/ReactEcharts";
 import { GachaForm } from "./GachaForm";
 import { range } from "@/lib/utils";
@@ -186,7 +186,7 @@ function createChartSeries(
     name: `${constShorthand}${eidolon}`,
     type: "line",
     showSymbol: false,
-    areaStyle: { opacity: 0.5 },
+    areaStyle: { opacity: 0.2 + eidolon * 0.1 },
     emphasis: { disabled: true },
     data,
   };

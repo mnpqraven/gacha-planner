@@ -109,6 +109,21 @@ const ENDPOINT = {
           name: z.string(),
           version: z.string(),
           dateStart: z.string().datetime(),
+          date2ndBanner: z.string().datetime(),
+          dateEnd: z.string().datetime(),
+        })
+        .array(),
+    }),
+  },
+  listFuturePatchBanner: {
+    path: "/honkai/list_future_patch_banner",
+    payload: undefined,
+    response: z.object({
+      banners: z
+        .object({
+          characterName: z.string(),
+          version: z.string(),
+          dateStart: z.string().datetime(),
           dateEnd: z.string().datetime(),
         })
         .array(),
