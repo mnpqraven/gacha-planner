@@ -2,7 +2,7 @@ import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, setMonth } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useQuery } from "@tanstack/react-query";
@@ -16,32 +16,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../components/ui/Form";
-import { Switch } from "../components/ui/Switch";
-import { Input } from "../components/ui/Input";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../components/ui/Tabs";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../components/ui/Popover";
-import { Button } from "../components/ui/Button";
+} from "../ui/Form";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
+import { Button } from "../ui/Button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../components/ui/Select";
-import { Calendar } from "../components/ui/Calendar";
+} from "../ui/Select";
+import { Calendar } from "../ui/Calendar";
 import { useEffect, useState } from "react";
-import { dateToISO } from "./schemas";
-import { Separator } from "./ui/Separator";
+import { dateToISO, objToDate } from "../schemas";
 import { useFuturePatchDateList } from "@/hooks/queries/useFuturePatchDate";
 import {
   CommandEmpty,
@@ -50,10 +37,15 @@ import {
   CommandItem,
   CommandList,
   CommandDialog,
-} from "./ui/Command";
+} from "../ui/Command";
 import equal from "fast-deep-equal/react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import STORAGE from "@/server/storage";
+import { useFuturePatchBannerList } from "@/hooks/queries/useFuturePatchBanner";
+import { CalendarFooter } from "./CalendarFooter";
+import { CurrentRollTab } from "./CurrentRollTab";
+import { RailPassField } from "./RailPassField";
+import { BattlePassField } from "./BattlePassField";
 
 type Props = {
   submitButton?: boolean;
@@ -61,7 +53,6 @@ type Props = {
 };
 
 type FormSchema = z.infer<(typeof ENDPOINT)["jadeEstimate"]["payload"]>;
-type BPType = FormSchema["battlePass"]["battlePassType"];
 
 export const defaultFormValues: FormSchema = {
   server: "America",
@@ -80,13 +71,6 @@ export default function JadeEstimateForm({
   updateTable,
   submitButton = false,
 }: Props) {
-  const [usingRailPass, setUsingRailPass] = useState(
-    defaultFormValues.railPass.useRailPass
-  );
-  const [usingBP, setUsingBP] = useState(
-    defaultFormValues.battlePass.battlePassType
-  );
-
   const [uncontrolledDate, setUncontrolledDate] = useState<Date | undefined>(
     new Date()
   );
@@ -100,9 +84,7 @@ export default function JadeEstimateForm({
     useState(defaultFormValues);
 
   const { futurePatchDateList } = useFuturePatchDateList();
-  const patchStartDays = futurePatchDateList.patches.map(
-    ({ dateStart }) => new Date(dateStart)
-  );
+  const { futurePatchBannerList } = useFuturePatchBannerList();
 
   // FORM SETUP
   const form = useForm<FormSchema>({
@@ -127,8 +109,10 @@ export default function JadeEstimateForm({
 
   useEffect(() => {
     if (savedFormData) {
-      console.log("should see", savedFormData);
       form.reset(savedFormData);
+      const updatedDate = objToDate.parse(savedFormData.untilDate);
+      setUncontrolledDate(updatedDate);
+      setMonthController(updatedDate);
       setUncontrolledQueryPayload(savedFormData);
     }
   }, [savedFormData]);
@@ -136,23 +120,6 @@ export default function JadeEstimateForm({
   useEffect(() => {
     if (data) updateTable(data);
   }, [data]);
-
-  function getFooterInfo(date: Date | undefined): string | undefined {
-    if (date) {
-      const find = futurePatchDateList.patches.find((e) => {
-        const left = new Date(e.dateStart);
-        return (
-          left.getDate() === date.getDate() &&
-          left.getMonth() === date.getMonth() &&
-          left.getFullYear() === date.getFullYear()
-        );
-      });
-      if (find) {
-        return `Start of patch ${find.version}`;
-      }
-    }
-    return undefined;
-  }
 
   function onSubmit(values: FormSchema) {
     if (!equal(values, defaultFormValues)) {
@@ -192,12 +159,31 @@ export default function JadeEstimateForm({
     return () => document.removeEventListener("keydown", down);
   }, []);
 
+  const eqField = {
+    label: "Equilibrum Level",
+    description: "You get more rewards the higher your Equilibrum level is",
+    options: [
+      { value: "Zero", label: "0 (TL 20-)" },
+      { value: "One", label: "1 (TL 20+)" },
+      { value: "Two", label: "2 (TL 30+)" },
+      { value: "Three", label: "3 (TL 40+)" },
+      { value: "Four", label: "4 (TL 50+)" },
+      { value: "Five", label: "5 (TL 60+)" },
+      { value: "Six", label: "6 (TL 65+)" },
+    ],
+  };
+  const mocField = {
+    label: "Memory of Chaos",
+    description: "Amount of stars you can clear in a MoC cycle",
+    options: mocStars(),
+  };
+
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-4"
-        // onChange={debounceOnChange}
+        onChange={debounceOnChange}
       >
         <FormField
           control={form.control}
@@ -218,6 +204,7 @@ export default function JadeEstimateForm({
                       <FormItem>
                         <Select
                           onValueChange={serverField.onChange}
+                          value={String(form.watch("server"))}
                           defaultValue={serverField.value}
                         >
                           <FormControl>
@@ -243,8 +230,8 @@ export default function JadeEstimateForm({
                             !dateField.value && "text-muted-foreground"
                           )}
                         >
-                          {uncontrolledDate ? (
-                            format(uncontrolledDate, "PPP")
+                          {dateField.value ? (
+                            format(objToDate.parse(dateField.value), "PPP")
                           ) : (
                             <span>Pick a date</span>
                           )}
@@ -294,19 +281,34 @@ export default function JadeEstimateForm({
                         mode="single"
                         selected={uncontrolledDate}
                         onSelect={(e) => {
-                          setUncontrolledDate(e);
-                          dateField.onChange(
-                            e ? dateToISO.parse(e) : undefined
-                          );
+                          if (e) {
+                            setUncontrolledDate(e);
+                            dateField.onChange(dateToISO.parse(e));
+                          }
                         }}
                         disabled={beforeToday}
                         month={monthController}
                         onMonthChange={setMonthController}
-                        modifiers={{ patchStart: patchStartDays }}
-                        modifiersStyles={{
-                          patchStart: { border: "2px solid white" },
+                        modifiers={{
+                          patchStart: futurePatchDateList.patches.map(
+                            (e) => new Date(e.dateStart)
+                          ),
+                          patchBanner: futurePatchBannerList.banners.map(
+                            (e) => new Date(e.dateStart)
+                          ),
                         }}
-                        footer={getFooterInfo(uncontrolledDate)}
+                        modifiersStyles={{
+                          patchStart: {
+                            fontWeight: "bold",
+                            border: "1px dashed green",
+                          },
+                          patchBanner: {
+                            fontWeight: "bold",
+                            textDecorationLine: "underline",
+                            textUnderlinePosition: "under",
+                          },
+                        }}
+                        footer={<CalendarFooter date={uncontrolledDate} />}
                         initialFocus
                       />
                     </PopoverContent>
@@ -316,130 +318,8 @@ export default function JadeEstimateForm({
             </FormItem>
           )}
         />
-        <div className="rounded-md border p-4">
-          <FormField
-            control={form.control}
-            name="railPass.useRailPass"
-            render={({ field }) => (
-              <FormItem>
-                <div className="flex items-center">
-                  <div className="flex-1">
-                    <FormLabel>Rail Pass</FormLabel>
-                    <FormDescription>Opt-in</FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={(e) => {
-                        setUsingRailPass(e);
-                        field.onChange(e);
-                      }}
-                    />
-                  </FormControl>
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {usingRailPass && (
-            <>
-              <Separator className="my-4" />
-              <FormField
-                control={form.control}
-                name="railPass.daysLeft"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex items-center">
-                      <div className="flex-1">
-                        <FormLabel>Days Left</FormLabel>
-                        <FormDescription>
-                          You'll receive 300 jades for renewing the subscription
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Input type="number" {...field} className="w-20" />
-                      </FormControl>
-                    </div>
-                  </FormItem>
-                )}
-              />
-            </>
-          )}
-        </div>
-        <div className="rounded-md border p-4">
-          <FormField
-            control={form.control}
-            name="battlePass.battlePassType"
-            render={({ field }) => (
-              <FormItem>
-                <div className="flex items-center">
-                  <div className="flex-1 space-y-1">
-                    <FormLabel>Nameless Honor</FormLabel>
-                    <FormDescription>
-                      If not selecting F2P, this assumes you've received the
-                      current patch's first time purchase rewards and those
-                      won't be calculated.
-                    </FormDescription>
-                  </div>
-                  <Select
-                    onValueChange={(e) => {
-                      field.onChange(e);
-                      setUsingBP(e as unknown as NonNullable<typeof usingBP>);
-                    }}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-fit">
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="None">F2P</SelectItem>
-                      <SelectItem value="Basic">Nameless Glory</SelectItem>
-                      <SelectItem value="Premium">Nameless Medal</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-          {usingBP !== "None" && (
-            <>
-              <Separator className="my-4" />
-              <FormField
-                control={form.control}
-                name="battlePass.currentLevel"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <div className="flex items-center">
-                      <div className="flex-1 space-y-1">
-                        <FormLabel>Current Nameless Honor Level</FormLabel>
-                        <FormDescription>
-                          This assumes you level up by 10 every Monday.
-                          <br />
-                          If you select 'Nameless Medal' then keep in mind you
-                          also get 10 levels for free, please update the level
-                          accordingly.
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Input
-                          className="w-20"
-                          type="number"
-                          min={0}
-                          onKeyDown={preventMinus}
-                          {...field}
-                        />
-                      </FormControl>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </>
-          )}
-        </div>
+        <RailPassField form={form} />
+        <BattlePassField form={form} />
         <FormField
           control={form.control}
           name="eq"
@@ -454,6 +334,7 @@ export default function JadeEstimateForm({
                 </div>
                 <Select
                   onValueChange={field.onChange}
+                  value={String(form.watch("eq"))}
                   defaultValue={field.value}
                 >
                   <FormControl>
@@ -490,6 +371,7 @@ export default function JadeEstimateForm({
                 </div>
                 <Select
                   onValueChange={field.onChange}
+                  value={String(form.watch("moc"))}
                   defaultValue={String(field.value)}
                 >
                   <FormControl>
@@ -500,7 +382,7 @@ export default function JadeEstimateForm({
                   <SelectContent>
                     {mocStars().map((value) => (
                       <SelectItem value={String(value)} key={value}>
-                        {value}*
+                        {value} ✦
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -510,73 +392,7 @@ export default function JadeEstimateForm({
             </FormItem>
           )}
         />
-
-        <div className="flex items-center space-x-4 rounded-md border p-4">
-          <Tabs defaultValue="currentRolls" className="w-full">
-            <TabsList className="w-full">
-              <TabsTrigger value="currentRolls" className="w-full">
-                Rolls
-              </TabsTrigger>
-              <TabsTrigger value="currentJades" className="w-full">
-                Jades
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="currentRolls">
-              <FormField
-                control={form.control}
-                name="currentRolls"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex">
-                      <div className="flex-1 space-y-1">
-                        <FormLabel>Current rolls</FormLabel>
-                        <FormDescription>
-                          Amount of rolls you currently possess
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Input
-                          className="w-20"
-                          type="number"
-                          min={0}
-                          {...field}
-                        />
-                      </FormControl>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </TabsContent>
-            <TabsContent value="currentJades">
-              <FormField
-                control={form.control}
-                name="currentJades"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex">
-                      <div className="flex-1 space-y-1">
-                        <FormLabel>Current jades</FormLabel>
-                        <FormDescription>
-                          Amount of jades you currently possess
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Input
-                          className="w-20"
-                          type="number"
-                          min={0}
-                          {...field}
-                        />
-                      </FormControl>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </TabsContent>
-          </Tabs>
-        </div>
+        <CurrentRollTab form={form} />
         {submitButton && <Button type="submit">Calculate</Button>}
       </form>
     </Form>
@@ -592,12 +408,12 @@ function beforeToday(date: Date): boolean {
   return date < b;
 }
 
-function mocStars(): number[] {
-  function* range(start: number, end: number, step: number) {
-    while (start <= end) {
-      yield start;
-      start += step;
-    }
+function* range(start: number, end: number, step: number) {
+  while (start <= end) {
+    yield start;
+    start += step;
   }
+}
+function mocStars(): number[] {
   return Array.from(range(0, 30, 3));
 }
