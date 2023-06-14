@@ -34,9 +34,12 @@ import {
   CardTitle,
 } from "./ui/Card";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useRouter } from "next/navigation";
 
-type Props = {};
-const CommandCenter = ({}: Props) => {
+type Props = {
+  routes: { path: string; label: string; icon: JSX.Element }[];
+};
+const CommandCenter = ({ routes }: Props) => {
   const [open, setOpen] = useState(false);
   const [uidOpen, setUidOpen] = useState(false);
   const [mhyProfile, setMhyProfile] = useLocalStorage<MihoResponse | undefined>(
@@ -44,6 +47,7 @@ const CommandCenter = ({}: Props) => {
     undefined
   );
   const [profile, setProfile] = useState(mhyProfile);
+  const router = useRouter();
 
   useEffect(() => {
     if (mhyProfile) setProfile(mhyProfile);
@@ -83,6 +87,10 @@ const CommandCenter = ({}: Props) => {
     // 805768477
     uidQuery.mutate({ id: e.target.value });
   }
+  function commandSelectRoute(path: string) {
+    router.push(path);
+    setOpen(false);
+  }
 
   return (
     <>
@@ -101,11 +109,20 @@ const CommandCenter = ({}: Props) => {
         <CommandInput placeholder="Click on a result or search..." />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup>
+          <CommandGroup heading="Configurations">
             <CommandItem onSelect={uidModalOpen}>
               <UserPlus2 className="mr-2 h-4 w-4" />
               <span>Set UID</span>
             </CommandItem>
+          </CommandGroup>
+          <CommandSeparator />
+          <CommandGroup heading="Tools">
+            {routes.map(({ path, icon, label }) => (
+              <CommandItem onSelect={() => commandSelectRoute(path)} key={path}>
+                <span className="mr-2">{icon}</span>
+                <span>{label}</span>
+              </CommandItem>
+            ))}
           </CommandGroup>
         </CommandList>
       </CommandDialog>
