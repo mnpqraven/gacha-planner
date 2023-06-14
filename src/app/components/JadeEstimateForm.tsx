@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { workerFetch } from "@/server/fetchHelper";
 import ENDPOINT from "@/server/endpoints";
 import {
@@ -41,28 +41,26 @@ import {
 import { Calendar } from "../components/ui/Calendar";
 import { useEffect, useState } from "react";
 import { dateToISO } from "./schemas";
-import { placeholderTableData } from "./tableData";
 import { Separator } from "./ui/Separator";
 import { useFuturePatchDateList } from "@/hooks/queries/useFuturePatchDate";
 import {
-  Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
   CommandDialog,
-  CommandSeparator,
-  CommandShortcut,
 } from "./ui/Command";
+import equal from "fast-deep-equal/react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import STORAGE from "@/server/storage";
 
 type Props = {
   submitButton?: boolean;
   updateTable: (to: z.infer<typeof ENDPOINT.jadeEstimate.response>) => void;
 };
 
-type FormSchema = z.infer<typeof ENDPOINT.jadeEstimate.payload>;
+type FormSchema = z.infer<(typeof ENDPOINT)["jadeEstimate"]["payload"]>;
 type BPType = FormSchema["battlePass"]["battlePassType"];
 
 export const defaultFormValues: FormSchema = {
@@ -82,40 +80,58 @@ export default function JadeEstimateForm({
   updateTable,
   submitButton = false,
 }: Props) {
-  const [usingRailPass, setUsingRailPass] = useState(false);
-
-  const [usingBP, setUsingBP] = useState<BPType>("None");
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [monthController, setMonthController] = useState<Date | undefined>(
-    date
+  const [usingRailPass, setUsingRailPass] = useState(
+    defaultFormValues.railPass.useRailPass
   );
+  const [usingBP, setUsingBP] = useState(
+    defaultFormValues.battlePass.battlePassType
+  );
+
+  const [uncontrolledDate, setUncontrolledDate] = useState<Date | undefined>(
+    new Date()
+  );
+  const [monthController, setMonthController] = useState<Date | undefined>(
+    uncontrolledDate
+  );
+  const [savedFormData, setSavedFormData] = useLocalStorage<
+    FormSchema | undefined
+  >(STORAGE.jadeEstimateForm, undefined);
+  const [uncontrolledQueryPayload, setUncontrolledQueryPayload] =
+    useState(defaultFormValues);
+
   const { futurePatchDateList } = useFuturePatchDateList();
   const patchStartDays = futurePatchDateList.patches.map(
     ({ dateStart }) => new Date(dateStart)
   );
 
-  // form setup
+  // FORM SETUP
   const form = useForm<FormSchema>({
     resolver: zodResolver(ENDPOINT.jadeEstimate.payload),
     defaultValues: defaultFormValues,
   });
-
   const debounceOnChange = useDebounce(form.handleSubmit(onSubmit), 300);
   const untilDateSubscription = form.watch("untilDate");
 
-  // NOTE: bandaid to manually trigger date
+  const { data } = useQuery({
+    queryKey: ["jadeEstimate", uncontrolledQueryPayload],
+    queryFn: async () =>
+      await workerFetch(ENDPOINT.jadeEstimate, {
+        payload: uncontrolledQueryPayload,
+        method: "POST",
+      }),
+  });
+
   useEffect(() => {
     debounceOnChange(null);
   }, [untilDateSubscription]);
 
-  const { data, mutate } = useMutation({
-    mutationKey: ["jadeEstimate"],
-    mutationFn: async (payload: FormSchema) =>
-      await workerFetch(ENDPOINT.jadeEstimate, {
-        payload,
-        method: "POST",
-      }),
-  });
+  useEffect(() => {
+    if (savedFormData) {
+      console.log("should see", savedFormData);
+      form.reset(savedFormData);
+      setUncontrolledQueryPayload(savedFormData);
+    }
+  }, [savedFormData]);
 
   useEffect(() => {
     if (data) updateTable(data);
@@ -139,19 +155,21 @@ export default function JadeEstimateForm({
   }
 
   function onSubmit(values: FormSchema) {
-    const payload: FormSchema = { ...values };
-    console.log("onSubmit", payload);
-    mutate(payload);
+    if (!equal(values, defaultFormValues)) {
+      // console.log("onSubmit", values);
+      // NOTE: this deep check is importnant
+      if (!equal(savedFormData, values)) setSavedFormData(values);
+    }
   }
 
   function onSelectDatePreset(date: string) {
     // today
     if (date === "0") {
       let nextDate = new Date();
-      setDate(nextDate);
+      setUncontrolledDate(nextDate);
       setMonthController(nextDate);
     } else {
-      setDate(new Date(date));
+      setUncontrolledDate(new Date(date));
       setMonthController(new Date(date));
     }
     setOpen(false);
@@ -175,271 +193,199 @@ export default function JadeEstimateForm({
   }, []);
 
   return (
-    <>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4"
-          onChange={debounceOnChange}
-        >
-          <FormField
-            control={form.control}
-            name="untilDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <div className="flex items-center space-x-4 rounded-md border p-4">
-                  <div className="flex-1 space-y-1">
-                    <FormLabel>Goal Date</FormLabel>
-                    <FormDescription>The date that you'll pull</FormDescription>
-                    <FormMessage />
-                  </div>
-                  <div className="flex flex-col lg:flex-row gap-4">
-                    <FormField
-                      control={form.control}
-                      name="server"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="Asia">Asia</SelectItem>
-                              <SelectItem value="America">America</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormItem>
-                      )}
-                    />
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-fit pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {date ? (
-                              format(date, "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        className="flex w-auto flex-col space-y-2 p-2"
-                        align="start"
-                      >
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4"
+        // onChange={debounceOnChange}
+      >
+        <FormField
+          control={form.control}
+          name="untilDate"
+          render={({ field: dateField }) => (
+            <FormItem className="flex flex-col">
+              <div className="flex items-center space-x-4 rounded-md border p-4">
+                <div className="flex-1 space-y-1">
+                  <FormLabel>Goal Date</FormLabel>
+                  <FormDescription>The date that you'll pull</FormDescription>
+                  <FormMessage />
+                </div>
+                <div className="flex flex-col lg:flex-row gap-4">
+                  <FormField
+                    control={form.control}
+                    name="server"
+                    render={({ field: serverField }) => (
+                      <FormItem>
+                        <Select
+                          onValueChange={serverField.onChange}
+                          defaultValue={serverField.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Asia">Asia</SelectItem>
+                            <SelectItem value="America">America</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )}
+                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
                         <Button
                           variant={"outline"}
-                          className="justify-between"
-                          onClick={() => setOpen(true)}
+                          className={cn(
+                            "w-fit pl-3 text-left font-normal",
+                            !dateField.value && "text-muted-foreground"
+                          )}
                         >
-                          <span>Jump to ...</span>
-                          <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-                            <span className="text-xs">⌘/Alt + K</span>
-                          </kbd>
+                          {uncontrolledDate ? (
+                            format(uncontrolledDate, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
                         </Button>
-                        <CommandDialog open={open} onOpenChange={setOpen}>
-                          <CommandInput placeholder="Click on a result or search..." />
-                          <CommandList>
-                            <CommandEmpty>No results found.</CommandEmpty>
-                            <CommandGroup>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="flex w-auto flex-col space-y-2 p-2"
+                      align="start"
+                    >
+                      <Button
+                        variant={"outline"}
+                        className="justify-between"
+                        onClick={() => setOpen(true)}
+                      >
+                        <span>Jump to ...</span>
+                        <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                          <span className="text-xs">⌘/Alt + K</span>
+                        </kbd>
+                      </Button>
+                      <CommandDialog open={open} onOpenChange={setOpen}>
+                        <CommandInput placeholder="Click on a result or search..." />
+                        <CommandList>
+                          <CommandEmpty>No results found.</CommandEmpty>
+                          <CommandGroup>
+                            <CommandItem
+                              onSelect={() => onSelectDatePreset("0")}
+                            >
+                              Today
+                            </CommandItem>
+                            {futurePatchDateList.patches.map((e) => (
                               <CommandItem
-                                onSelect={() => onSelectDatePreset("0")}
+                                key={e.version}
+                                onSelect={() => onSelectDatePreset(e.dateStart)}
                               >
-                                Today
+                                {e.name} - {new Date(e.dateStart).getUTCDate()}/
+                                {new Date(e.dateStart).getUTCMonth() + 1}
                               </CommandItem>
-                              {futurePatchDateList.patches.map((e) => (
-                                <CommandItem
-                                  key={e.version}
-                                  onSelect={() =>
-                                    onSelectDatePreset(e.dateStart)
-                                  }
-                                >
-                                  {e.name} -{" "}
-                                  {new Date(e.dateStart).getUTCDate()}/
-                                  {new Date(e.dateStart).getUTCMonth() + 1}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </CommandDialog>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </CommandDialog>
 
-                        <Calendar
-                          className="py-0"
-                          mode="single"
-                          selected={date}
-                          onSelect={(e) => {
-                            setDate(e);
-                            if (e) field.onChange(dateToISO.parse(e));
-                            else field.onChange(undefined);
-                          }}
-                          disabled={beforeToday}
-                          month={monthController}
-                          onMonthChange={setMonthController}
-                          modifiers={{ patchStart: patchStartDays }}
-                          modifiersStyles={{
-                            patchStart: { border: "2px solid white" },
-                          }}
-                          footer={getFooterInfo(date)}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
+                      <Calendar
+                        className="py-0"
+                        mode="single"
+                        selected={uncontrolledDate}
+                        onSelect={(e) => {
+                          setUncontrolledDate(e);
+                          dateField.onChange(
+                            e ? dateToISO.parse(e) : undefined
+                          );
+                        }}
+                        disabled={beforeToday}
+                        month={monthController}
+                        onMonthChange={setMonthController}
+                        modifiers={{ patchStart: patchStartDays }}
+                        modifiersStyles={{
+                          patchStart: { border: "2px solid white" },
+                        }}
+                        footer={getFooterInfo(uncontrolledDate)}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
+              </div>
+            </FormItem>
+          )}
+        />
+        <div className="rounded-md border p-4">
+          <FormField
+            control={form.control}
+            name="railPass.useRailPass"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-center">
+                  <div className="flex-1">
+                    <FormLabel>Rail Pass</FormLabel>
+                    <FormDescription>Opt-in</FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={(e) => {
+                        setUsingRailPass(e);
+                        field.onChange(e);
+                      }}
+                    />
+                  </FormControl>
+                </div>
+                <FormMessage />
               </FormItem>
             )}
           />
-          <div className="rounded-md border p-4">
-            <FormField
-              control={form.control}
-              name="railPass.useRailPass"
-              render={({ field }) => (
-                <FormItem>
-                  <div className="flex items-center">
-                    <div className="flex-1">
-                      <FormLabel>Rail Pass</FormLabel>
-                      <FormDescription>Opt-in</FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={(e) => {
-                          setUsingRailPass(e);
-                          field.onChange(e);
-                        }}
-                      />
-                    </FormControl>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {usingRailPass && (
-              <>
-                <Separator className="my-4" />
-                <FormField
-                  control={form.control}
-                  name="railPass.daysLeft"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="flex items-center">
-                        <div className="flex-1">
-                          <FormLabel>Days Left</FormLabel>
-                          <FormDescription>
-                            You'll receive 300 jades for renewing the
-                            subscription
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Input type="number" {...field} className="w-20" />
-                        </FormControl>
+          {usingRailPass && (
+            <>
+              <Separator className="my-4" />
+              <FormField
+                control={form.control}
+                name="railPass.daysLeft"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center">
+                      <div className="flex-1">
+                        <FormLabel>Days Left</FormLabel>
+                        <FormDescription>
+                          You'll receive 300 jades for renewing the subscription
+                        </FormDescription>
                       </div>
-                    </FormItem>
-                  )}
-                />
-              </>
-            )}
-          </div>
-          <div className="rounded-md border p-4">
-            <FormField
-              control={form.control}
-              name="battlePass.battlePassType"
-              render={({ field }) => (
-                <FormItem>
-                  <div className="flex items-center">
-                    <div className="flex-1 space-y-1">
-                      <FormLabel>Nameless Honor</FormLabel>
-                      <FormDescription>
-                        If not selecting F2P, this assumes you've received the
-                        current patch's first time purchase rewards and those
-                        won't be calculated.
-                      </FormDescription>
-                    </div>
-                    <Select
-                      onValueChange={(e) => {
-                        field.onChange(e);
-                        setUsingBP(e as unknown as NonNullable<typeof usingBP>);
-                      }}
-                      defaultValue={field.value}
-                    >
                       <FormControl>
-                        <SelectTrigger className="w-fit">
-                          <SelectValue />
-                        </SelectTrigger>
+                        <Input type="number" {...field} className="w-20" />
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="None">F2P</SelectItem>
-                        <SelectItem value="Basic">Nameless Glory</SelectItem>
-                        <SelectItem value="Premium">Nameless Medal</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </div>
-                </FormItem>
-              )}
-            />
-            {usingBP !== "None" && (
-              <>
-                <Separator className="my-4" />
-                <FormField
-                  control={form.control}
-                  name="battlePass.currentLevel"
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <div className="flex items-center">
-                        <div className="flex-1 space-y-1">
-                          <FormLabel>Current Nameless Honor Level</FormLabel>
-                          <FormDescription>
-                            This assumes you level up by 10 every Monday.
-                            <br />
-                            If you select 'Nameless Medal' then keep in mind you
-                            also get 10 levels for free, please update the level
-                            accordingly.
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Input
-                            className="w-20"
-                            type="number"
-                            min={0}
-                            onKeyDown={preventMinus}
-                            {...field}
-                          />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </>
-            )}
-          </div>
+                    </div>
+                  </FormItem>
+                )}
+              />
+            </>
+          )}
+        </div>
+        <div className="rounded-md border p-4">
           <FormField
             control={form.control}
-            name="eq"
+            name="battlePass.battlePassType"
             render={({ field }) => (
               <FormItem>
-                <div className="flex items-center space-x-4 rounded-md border p-4">
+                <div className="flex items-center">
                   <div className="flex-1 space-y-1">
-                    <FormLabel>Equilibrum Level</FormLabel>
+                    <FormLabel>Nameless Honor</FormLabel>
                     <FormDescription>
-                      You get more rewards the higher your Equilibrum level is
+                      If not selecting F2P, this assumes you've received the
+                      current patch's first time purchase rewards and those
+                      won't be calculated.
                     </FormDescription>
                   </div>
                   <Select
-                    onValueChange={field.onChange}
+                    onValueChange={(e) => {
+                      field.onChange(e);
+                      setUsingBP(e as unknown as NonNullable<typeof usingBP>);
+                    }}
                     defaultValue={field.value}
                   >
                     <FormControl>
@@ -448,13 +394,9 @@ export default function JadeEstimateForm({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="Zero">0 (TL 20-)</SelectItem>
-                      <SelectItem value="One">1 (TL 20+)</SelectItem>
-                      <SelectItem value="Two">2 (TL 30+)</SelectItem>
-                      <SelectItem value="Three">3 (TL 40+)</SelectItem>
-                      <SelectItem value="Four">4 (TL 50+)</SelectItem>
-                      <SelectItem value="Five">5 (TL 60+)</SelectItem>
-                      <SelectItem value="Six">6 (TL 65+)</SelectItem>
+                      <SelectItem value="None">F2P</SelectItem>
+                      <SelectItem value="Basic">Nameless Glory</SelectItem>
+                      <SelectItem value="Premium">Nameless Medal</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -462,111 +404,182 @@ export default function JadeEstimateForm({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="moc"
-            render={({ field }) => (
-              <FormItem>
-                <div className="flex items-center space-x-4 rounded-md border p-4">
-                  <div className="flex-1 space-y-1">
-                    <FormLabel>Memory of Chaos</FormLabel>
-                    <FormDescription>
-                      Amount of stars you can clear in a MoC cycle
-                    </FormDescription>
-                  </div>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={String(field.value)}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-fit">
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {mocStars().map((value) => (
-                        <SelectItem value={String(value)} key={value}>
-                          {value}*
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
+          {usingBP !== "None" && (
+            <>
+              <Separator className="my-4" />
+              <FormField
+                control={form.control}
+                name="battlePass.currentLevel"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <div className="flex items-center">
+                      <div className="flex-1 space-y-1">
+                        <FormLabel>Current Nameless Honor Level</FormLabel>
+                        <FormDescription>
+                          This assumes you level up by 10 every Monday.
+                          <br />
+                          If you select 'Nameless Medal' then keep in mind you
+                          also get 10 levels for free, please update the level
+                          accordingly.
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Input
+                          className="w-20"
+                          type="number"
+                          min={0}
+                          onKeyDown={preventMinus}
+                          {...field}
+                        />
+                      </FormControl>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </>
+          )}
+        </div>
+        <FormField
+          control={form.control}
+          name="eq"
+          render={({ field }) => (
+            <FormItem>
+              <div className="flex items-center space-x-4 rounded-md border p-4">
+                <div className="flex-1 space-y-1">
+                  <FormLabel>Equilibrum Level</FormLabel>
+                  <FormDescription>
+                    You get more rewards the higher your Equilibrum level is
+                  </FormDescription>
                 </div>
-              </FormItem>
-            )}
-          />
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className="w-fit">
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="Zero">0 (TL 20-)</SelectItem>
+                    <SelectItem value="One">1 (TL 20+)</SelectItem>
+                    <SelectItem value="Two">2 (TL 30+)</SelectItem>
+                    <SelectItem value="Three">3 (TL 40+)</SelectItem>
+                    <SelectItem value="Four">4 (TL 50+)</SelectItem>
+                    <SelectItem value="Five">5 (TL 60+)</SelectItem>
+                    <SelectItem value="Six">6 (TL 65+)</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </div>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="moc"
+          render={({ field }) => (
+            <FormItem>
+              <div className="flex items-center space-x-4 rounded-md border p-4">
+                <div className="flex-1 space-y-1">
+                  <FormLabel>Memory of Chaos</FormLabel>
+                  <FormDescription>
+                    Amount of stars you can clear in a MoC cycle
+                  </FormDescription>
+                </div>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={String(field.value)}
+                >
+                  <FormControl>
+                    <SelectTrigger className="w-fit">
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {mocStars().map((value) => (
+                      <SelectItem value={String(value)} key={value}>
+                        {value}*
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </div>
+            </FormItem>
+          )}
+        />
 
-          <div className="flex items-center space-x-4 rounded-md border p-4">
-            <Tabs defaultValue="currentRolls" className="w-full">
-              <TabsList className="w-full">
-                <TabsTrigger value="currentRolls" className="w-full">
-                  Rolls
-                </TabsTrigger>
-                <TabsTrigger value="currentJades" className="w-full">
-                  Jades
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="currentRolls">
-                <FormField
-                  control={form.control}
-                  name="currentRolls"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="flex">
-                        <div className="flex-1 space-y-1">
-                          <FormLabel>Current rolls</FormLabel>
-                          <FormDescription>
-                            Amount of rolls you currently possess
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Input
-                            className="w-20"
-                            type="number"
-                            min={0}
-                            {...field}
-                          />
-                        </FormControl>
+        <div className="flex items-center space-x-4 rounded-md border p-4">
+          <Tabs defaultValue="currentRolls" className="w-full">
+            <TabsList className="w-full">
+              <TabsTrigger value="currentRolls" className="w-full">
+                Rolls
+              </TabsTrigger>
+              <TabsTrigger value="currentJades" className="w-full">
+                Jades
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="currentRolls">
+              <FormField
+                control={form.control}
+                name="currentRolls"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex">
+                      <div className="flex-1 space-y-1">
+                        <FormLabel>Current rolls</FormLabel>
+                        <FormDescription>
+                          Amount of rolls you currently possess
+                        </FormDescription>
                       </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </TabsContent>
-              <TabsContent value="currentJades">
-                <FormField
-                  control={form.control}
-                  name="currentJades"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="flex">
-                        <div className="flex-1 space-y-1">
-                          <FormLabel>Current jades</FormLabel>
-                          <FormDescription>
-                            Amount of jades you currently possess
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Input
-                            className="w-20"
-                            type="number"
-                            min={0}
-                            {...field}
-                          />
-                        </FormControl>
+                      <FormControl>
+                        <Input
+                          className="w-20"
+                          type="number"
+                          min={0}
+                          {...field}
+                        />
+                      </FormControl>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </TabsContent>
+            <TabsContent value="currentJades">
+              <FormField
+                control={form.control}
+                name="currentJades"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex">
+                      <div className="flex-1 space-y-1">
+                        <FormLabel>Current jades</FormLabel>
+                        <FormDescription>
+                          Amount of jades you currently possess
+                        </FormDescription>
                       </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </TabsContent>
-            </Tabs>
-          </div>
-          {submitButton && <Button type="submit">Calculate</Button>}
-        </form>
-      </Form>
-    </>
+                      <FormControl>
+                        <Input
+                          className="w-20"
+                          type="number"
+                          min={0}
+                          {...field}
+                        />
+                      </FormControl>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </TabsContent>
+          </Tabs>
+        </div>
+        {submitButton && <Button type="submit">Calculate</Button>}
+      </form>
+    </Form>
   );
 }
 

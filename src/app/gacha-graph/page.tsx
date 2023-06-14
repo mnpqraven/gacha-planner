@@ -16,16 +16,23 @@ import { ReactECharts } from "../components/ReactEcharts";
 import { GachaForm } from "./GachaForm";
 import { range } from "@/lib/utils";
 import { defaultGachaQuery } from "./types";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import STORAGE from "@/server/storage";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import equal from "fast-deep-equal/react";
 
 type FormSchema = z.infer<typeof ENDPOINT.probabilityRate.payload>;
 
 export default function GachaGraph() {
-  const [currentEidolon, setCurrentEidolon] = useState(-1);
   const { theme } = useTheme();
   const { bannerList } = useBannerList();
   const [selectedBanner, setSelectedBanner] = useState<Banner>(defaultBanner);
 
   const [payload, setPayload] = useState(defaultGachaQuery);
+  const [savedFormData, setSavedFormData] = useLocalStorage<
+    typeof payload | undefined
+  >(STORAGE.gachaForm, undefined);
 
   const { data } = useQuery({
     queryKey: [ENDPOINT.probabilityRate, payload],
@@ -41,18 +48,31 @@ export default function GachaGraph() {
     roll_budget: 0,
   });
 
+  const form = useForm<z.infer<typeof ENDPOINT.probabilityRate.payload>>({
+    resolver: zodResolver(ENDPOINT.probabilityRate.payload),
+    defaultValues: defaultGachaQuery,
+  });
+
   // avoids mutating current on-screen chart data to undefined, not sure if
   // this is the best way
   useEffect(() => {
     if (data) setDefinedData(data);
   }, [data]);
 
+  useEffect(() => {
+    if (savedFormData) {
+      form.reset(savedFormData);
+      setPayload(savedFormData);
+    }
+  }, [savedFormData]);
+  const eidolonSubscriber = form.watch("currentEidolon");
+
   // this is getting triggered every re-render
   const chartOption = useMemo(
     () =>
       chartOptions({
         data: definedData,
-        currentEidolon,
+        currentEidolon: eidolonSubscriber,
         selectedBanner,
         theme,
       }),
@@ -62,7 +82,9 @@ export default function GachaGraph() {
   function updateQuery(
     payload: z.infer<typeof ENDPOINT.probabilityRate.payload>
   ) {
-    setPayload(payload);
+    if (!equal(payload, defaultGachaQuery)) {
+      if (!equal(savedFormData, payload)) setSavedFormData(payload);
+    }
   }
 
   function updateSelectedBanner(bannerType: FormSchema["banner"]) {
@@ -76,7 +98,7 @@ export default function GachaGraph() {
           updateQuery={updateQuery}
           bannerOnChange={updateSelectedBanner}
           selectedBanner={selectedBanner}
-          updateEidolon={setCurrentEidolon}
+          form={form}
         />
       </div>
       {definedData.roll_budget > 0 && (

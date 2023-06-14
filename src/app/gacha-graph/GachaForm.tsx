@@ -18,32 +18,26 @@ import {
 } from "../components/ui/Form";
 import * as z from "zod";
 import ENDPOINT from "@/server/endpoints";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { UseFormReturn } from "react-hook-form";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Switch } from "../components/ui/Switch";
-import { defaultGachaQuery } from "./types";
 
 type FormSchema = z.infer<typeof ENDPOINT.probabilityRate.payload>;
 
 type Props = {
   updateQuery: (payload: FormSchema) => void;
   bannerOnChange: (value: FormSchema["banner"]) => void;
-  updateEidolon: (value: number) => void;
   selectedBanner: Banner;
+  form: UseFormReturn<FormSchema>;
 };
 
 export function GachaForm({
   updateQuery,
   selectedBanner,
   bannerOnChange,
-  updateEidolon,
+  form,
 }: Props) {
   const { bannerList } = useBannerList();
-  const form = useForm<FormSchema>({
-    resolver: zodResolver(ENDPOINT.probabilityRate.payload),
-    defaultValues: defaultGachaQuery,
-  });
   const debounceOnChange = useDebounce(form.handleSubmit(updateQuery), 300);
 
   function preventMinus(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -136,10 +130,7 @@ export function GachaForm({
               <FormItem>
                 <FormLabel>Current {selectedBanner.constPrefix}</FormLabel>
                 <Select
-                  onValueChange={(e) => {
-                    field.onChange(parseInt(e));
-                    updateEidolon(parseInt(e));
-                  }}
+                  onValueChange={field.onChange}
                   value={String(field.value)}
                 >
                   <FormControl>

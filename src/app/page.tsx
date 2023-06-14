@@ -7,7 +7,9 @@ import JadeEstimateForm from "./components/JadeEstimateForm";
 import JadeRewardTable from "./components/JadeRewardTable";
 import { placeholderTableData } from "./components/tableData";
 import { dateToISO } from "./components/schemas";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 
+type FormSchema = z.infer<typeof ENDPOINT.jadeEstimate.payload>;
 export default function Home() {
   const [tableData, setTableData] =
     useState<z.infer<typeof ENDPOINT.jadeEstimate.response>>(
