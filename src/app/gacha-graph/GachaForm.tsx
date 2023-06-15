@@ -1,4 +1,4 @@
-import { Banner, useBannerList } from "@/hooks/queries/useBannerList";
+import { Banner, useBannerList } from "@/hooks/queries/useGachaBannerList";
 import {
   Select,
   SelectContent,
@@ -18,32 +18,26 @@ import {
 } from "../components/ui/Form";
 import * as z from "zod";
 import ENDPOINT from "@/server/endpoints";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { UseFormReturn } from "react-hook-form";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Switch } from "../components/ui/Switch";
-import { defaultGachaQuery } from "./types";
 
 type FormSchema = z.infer<typeof ENDPOINT.probabilityRate.payload>;
 
 type Props = {
   updateQuery: (payload: FormSchema) => void;
   bannerOnChange: (value: FormSchema["banner"]) => void;
-  updateEidolon: (value: number) => void;
   selectedBanner: Banner;
+  form: UseFormReturn<FormSchema>;
 };
 
 export function GachaForm({
   updateQuery,
   selectedBanner,
   bannerOnChange,
-  updateEidolon,
+  form,
 }: Props) {
   const { bannerList } = useBannerList();
-  const form = useForm<FormSchema>({
-    resolver: zodResolver(ENDPOINT.probabilityRate.payload),
-    defaultValues: defaultGachaQuery,
-  });
   const debounceOnChange = useDebounce(form.handleSubmit(updateQuery), 300);
 
   function preventMinus(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -55,7 +49,6 @@ export function GachaForm({
       <form
         onSubmit={form.handleSubmit(updateQuery)}
         onInvalid={(e) => console.log(e)}
-        // className="space-y-4"
         onChange={debounceOnChange}
       >
         <div className="flex flex-col md:flex-row flex-wrap md:space-x-4 gap-y-4 rounded-md border p-4 justify-evenly">
@@ -114,7 +107,7 @@ export function GachaForm({
             name="pity"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Pulls since last SSR</FormLabel>
+                <FormLabel>Pulls since last 5✦</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -138,7 +131,6 @@ export function GachaForm({
                 <Select
                   onValueChange={(e) => {
                     field.onChange(parseInt(e));
-                    updateEidolon(parseInt(e));
                   }}
                   value={String(field.value)}
                 >
@@ -173,9 +165,11 @@ export function GachaForm({
               <FormItem>
                 <div className="flex flex-col h-full">
                   <div>
-                    <FormLabel>Next SSR Guaranteed</FormLabel>
+                    <FormLabel htmlFor="isGuaranteed">
+                      Next 5✦ Guaranteed
+                    </FormLabel>
                   </div>
-                  <div className="flex flex-col justify-center h-full">
+                  <div className="flex flex-col justify-center h-full mt-2">
                     <FormControl>
                       <Switch
                         checked={field.value}

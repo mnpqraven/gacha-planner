@@ -71,6 +71,7 @@ const ENDPOINT = {
           jades_amount: z.number().nullable(),
           rolls_amount: z.number().nullable(),
           source_type: z.string(),
+          description: z.string().nullable(),
         })
         .array(),
       total_jades: z.number(),
@@ -108,6 +109,21 @@ const ENDPOINT = {
           name: z.string(),
           version: z.string(),
           dateStart: z.string().datetime(),
+          date2ndBanner: z.string().datetime(),
+          dateEnd: z.string().datetime(),
+        })
+        .array(),
+    }),
+  },
+  listFuturePatchBanner: {
+    path: "/honkai/list_future_patch_banner",
+    payload: undefined,
+    response: z.object({
+      banners: z
+        .object({
+          characterName: z.string(),
+          version: z.string(),
+          dateStart: z.string().datetime(),
           dateEnd: z.string().datetime(),
         })
         .array(),
@@ -133,7 +149,21 @@ const ENDPOINT = {
       ),
     }),
   },
+  mhy: {
+    path: "/honkai/mhy",
+    payload: z.object({
+      id: z.string(),
+    }),
+    response: z.any(),
+  },
+  dev: {
+    path: '/cron/characters_db',
+    payload: undefined,
+    response: z.any().array()
+  }
 } as const;
 export type EndpointUrl = (typeof ENDPOINT)[keyof typeof ENDPOINT]["path"];
+
+export const IMAGE_URL = 'https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/'
 
 export default ENDPOINT;
