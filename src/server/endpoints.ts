@@ -122,6 +122,9 @@ const ENDPOINT = {
       banners: z
         .object({
           characterName: z.string(),
+          icon: z.string().nullable(),
+          element: z.enum(["Fire", "Ice", "Physical", "Wind", "Lightning", "Quantum", "Imaginary"]).nullable(),
+          elementColor: z.string().nullable(),
           version: z.string(),
           dateStart: z.string().datetime(),
           dateEnd: z.string().datetime(),
