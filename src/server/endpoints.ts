@@ -141,6 +141,11 @@ const ENDPOINT = {
     }),
     response: z.any(),
   },
+  dev: {
+    path: '/cron/characters_db',
+    payload: undefined,
+    response: z.any().array()
+  }
 } as const;
 export type EndpointUrl = (typeof ENDPOINT)[keyof typeof ENDPOINT]["path"];
 
