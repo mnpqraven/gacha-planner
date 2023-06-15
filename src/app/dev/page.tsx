@@ -9,11 +9,7 @@ import ENDPOINT from "@/server/endpoints";
 export default function Dev() {
   const mutation = useMutation({
     mutationKey: ["dev"],
-    mutationFn: async () =>
-      await workerFetch(ENDPOINT.mhy, {
-        payload: { id: '805768477' },
-        method: "POST",
-      }),
+    mutationFn: async () => await workerFetch(ENDPOINT.dev),
   });
 
   return <Button onClick={() => mutation.mutate()}>request</Button>;
