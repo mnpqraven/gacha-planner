@@ -1,9 +1,6 @@
 export type AssetPath = string;
 
 export type Element = "Fire" | "Ice" | "Physical" | "Wind" | "Lightning" | "Quantum" | "Imaginary";
-/**
- * semver version
- */
 
 export type PatchVersion = string;
 
