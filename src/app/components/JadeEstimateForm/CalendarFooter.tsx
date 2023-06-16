@@ -27,7 +27,7 @@ const CalendarFooter = ({ date }: Props) => {
   const banner = futurePatchBannerList.list.find(hasDate);
 
   if (!start && !banner) return null;
-  const color = banner?.elementColor ? `border-[${banner.elementColor}]` : "";
+  const color = banner?.element ? `border-${banner.element.name.toLowerCase()}` : "";
 
   return (
     <div className="flex items-center justify-evenly">
