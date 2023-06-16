@@ -6,7 +6,7 @@ export const useFuturePatchDateList = () => {
   const { data: futurePatchDateList } = useQuery({
     queryKey: ["futurePatchDateList"],
     queryFn: async () => await workerFetch(ENDPOINT.listFuturePatchDate),
-    initialData: { patches: [] },
+    initialData: { list: [] },
   });
 
   return { futurePatchDateList };

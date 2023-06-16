@@ -23,8 +23,8 @@ const CalendarFooter = ({ date }: Props) => {
   const hasDate = (e: { dateStart: string }) =>
     sameDate(new Date(e.dateStart), date);
 
-  const start = futurePatchDateList.patches.find(hasDate);
-  const banner = futurePatchBannerList.banners.find(hasDate);
+  const start = futurePatchDateList.list.find(hasDate);
+  const banner = futurePatchBannerList.list.find(hasDate);
 
   if (!start && !banner) return null;
   const color = banner?.elementColor ? `border-[${banner.elementColor}]` : "";
