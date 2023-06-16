@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "codegen": "watch 'npx tsx scripts/codegen.ts'",
+    "codegen": "npx tsx scripts/codegen.ts",
     "lint": "next lint",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
@@ -57,7 +57,6 @@
     "@storybook/react": "^7.0.20",
     "@storybook/testing-library": "^0.0.14-next.2",
     "json-schema-to-typescript": "^13.0.2",
-    "storybook": "^7.0.20",
-    "watch": "^1.0.2"
+    "storybook": "^7.0.20"
   }
 }

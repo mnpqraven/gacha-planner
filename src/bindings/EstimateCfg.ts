@@ -8,6 +8,7 @@ export interface EstimateCfg {
   battlePass: BattlePassOption;
   currentJades?: number | null;
   currentRolls?: number | null;
+  dailyRefills?: number | null;
   eq: EqTier;
   moc: number;
   railPass: RailPassCfg;

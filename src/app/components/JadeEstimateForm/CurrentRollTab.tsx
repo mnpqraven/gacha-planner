@@ -1,4 +1,4 @@
-import { FieldValues, UseFormReturn } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
 import * as F from "../ui/Form";
 import { Input } from "../ui/Input";
@@ -18,6 +18,9 @@ const CurrentRollTab = ({ form }: Props) => {
           </TabsTrigger>
           <TabsTrigger value="currentJades" className="w-full">
             Stellar Jades
+          </TabsTrigger>
+          <TabsTrigger value="dailyRefills" className="w-full">
+            Daily Refills
           </TabsTrigger>
         </TabsList>
         <TabsContent value="currentRolls">
@@ -57,6 +60,35 @@ const CurrentRollTab = ({ form }: Props) => {
                   </div>
                   <F.FormControl>
                     <Input className="w-20" type="number" min={0} {...field} />
+                  </F.FormControl>
+                </div>
+                <F.FormMessage />
+              </F.FormItem>
+            )}
+          />
+        </TabsContent>
+        <TabsContent value="dailyRefills">
+          <F.FormField
+            control={form.control}
+            name="dailyRefills"
+            render={({ field }) => (
+              <F.FormItem>
+                <div className="flex">
+                  <div className="flex-1 space-y-1">
+                    <F.FormLabel>Daily Refills</F.FormLabel>
+                    <F.FormDescription>
+                      Amount of refills (using Jades) everyday
+                    </F.FormDescription>
+                  </div>
+                  <F.FormControl>
+                    <Input
+                      className="w-20"
+                      type="number"
+                      defaultValue={"0"}
+                      min={0}
+                      max={8}
+                      {...field}
+                    />
                   </F.FormControl>
                 </div>
                 <F.FormMessage />
