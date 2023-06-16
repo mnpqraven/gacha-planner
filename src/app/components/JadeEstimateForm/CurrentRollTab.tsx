@@ -84,7 +84,6 @@ const CurrentRollTab = ({ form }: Props) => {
                     <Input
                       className="w-20"
                       type="number"
-                      defaultValue={"0"}
                       min={0}
                       max={8}
                       {...field}
