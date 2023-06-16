@@ -53,3 +53,50 @@ export async function workerFetch<
     }
   }
 }
+
+export async function typedFetch<TPayload, TResponse>(
+  endpoint: (typeof ENDPOINT)[keyof typeof ENDPOINT],
+  opt?: {
+    payload?: TPayload;
+    method: "POST" | "DELETE";
+  }
+): Promise<TResponse> {
+  const url = endpoint.path;
+
+  // POST
+  if (opt) {
+    const { payload, method } = opt;
+    const body = JSON.stringify(payload);
+    const res = await fetch(url, {
+      body,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method,
+    });
+
+    if (res.ok) {
+      return res.json();
+    } else {
+      console.error("api fetch failed, code:", res.status);
+      const errText = await res.text();
+      console.error("unknown error", errText);
+      return Promise.reject(`unknown error ${errText}`);
+    }
+  } else {
+    // GET
+    const res = await fetch(url, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "GET",
+    });
+
+    if (res.ok) {
+      return res.json();
+    } else {
+      console.error("api fetch failed, code:", res.status);
+      return Promise.reject(`unknown error ${res.text()}`);
+    }
+  }
+}

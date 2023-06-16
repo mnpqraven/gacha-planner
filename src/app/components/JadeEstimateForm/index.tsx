@@ -2,7 +2,7 @@ import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { cn } from "@/lib/utils";
-import { format, setMonth } from "date-fns";
+import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useQuery } from "@tanstack/react-query";
@@ -263,7 +263,7 @@ export default function JadeEstimateForm({
                             >
                               Today
                             </CommandItem>
-                            {futurePatchDateList.patches.map((e) => (
+                            {futurePatchDateList.list.map((e) => (
                               <CommandItem
                                 key={e.version}
                                 onSelect={() => onSelectDatePreset(e.dateStart)}
@@ -290,10 +290,10 @@ export default function JadeEstimateForm({
                         month={monthController}
                         onMonthChange={setMonthController}
                         modifiers={{
-                          patchStart: futurePatchDateList.patches.map(
+                          patchStart: futurePatchDateList.list.map(
                             (e) => new Date(e.dateStart)
                           ),
-                          patchBanner: futurePatchBannerList.banners.map(
+                          patchBanner: futurePatchBannerList.list.map(
                             (e) => new Date(e.dateStart)
                           ),
                         }}

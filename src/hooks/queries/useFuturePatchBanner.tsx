@@ -1,12 +1,17 @@
+import { PatchBanner } from "@/bindings/PatchBanner";
+import { List } from "@/lib/generics";
 import ENDPOINT from "@/server/endpoints";
-import { workerFetch } from "@/server/fetchHelper";
+import { typedFetch } from "@/server/fetchHelper";
 import { useQuery } from "@tanstack/react-query";
 
 export const useFuturePatchBannerList = () => {
   const { data: futurePatchBannerList } = useQuery({
     queryKey: ["futurePatchBannerList"],
-    queryFn: async () => await workerFetch(ENDPOINT.listFuturePatchBanner),
-    initialData: { banners: [] },
+    queryFn: async () =>
+      await typedFetch<null, List<PatchBanner>>(
+        ENDPOINT.listFuturePatchBanner
+      ),
+    initialData: { list: [] },
   });
 
   return { futurePatchBannerList };

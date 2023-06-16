@@ -1,5 +1,7 @@
 import { useFuturePatchBannerList } from "@/hooks/queries/useFuturePatchBanner";
 import { useFuturePatchDateList } from "@/hooks/queries/useFuturePatchDate";
+import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 type Props = {
   date: Date | undefined;
@@ -21,16 +23,28 @@ const CalendarFooter = ({ date }: Props) => {
   const hasDate = (e: { dateStart: string }) =>
     sameDate(new Date(e.dateStart), date);
 
-  const start = futurePatchDateList.patches.find(hasDate);
-  const banner = futurePatchBannerList.banners.find(hasDate);
+  const start = futurePatchDateList.list.find(hasDate);
+  const banner = futurePatchBannerList.list.find(hasDate);
 
   if (!start && !banner) return null;
+  const color = banner?.elementColor ? `border-[${banner.elementColor}]` : "";
 
   return (
-    <ul>
-      {start && <li>Start of patch {start.version}</li>}
-      {banner && <li>{banner.characterName} Character Banner</li>}
-    </ul>
+    <div className="flex items-center justify-evenly">
+      {banner && banner.icon && (
+        <Image
+          src={`https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/${banner.icon}`}
+          alt={banner.characterName}
+          className={cn("rounded-full w-24 h-24 border-2", color)}
+          width={128}
+          height={128}
+        />
+      )}
+      <ul>
+        {start && <li>Start of patch {start.version}</li>}
+        {banner && <li>{banner.characterName} Banner</li>}
+      </ul>
+    </div>
   );
 };
 export { CalendarFooter };

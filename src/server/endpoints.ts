@@ -48,12 +48,20 @@ const ENDPOINT = {
         z.coerce
           .number({
             invalid_type_error: "Must be a number",
-            required_error: "Required field",
           })
           .nonnegative()
           .optional()
       ),
       currentJades: z.preprocess(
+        (args) => (args === "" ? undefined : args),
+        z.coerce
+          .number({
+            invalid_type_error: "Must be a number",
+          })
+          .nonnegative()
+          .optional()
+      ),
+      dailyRefills: z.preprocess(
         (args) => (args === "" ? undefined : args),
         z.coerce
           .number({
@@ -104,7 +112,7 @@ const ENDPOINT = {
     path: "/honkai/list_future_patch_date",
     payload: undefined,
     response: z.object({
-      patches: z
+      list: z
         .object({
           name: z.string(),
           version: z.string(),
@@ -119,11 +127,21 @@ const ENDPOINT = {
     path: "/honkai/list_future_patch_banner",
     payload: undefined,
     response: z.object({
-      banners: z
+      list: z
         .object({
           characterName: z.string(),
           icon: z.string().nullable(),
-          element: z.enum(["Fire", "Ice", "Physical", "Wind", "Lightning", "Quantum", "Imaginary"]).nullable(),
+          element: z
+            .enum([
+              "Fire",
+              "Ice",
+              "Physical",
+              "Wind",
+              "Lightning",
+              "Quantum",
+              "Imaginary",
+            ])
+            .nullable(),
           elementColor: z.string().nullable(),
           version: z.string(),
           dateStart: z.string().datetime(),
@@ -136,7 +154,7 @@ const ENDPOINT = {
     path: "/honkai/gacha_banner_list",
     payload: undefined,
     response: z.object({
-      banners: z.array(
+      list: z.array(
         z.object({
           bannerName: z.string(),
           banner: z.number(),
@@ -160,13 +178,14 @@ const ENDPOINT = {
     response: z.any(),
   },
   dev: {
-    path: '/cron/characters_db',
+    path: "/cron/characters_db",
     payload: undefined,
-    response: z.any().array()
-  }
+    response: z.any().array(),
+  },
 } as const;
 export type EndpointUrl = (typeof ENDPOINT)[keyof typeof ENDPOINT]["path"];
 
-export const IMAGE_URL = 'https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/'
+export const IMAGE_URL =
+  "https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/";
 
 export default ENDPOINT;
