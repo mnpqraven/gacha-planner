@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "codegen": "watch 'npx tsx scripts/codegen.ts' ./.schemas",
+    "codegen": "watch 'npx tsx scripts/codegen.ts'",
     "lint": "next lint",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"

@@ -50,8 +50,8 @@ async function main() {
           // Skip writing if it hasn't changed, so that we don't confuse any sort
           // of incremental builds. This check isn't ideal but the script runs
           // quickly enough and rarely enough that it doesn't matter.
-          console.log("Schemas are up to date");
-          return;
+          console.log(`Schema ${filename} is up to date`);
+          continue;
         }
       }
     } catch (e) {

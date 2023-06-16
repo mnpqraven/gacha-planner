@@ -2,6 +2,27 @@ export type AssetPath = string;
 
 export type Element = "Fire" | "Ice" | "Physical" | "Wind" | "Lightning" | "Quantum" | "Imaginary";
 
+export type MainAffixType =
+  | "HPDelta"
+  | "AttackDelta"
+  | "HPAddedRatio"
+  | "AttackAddedRatio"
+  | "DefenceAddedRatio"
+  | "CriticalChanceBase"
+  | "CriticalDamageBase"
+  | "HealRatioBase"
+  | "StatusProbabilityBase"
+  | "SpeedDelta"
+  | "PhysicalAddedRatio"
+  | "FireAddedRatio"
+  | "IceAddedRatio"
+  | "ThunderAddedRatio"
+  | "WindAddedRatio"
+  | "QuantumAddedRatio"
+  | "ImaginaryAddedRatio"
+  | "BreakDamageAddedRatioBase"
+  | "SPRatioBase";
+
 export interface MihoResponse {
   characters: Character[];
   player: Player;
@@ -53,7 +74,7 @@ export interface CharacterElement {
 export interface LightCone {
   attributes: LightConeAttribute[];
   icon: AssetPath;
-  id: string;
+  id: number;
   level: number;
   name: string;
   path: CharacterPath;
@@ -108,45 +129,34 @@ export interface AttributeProperty {
 export interface RelicSet {
   desc: string;
   icon: AssetPath;
-  id: string;
+  id: number;
   name: string;
   num: number;
-  properties: RelicSetProperty[];
+  properties: AffixProperty[];
   [k: string]: unknown;
 }
 
-export interface RelicSetProperty {
+export interface AffixProperty {
   display: string;
   field: string;
   icon: AssetPath;
   name: string;
   percent: boolean;
-  type: string;
+  type: MainAffixType;
   value: number;
   [k: string]: unknown;
 }
 
 export interface Relic {
   icon: AssetPath;
-  id: string;
+  id: number;
   level: number;
-  main_affix: MainAffix;
+  main_affix: AffixProperty;
   name: string;
   rarity: number;
-  set_id: string;
+  set_id: number;
   set_name: string;
   sub_affix: SubAffix[];
-  [k: string]: unknown;
-}
-
-export interface MainAffix {
-  display: string;
-  field: string;
-  icon: AssetPath;
-  name: string;
-  percent: boolean;
-  type: string;
-  value: number;
   [k: string]: unknown;
 }
 
