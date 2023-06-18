@@ -7,7 +7,7 @@ import { Slider } from "../ui/Slider";
 import { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/Dialog";
-import { CharacterTraceInfo } from "../Character/CharacterTraceInfo";
+import { CharacterTabWrapper } from "../Character/CharacterTabWrapper";
 
 type Props = {
   date: Date | undefined;
@@ -50,9 +50,9 @@ const CalendarFooter = ({ date }: Props) => {
               height={128}
             />
           </DialogTrigger>
-          <DialogContent className="w-[500px] h-[500px]">
+          <DialogContent className="sm:max-w-4xl min-h-[16rem]">
             {banner.characterId && (
-              <CharacterTraceInfo
+              <CharacterTabWrapper
                 skills={banner.skills}
                 characterId={banner.characterId}
               />
