@@ -109,9 +109,11 @@ const TraceDescription = ({
       const [node] = trace.levels;
       if (node.properties.length > 0) {
         const [property] = node.properties;
-        return `${
-          propertyBucket.find((e) => e.type === property.ttype)?.name
-        }: ${property.value * 100} %`;
+        return (
+          <span>
+            {`${propertyBucket.find((e) => e.type === property.ttype)?.name}: ${property.value * 100} %`}
+          </span>
+        );
       }
     }
   }
