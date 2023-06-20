@@ -175,6 +175,11 @@ const ENDPOINT = {
     payload: undefined,
     response: z.any(),
   },
+  mhyEidolon: {
+    path: "/honkai/mhy/eidolon/", // :id
+    payload: undefined,
+    response: z.any(),
+  },
 } as const;
 export type EndpointUrl = (typeof ENDPOINT)[keyof typeof ENDPOINT]["path"];
 

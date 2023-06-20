@@ -4,11 +4,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
 import Image from "next/image";
 import { TraceTable } from "./TraceTable";
 import { anchorType } from "react-xarrows";
+import { EidolonTable } from "./EidolonTable";
 
 type Props = {
   skills: SimpleSkill[];
   characterId: number;
-  path?: 'Nihility' | 'Destruction' | 'Hunt' | 'Preservation' | 'Harmony' | 'Abundance';
+  path?:
+    | "Nihility"
+    | "Destruction"
+    | "Hunt"
+    | "Preservation"
+    | "Harmony"
+    | "Abundance";
 };
 const CharacterTabWrapper = ({
   skills,
@@ -30,16 +37,18 @@ const CharacterTabWrapper = ({
           <div className="absolute w-full h-full text-center before:inline-block before:align-middle before:h-full -z-50 -mx-6 pt-[72px] pb-6 top-0">
             <Image
               className="inline-block align-middle opacity-10"
-              src={pathUrl('Abundance')}
+              src={pathUrl(path)}
               alt={path}
               quality={100}
               width={384}
               height={384}
             />
           </div>
-          <TraceTable characterId={1105} path={'Abundance'} />
+          <TraceTable characterId={characterId} path={path} />
         </TabsContent>
-        <TabsContent value="eidolons"></TabsContent>
+        <TabsContent value="eidolons">
+          <EidolonTable characterId={characterId} />
+        </TabsContent>
       </Tabs>
     </>
   );

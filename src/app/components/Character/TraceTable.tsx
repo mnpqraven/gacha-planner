@@ -216,15 +216,14 @@ function getLineTrips(path: Props["path"]) {
         ["Point08", "Point16"],
         ["Point08", "Point17"],
         ["Point03", "Point05"],
-        ["Point18", "Point07"],
         ["Point06", "Point10"],
         ["Point10", "Point11"],
         ["Point11", "Point12"],
-        ["Point09", "Point06"],
         ["Point07", "Point13"],
         ["Point13", "Point14"],
         ["Point14", "Point15"],
         ["Point06", "Point07"],
+        ["Point18", "Point09"],
       ];
   }
 }
