@@ -59,9 +59,11 @@ export async function typedFetch<TPayload, TResponse>(
   opt?: {
     payload?: TPayload;
     method: "POST" | "DELETE";
-  }
+  },
+  params?: string | number
 ): Promise<TResponse> {
-  const url = endpoint.path;
+  let url = endpoint.path;
+  if (params) url += `/${params}`;
 
   // POST
   if (opt) {

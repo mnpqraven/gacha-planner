@@ -37,10 +37,12 @@ export default function GachaGraph() {
   const { data } = useQuery({
     queryKey: [ENDPOINT.probabilityRate, payload],
     queryFn: async () =>
-      await workerFetch(ENDPOINT.probabilityRate, {
-        payload,
-        method: "POST",
-      }),
+      await workerFetch({
+          endpoint: ENDPOINT.probabilityRate, opt: {
+            payload,
+            method: "POST",
+          }
+        }),
   });
   // should only be undefined on mount
   const [definedData, setDefinedData] = useState<NonNullable<typeof data>>({

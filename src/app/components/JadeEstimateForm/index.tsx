@@ -193,6 +193,7 @@ export default function JadeEstimateForm({
               <div className="flex items-center space-x-4 rounded-md border p-4">
                 <div className="flex-1 space-y-1">
                   <FormLabel>Goal Date</FormLabel>
+                  {/* eslint-disable-next-line react/no-unescaped-entities */}
                   <FormDescription>The date that you'll pull</FormDescription>
                   <FormMessage />
                 </div>

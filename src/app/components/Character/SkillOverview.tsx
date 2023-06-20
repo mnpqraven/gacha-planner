@@ -27,7 +27,7 @@ const SkillOverview = ({ skills, characterId }: Props) => {
             (skill) => skill.ttype !== "Normal" && skill.ttype !== "MazeNormal"
           )
           .map((skill, index) => (
-            <div className="flex flex-col">
+            <div className="flex flex-col" key={index}>
               {getImagePath(characterId, skill.ttype) && (
                 <Image
                   src={`${getImagePath(characterId, skill.ttype)}`}

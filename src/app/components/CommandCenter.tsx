@@ -56,10 +56,12 @@ const CommandCenter = ({ routes }: Props) => {
   const uidQuery = useMutation({
     mutationKey: ["mhy_api"],
     mutationFn: async ({ id }: { id: string }) =>
-      await workerFetch(ENDPOINT.mhy, {
-        payload: { id },
-        method: "POST",
-      }),
+      await workerFetch({
+          endpoint: ENDPOINT.mhy, opt: {
+            payload: { id },
+            method: "POST",
+          }
+        }),
     onSuccess: (data) => {
       console.log(data);
       setProfile(data as unknown as MihoResponse);

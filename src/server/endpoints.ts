@@ -109,7 +109,7 @@ const ENDPOINT = {
     }),
   },
   listFuturePatchDate: {
-    path: "/honkai/list_future_patch_date",
+    path: "/honkai/patch_dates",
     payload: undefined,
     response: z.object({
       list: z
@@ -124,7 +124,7 @@ const ENDPOINT = {
     }),
   },
   listFuturePatchBanner: {
-    path: "/honkai/list_future_patch_banner",
+    path: "/honkai/patch_banners",
     payload: undefined,
     response: z.object({
       list: z
@@ -151,7 +151,7 @@ const ENDPOINT = {
     }),
   },
   gachaBannerList: {
-    path: "/honkai/gacha_banner_list",
+    path: "/honkai/warp_banners",
     payload: undefined,
     response: z.object({
       list: z.array(
@@ -170,17 +170,10 @@ const ENDPOINT = {
       ),
     }),
   },
-  mhy: {
-    path: "/honkai/mhy",
-    payload: z.object({
-      id: z.string(),
-    }),
-    response: z.any(),
-  },
-  dev: {
-    path: "/cron/characters_db",
+  mhyTrace: {
+    path: "/honkai/mhy/trace/", // :id
     payload: undefined,
-    response: z.any().array(),
+    response: z.any(),
   },
 } as const;
 export type EndpointUrl = (typeof ENDPOINT)[keyof typeof ENDPOINT]["path"];

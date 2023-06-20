@@ -1,11 +1,7 @@
-import { SimpleSkill, SkillType } from "@/bindings/PatchBanner";
 import { useFuturePatchBannerList } from "@/hooks/queries/useFuturePatchBanner";
 import { useFuturePatchDateList } from "@/hooks/queries/useFuturePatchDate";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { Slider } from "../ui/Slider";
-import { useState } from "react";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/Dialog";
 import { CharacterTabWrapper } from "../Character/CharacterTabWrapper";
 
@@ -34,27 +30,27 @@ const CalendarFooter = ({ date }: Props) => {
 
   if (!start && !banner) return null;
   const color = banner?.element
-    ? `border-${banner.element.name.toLowerCase()}`
+    ? `border-${banner.characterData.element?.name.toLowerCase()}`
     : "";
 
   return (
     <div className="flex items-center justify-evenly">
-      {banner && banner.icon && (
+      {banner && banner.characterData.icon && (
         <Dialog>
           <DialogTrigger>
             <Image
-              src={`https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/${banner.icon}`}
-              alt={banner.characterName}
+              src={`https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/${banner.characterData.icon}`}
+              alt={banner.characterData.character_name ?? ""}
               className={cn("rounded-full w-20 h-20 border-2", color)}
               width={128}
               height={128}
             />
           </DialogTrigger>
           <DialogContent className="sm:max-w-4xl min-h-[16rem]">
-            {banner.characterId && (
+            {banner.characterData.character_id && (
               <CharacterTabWrapper
-                skills={banner.skills}
-                characterId={banner.characterId}
+                skills={banner.characterData.skills}
+                characterId={banner.characterData.character_id}
               />
             )}
           </DialogContent>
@@ -64,7 +60,7 @@ const CalendarFooter = ({ date }: Props) => {
         {start && <li>Start of patch {start.version}</li>}
         {banner && (
           <>
-            <li>{banner.characterName} Banner</li>
+            <li>{banner.characterData.character_name} Banner</li>
             <li>Click to view</li>
           </>
         )}
