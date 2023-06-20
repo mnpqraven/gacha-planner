@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useState } from "react";
 import { Toggle } from "../ui/Toggle";
+import { Card, CardContent } from "../ui/Card";
 
 type Props = {
   characterId: number;
@@ -29,7 +30,12 @@ const EidolonTable = ({ characterId }: Props) => {
       <div className="flex">
         {top &&
           top.map((eidolon) => (
-            <Toggle key={eidolon.id} className="h-fit">
+            <Toggle
+              key={eidolon.id}
+              className="h-fit flex-1"
+              pressed={selectedEidolon === eidolon.rank}
+              onPressedChange={(_e) => setSelectedEidolon(eidolon.rank)}
+            >
               {eidolon.name}
               <Image
                 src={url(characterId, eidolon.rank)}
@@ -41,11 +47,18 @@ const EidolonTable = ({ characterId }: Props) => {
             </Toggle>
           ))}
       </div>
-      <div>{data?.list.find((e) => e.rank == selectedEidolon)?.desc}</div>
+      <div className="border rounded-md p-4 my-4 min-h-[8rem]">
+        {data?.list.find((e) => e.rank == selectedEidolon)?.desc}
+      </div>
       <div className="flex">
         {bottom &&
           bottom.map((eidolon) => (
-            <Toggle key={eidolon.id} className="h-fit">
+            <Toggle
+              key={eidolon.id}
+              className="h-fit flex-1"
+              pressed={selectedEidolon === eidolon.rank}
+              onPressedChange={(_e) => setSelectedEidolon(eidolon.rank)}
+            >
               {eidolon.name}
               <Image
                 src={url(characterId, eidolon.rank)}

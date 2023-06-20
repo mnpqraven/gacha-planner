@@ -53,21 +53,7 @@ const CommandCenter = ({ routes }: Props) => {
     if (mhyProfile) setProfile(mhyProfile);
   }, [mhyProfile]);
 
-  const uidQuery = useMutation({
-    mutationKey: ["mhy_api"],
-    mutationFn: async ({ id }: { id: string }) =>
-      await workerFetch({
-          endpoint: ENDPOINT.mhy, opt: {
-            payload: { id },
-            method: "POST",
-          }
-        }),
-    onSuccess: (data) => {
-      console.log(data);
-      setProfile(data as unknown as MihoResponse);
-      setMhyProfile(data);
-    },
-  });
+  const uidQuery = undefined;
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -87,7 +73,7 @@ const CommandCenter = ({ routes }: Props) => {
   function getUidInfo(e: ChangeEvent<HTMLInputElement>) {
     setProfile(undefined);
     // 805768477
-    uidQuery.mutate({ id: e.target.value });
+    // uidQuery.mutate({ id: e.target.value });
   }
   function commandSelectRoute(path: string) {
     router.push(path);
@@ -140,7 +126,7 @@ const CommandCenter = ({ routes }: Props) => {
             onChange={getUidInfo}
             defaultValue={mhyProfile?.player.uid}
           />
-          {uidQuery.isLoading && <Loader />}
+          {/* {uidQuery.isLoading && <Loader />} */}
           {profile && (
             <Card className="bg-muted rounded-lg">
               <div className="flex items-center p-4 gap-4">

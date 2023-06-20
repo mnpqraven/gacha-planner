@@ -2,6 +2,7 @@ import { SimpleSkill, SkillType } from "@/bindings/PatchBanner";
 import { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
 import { Slider } from "../ui/Slider";
+import Image from "next/image";
 
 type Props = {
   skill: SimpleSkill;
@@ -21,7 +22,7 @@ const SkillIconInfo = ({ skill, characterId }: Props) => {
   return (
     <Popover>
       <PopoverTrigger>
-        <img src={imageSrc} alt={skill.name} />
+        <Image src={imageSrc} alt={skill.name} width={64} height={64} />
       </PopoverTrigger>
       <PopoverContent>
         <div className="flex">
@@ -66,6 +67,7 @@ function getImagePath(
       ttype = "technique";
       break;
   }
-  if (!characterId) return undefined;
-  return `https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/icon/skill/${characterId}_${ttype}.png`;
+  return `https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/icon/skill/${
+    characterId ?? ""
+  }_${ttype}.png`;
 }

@@ -23,7 +23,7 @@ export const defaultBanner: Banner = {
 export const useBannerList = () => {
   const { data } = useQuery({
     queryKey: ["gachaBannerList"],
-    queryFn: async () => await workerFetch({ endpoint: ENDPOINT.gachaBannerList }),
+    queryFn: async () => await workerFetch(ENDPOINT.gachaBannerList),
     initialData: { list: [defaultBanner] },
   });
 

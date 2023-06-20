@@ -24,8 +24,8 @@ const BattlePassField = ({ form }: Props) => {
               <div className="flex-1 space-y-1">
                 <F.FormLabel>Nameless Honor</F.FormLabel>
                 <F.FormDescription>
-                  If not selecting F2P, this assumes you've received the current
-                  patch's first time purchase rewards and those won't be
+                  If not selecting F2P, this assumes you{'\''}ve received the current
+                  patch{'\''}s first time purchase rewards and those won{'\''}t be
                   calculated.
                 </F.FormDescription>
               </div>
@@ -63,7 +63,7 @@ const BattlePassField = ({ form }: Props) => {
                   <F.FormDescription>
                     This assumes you level up by 10 every Monday.
                     <br />
-                    If you select 'Nameless Medal' then keep in mind you also
+                    If you select {'Nameless Medal'} then keep in mind you also
                     get 10 levels for free, please update the level accordingly.
                   </F.FormDescription>
                 </div>

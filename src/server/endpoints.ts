@@ -170,6 +170,11 @@ const ENDPOINT = {
       ),
     }),
   },
+  mhyCharacter: {
+    path: "/honkai/mhy/character/", // :id
+    payload: undefined,
+    response: z.any(),
+  },
   mhyTrace: {
     path: "/honkai/mhy/trace/", // :id
     payload: undefined,
@@ -180,6 +185,11 @@ const ENDPOINT = {
     payload: undefined,
     response: z.any(),
   },
+  mhyAttributeProperty: {
+    path: "/honkai/mhy/attribute_property_list", // :id
+    payload: undefined,
+    response: z.any(),
+  }
 } as const;
 export type EndpointUrl = (typeof ENDPOINT)[keyof typeof ENDPOINT]["path"];
 

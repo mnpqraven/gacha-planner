@@ -56,7 +56,7 @@ const RailPassField = ({ form }: Props) => {
                   <div className="flex-1">
                     <F.FormLabel>Days Left</F.FormLabel>
                     <F.FormDescription>
-                      You'll receive 300 jades for renewing the subscription
+                      You{'\''}ll receive 300 jades for renewing the subscription
                     </F.FormDescription>
                   </div>
                   <F.FormControl>

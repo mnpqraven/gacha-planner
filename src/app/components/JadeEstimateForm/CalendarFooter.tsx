@@ -29,7 +29,7 @@ const CalendarFooter = ({ date }: Props) => {
   const banner = futurePatchBannerList.list.find(hasDate);
 
   if (!start && !banner) return null;
-  const color = banner?.element
+  const color = banner?.characterData.element
     ? `border-${banner.characterData.element?.name.toLowerCase()}`
     : "";
 

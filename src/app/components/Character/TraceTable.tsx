@@ -1,17 +1,19 @@
 import { DbCharacterSkillTree } from "@/bindings/DbCharacterSkillTree";
 import ENDPOINT, { IMAGE_URL } from "@/server/endpoints";
 import { typedFetch } from "@/server/fetchHelper";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
 import { cn } from "@/lib/utils";
 import { cva } from "class-variance-authority";
 import Xarrow, { Xwrapper, useXarrow } from "react-xarrows";
 import { useEffect } from "react";
+import { DbAttributeProperty } from "@/bindings/DbAttributeProperty";
 
 type Props = {
   characterId: number;
   path:
+    | "Erudition"
     | "Nihility"
     | "Destruction"
     | "Hunt"
@@ -29,27 +31,19 @@ const TraceTable = ({ characterId, path }: Props) => {
         characterId
       ),
   });
+  const properties = useQuery({
+    queryKey: ["attribute_property"],
+    queryFn: async () =>
+      await typedFetch<undefined, { list: DbAttributeProperty[] }>(
+        ENDPOINT.mhyAttributeProperty
+      ),
+  });
   const updateLines = useXarrow();
 
   useEffect(() => {
     if (data) updateLines();
-  }, [data, updateLines]);
-
-  function isSkillNode(node: DbCharacterSkillTree): boolean {
-    let emptyProperty = node.levels
-      .map((e) => e.properties)
-      .every((e) => e.length == 0);
-    return emptyProperty && !node.icon.includes("_skilltree");
-  }
-  function isSmallTrace(node: DbCharacterSkillTree): boolean {
-    let emptyProperty = node.levels
-      .map((e) => e.properties)
-      .every((e) => e.length != 0);
-    return emptyProperty;
-  }
-  function isBigTrace(node: DbCharacterSkillTree): boolean {
-    return node.icon.includes("_skilltree");
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
   return (
     <div id="parent-wrapper" className="h-full w-full relative">
@@ -75,14 +69,10 @@ const TraceTable = ({ characterId, path }: Props) => {
                   />
                 </PopoverTrigger>
                 <PopoverContent>
-                  {traceNode.id} - {traceNode.anchor} <br />
-                  {traceNode.levels[0] &&
-                    traceNode.levels[0].properties[0] &&
-                    traceNode.levels[0].properties[0].value && (
-                      <p>
-                        value: {traceNode.levels[0].properties[0].value * 100}
-                      </p>
-                    )}
+                  <TraceDescription
+                    trace={traceNode}
+                    propertyBucket={properties.data?.list}
+                  />
                 </PopoverContent>
               </Popover>
             </div>
@@ -107,9 +97,68 @@ const TraceTable = ({ characterId, path }: Props) => {
     </div>
   );
 };
+const TraceDescription = ({
+  trace,
+  propertyBucket = [],
+}: {
+  trace: DbCharacterSkillTree;
+  propertyBucket: DbAttributeProperty[] | undefined;
+}) => {
+  if (isSmallTrace(trace)) {
+    if (trace.levels.length > 0) {
+      const [node] = trace.levels;
+      if (node.properties.length > 0) {
+        const [property] = node.properties;
+        return `${
+          propertyBucket.find((e) => e.type === property.ttype)?.name
+        }: ${property.value * 100} %`;
+      }
+    }
+  }
+
+  // TODO: big traces + skill
+
+  return null;
+};
+
+function isSkillNode(node: DbCharacterSkillTree): boolean {
+  let emptyProperty = node.levels
+    .map((e) => e.properties)
+    .every((e) => e.length == 0);
+  return emptyProperty && !node.icon.includes("_skilltree");
+}
+function isSmallTrace(node: DbCharacterSkillTree): boolean {
+  let emptyProperty = node.levels
+    .map((e) => e.properties)
+    .every((e) => e.length != 0);
+  return emptyProperty;
+}
+function isBigTrace(node: DbCharacterSkillTree): boolean {
+  return node.icon.includes("_skilltree");
+}
 
 function getLineTrips(path: Props["path"]) {
   switch (path) {
+    case "Erudition":
+      return [
+        ["Point03", "Point04"],
+        ["Point04", "Point08"],
+        ["Point08", "Point16"],
+        ["Point08", "Point17"],
+        ["Point03", "Point01"],
+        ["Point01", "Point06"],
+        ["Point06", "Point10"],
+        ["Point10", "Point11"],
+        ["Point10", "Point12"],
+        ["Point03", "Point02"],
+        ["Point02", "Point07"],
+        ["Point07", "Point13"],
+        ["Point13", "Point14"],
+        ["Point13", "Point15"],
+        ["Point03", "Point05"],
+        ["Point05", "Point09"],
+        ["Point05", "Point18"],
+      ];
     case "Nihility":
       return [
         ["Point03", "Point04"],
@@ -230,6 +279,31 @@ function getLineTrips(path: Props["path"]) {
 
 function getTraceVariants(path: Props["path"]) {
   switch (path) {
+    case "Erudition":
+      return cva("absolute", {
+        variants: {
+          anchor: {
+            Point01: "top-[46%] left-[calc(50%-24px-84px)]", //  basic
+            Point02: "top-[46%] left-[calc(50%-24px+84px)]", //  skill
+            Point03: "top-[46%] left-[calc(50%-24px)]", //  ult
+            Point04: "top-[28%] left-[calc(50%-24px)]", //  talent
+            Point05: "top-[77%] left-[calc(50%-24px)]", //  tech
+            Point06: "top-[46%] left-[calc(50%-24px-152px)]", //  left big
+            Point07: "top-[46%] left-[calc(50%-24px+152px)]", //  right big
+            Point08: "top-[8%]  left-[calc(50%-24px)]", //  up big
+            Point09: "top-[75%] left-[calc(50%-24px-84px)]", //  down small 1
+            Point10: "top-[46%] left-[calc(50%-24px-226px)]", //  left small 1
+            Point11: "top-[61%] left-[calc(50%-24px-200px)]", //  left small 2
+            Point12: "top-[32%] left-[calc(50%-24px-200px)]", //  left small 3
+            Point13: "top-[46%] left-[calc(50%-24px+226px)]", //  right small 1
+            Point14: "top-[61%] left-[calc(50%-24px+200px)]", //  right small 2
+            Point15: "top-[32%] left-[calc(50%-24px+200px)]", //  right small 2
+            Point16: "top-[12%]  left-[calc(50%-24px-96px)]", //  top left small
+            Point17: "top-[12%]  left-[calc(50%-24px+96px)]", //  top right small
+            Point18: "top-[75%] left-[calc(50%-24px+84px)]", //  down small 2
+          },
+        },
+      });
     case "Nihility":
       return cva("absolute", {
         variants: {

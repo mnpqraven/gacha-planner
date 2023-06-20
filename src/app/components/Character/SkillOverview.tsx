@@ -26,6 +26,16 @@ const SkillOverview = ({ skills, characterId }: Props) => {
           .filter(
             (skill) => skill.ttype !== "Normal" && skill.ttype !== "MazeNormal"
           )
+          .sort((a, b) => {
+            const toInt = (ttype: SimpleSkill["ttype"]) => {
+              if (ttype === "Ultra") return 4;
+              if (ttype === "BPSkill") return 3;
+              if (ttype === "Talent") return 2;
+              if (ttype === "Maze") return 1;
+              return 0;
+            };
+            return toInt(a.ttype) - toInt(b.ttype);
+          })
           .map((skill, index) => (
             <div className="flex flex-col" key={index}>
               {getImagePath(characterId, skill.ttype) && (
@@ -40,21 +50,27 @@ const SkillOverview = ({ skills, characterId }: Props) => {
               <span className="self-center">{skill.ttype}</span>
             </div>
           ))}
+        <div className="flex flex-col px-4">
+          <div>
+            {selectedSkill.name} - {selectedSkill.ttype} - Slv.{" "}
+            {selectedSlv + 1}
+          </div>
+          {selectedSkill.params.length > 1 && (
+            <Slider
+              className="py-4"
+              defaultValue={[0]}
+              min={0}
+              max={selectedSkill.params.length - 1}
+              onValueChange={(e) => setSelectedSlv(e[0])}
+            />
+          )}
+        </div>
       </div>
 
       <div className="flex flex-col gap-4">
-        <span>
-          {selectedSkill.name} - {selectedSkill.ttype} - Slv. {selectedSlv + 1}
-        </span>
-        {selectedSkill.params.length > 1 && (
-          <Slider
-            defaultValue={[0]}
-            min={0}
-            max={selectedSkill.params.length - 1}
-            onValueChange={(e) => setSelectedSlv(e[0])}
-          />
-        )}
-        <p>{skillDescription}</p>
+        <div className="border rounded-md p-4 my-4 min-h-[8rem]">
+          {skillDescription}
+        </div>
       </div>
     </>
   );
