@@ -76,30 +76,33 @@ const TraceTable = ({ characterId, path }: Props) => {
                 </PopoverTrigger>
                 <PopoverContent>
                   {traceNode.id} - {traceNode.anchor} <br />
-                  SkillNode: {isSkillNode(traceNode) ? "true" : "false"}
-                  <br />
-                  SmallNode: {isSmallTrace(traceNode) ? "true" : "false"}
-                  <br />
-                  BigNode: {isBigTrace(traceNode) ? "true" : "false"}
+                  {traceNode.levels[0] &&
+                    traceNode.levels[0].properties[0] &&
+                    traceNode.levels[0].properties[0].value && (
+                      <p>
+                        value: {traceNode.levels[0].properties[0].value * 100}
+                      </p>
+                    )}
                 </PopoverContent>
               </Popover>
             </div>
           ))}
 
-        {data && getLineTrips(path).map(([a, b], index) => (
-          <Xarrow
-            key={index}
-            start={a}
-            end={b}
-            color="white"
-            zIndex={-1}
-            showHead={false}
-            curveness={0}
-            startAnchor={"middle"}
-            endAnchor={"middle"}
-            strokeWidth={2}
-          />
-        ))}
+        {data &&
+          getLineTrips(path).map(([a, b], index) => (
+            <Xarrow
+              key={index}
+              start={a}
+              end={b}
+              color="white"
+              zIndex={-1}
+              showHead={false}
+              curveness={0}
+              startAnchor={"middle"}
+              endAnchor={"middle"}
+              strokeWidth={2}
+            />
+          ))}
       </Xwrapper>
     </div>
   );
@@ -108,13 +111,83 @@ const TraceTable = ({ characterId, path }: Props) => {
 function getLineTrips(path: Props["path"]) {
   switch (path) {
     case "Nihility":
-      return [];
+      return [
+        ["Point03", "Point04"],
+        ["Point04", "Point08"],
+        ["Point08", "Point16"],
+        ["Point08", "Point17"],
+        ["Point03", "Point01"],
+        ["Point01", "Point06"],
+        ["Point06", "Point10"],
+        ["Point10", "Point11"],
+        ["Point11", "Point12"],
+        ["Point03", "Point02"],
+        ["Point02", "Point07"],
+        ["Point07", "Point13"],
+        ["Point13", "Point14"],
+        ["Point14", "Point15"],
+        ["Point03", "Point05"],
+        ["Point05", "Point09"],
+        ["Point09", "Point18"],
+      ];
     case "Destruction":
-      return [];
+      return [
+        ["Point01", "Point02"],
+        ["Point03", "Point04"],
+        ["Point03", "Point05"],
+        ["Point04", "Point08"],
+        ["Point08", "Point16"],
+        ["Point16", "Point17"],
+        ["Point16", "Point18"],
+        ["Point05", "Point09"],
+        ["Point06", "Point10"],
+        ["Point10", "Point11"],
+        ["Point11", "Point12"],
+        ["Point06", "Point07"],
+        ["Point07", "Point13"],
+        ["Point13", "Point14"],
+        ["Point14", "Point15"],
+      ];
     case "Hunt":
-      return [];
+      return [
+        ["Point03", "Point01"],
+        ["Point01", "Point12"],
+        ["Point03", "Point02"],
+        ["Point02", "Point15"],
+        ["Point03", "Point04"],
+        ["Point04", "Point08"],
+        ["Point08", "Point16"],
+        ["Point16", "Point17"],
+        ["Point16", "Point18"],
+        ["Point03", "Point05"],
+        ["Point05", "Point09"],
+        ["Point05", "Point06"],
+        ["Point06", "Point10"],
+        ["Point10", "Point11"],
+        ["Point05", "Point07"],
+        ["Point07", "Point13"],
+        ["Point13", "Point14"],
+      ];
     case "Preservation":
-      return [];
+      return [
+        ["Point03", "Point01"],
+        ["Point01", "Point12"],
+        ["Point03", "Point02"],
+        ["Point02", "Point15"],
+        ["Point03", "Point04"],
+        ["Point04", "Point08"],
+        ["Point08", "Point16"],
+        ["Point16", "Point17"],
+        ["Point16", "Point18"],
+        ["Point03", "Point05"],
+        ["Point05", "Point09"],
+        ["Point09", "Point06"],
+        ["Point06", "Point10"],
+        ["Point10", "Point11"],
+        ["Point09", "Point07"],
+        ["Point07", "Point13"],
+        ["Point13", "Point14"],
+      ];
     case "Harmony":
       return [
         ["Point04", "Point08"],
@@ -136,7 +209,23 @@ function getLineTrips(path: Props["path"]) {
         ["Point09", "Point15"],
       ];
     case "Abundance":
-      return [];
+      return [
+        ["Point01", "Point02"],
+        ["Point03", "Point04"],
+        ["Point04", "Point08"],
+        ["Point08", "Point16"],
+        ["Point08", "Point17"],
+        ["Point03", "Point05"],
+        ["Point18", "Point07"],
+        ["Point06", "Point10"],
+        ["Point10", "Point11"],
+        ["Point11", "Point12"],
+        ["Point09", "Point06"],
+        ["Point07", "Point13"],
+        ["Point13", "Point14"],
+        ["Point14", "Point15"],
+        ["Point06", "Point07"],
+      ];
   }
 }
 
@@ -168,11 +257,80 @@ function getTraceVariants(path: Props["path"]) {
         },
       });
     case "Destruction":
-      return cva("");
+      return cva("absolute", {
+        variants: {
+          anchor: {
+            Point01: "top-[47%] left-[calc(50%-24px-84px)]", //  basic
+            Point02: "top-[47%] left-[calc(50%-24px+84px)]", //  skill
+            Point03: "top-[43%] left-[calc(50%-24px)]", //  ult
+            Point04: "top-[25%] left-[calc(50%-24px)]", //  talent
+            Point05: "top-[62%] left-[calc(50%-24px)]", //  tech
+            Point06: "top-[72%] left-[calc(50%-24px-84px)]", //  left small 3
+            Point07: "top-[72%] left-[calc(50%-24px+84px)]", //  right small 2
+            Point08: "top-[7%]  left-[calc(50%-24px)]", //  up big
+            Point09: "top-[75%] left-[calc(50%-24px)]", //  down small 1
+            Point10: "top-[60%] left-[calc(50%-24px-152px)]", //  left small 2
+            Point11: "top-[48%] left-[calc(50%-24px-210px)]", //  left small 1
+            Point12: "top-[35%] left-[calc(50%-24px-152px)]", //  left big
+            Point13: "top-[60%] left-[calc(50%-24px+152px)]", //  right small 2
+            Point14: "top-[48%] left-[calc(50%-24px+210px)]", //  right small 1
+            Point15: "top-[35%] left-[calc(50%-24px+152px)]", //  right big
+            Point16: "top-[2%] left-[calc(50%-24px)]", //  down small 2
+            Point17: "top-[11%]  left-[calc(50%-24px-96px)]", //  top left small
+            Point18: "top-[11%]  left-[calc(50%-24px+96px)]", //  top right small
+          },
+        },
+      });
     case "Hunt":
-      return cva("");
+      return cva("absolute", {
+        variants: {
+          anchor: {
+            Point01: "top-[47%] left-[calc(50%-24px-84px)]", //  basic
+            Point02: "top-[47%] left-[calc(50%-24px+84px)]", //  skill
+            Point03: "top-[43%] left-[calc(50%-24px)]", //  ult
+            Point04: "top-[25%] left-[calc(50%-24px)]", //  talent
+            Point05: "top-[62%] left-[calc(50%-24px)]", //  tech
+            Point06: "top-[72%] left-[calc(50%-24px-84px)]", //  left small 3
+            Point07: "top-[72%] left-[calc(50%-24px+84px)]", //  right small 2
+            Point08: "top-[7%]  left-[calc(50%-24px)]", //  up big
+            Point09: "top-[75%] left-[calc(50%-24px)]", //  down small 1
+            Point10: "top-[60%] left-[calc(50%-24px-152px)]", //  left small 2
+            Point11: "top-[48%] left-[calc(50%-24px-210px)]", //  left small 1
+            Point12: "top-[35%] left-[calc(50%-24px-152px)]", //  left big
+            Point13: "top-[60%] left-[calc(50%-24px+152px)]", //  right small 2
+            Point14: "top-[48%] left-[calc(50%-24px+210px)]", //  right small 1
+            Point15: "top-[35%] left-[calc(50%-24px+152px)]", //  right big
+            Point16: "top-[2%] left-[calc(50%-24px)]", //  down small 2
+            Point17: "top-[11%]  left-[calc(50%-24px-96px)]", //  top left small
+            Point18: "top-[11%]  left-[calc(50%-24px+96px)]", //  top right small
+          },
+        },
+      });
     case "Preservation":
-      return cva("");
+      return cva("absolute", {
+        variants: {
+          anchor: {
+            Point01: "top-[47%] left-[calc(50%-24px-84px)]", //  basic
+            Point02: "top-[47%] left-[calc(50%-24px+84px)]", //  skill
+            Point03: "top-[43%] left-[calc(50%-24px)]", //  ult
+            Point04: "top-[25%] left-[calc(50%-24px)]", //  talent
+            Point05: "top-[62%] left-[calc(50%-24px)]", //  tech
+            Point06: "top-[72%] left-[calc(50%-24px-84px)]", //  left small 3
+            Point07: "top-[72%] left-[calc(50%-24px+84px)]", //  right small 2
+            Point08: "top-[7%]  left-[calc(50%-24px)]", //  up big
+            Point09: "top-[75%] left-[calc(50%-24px)]", //  down small 1
+            Point10: "top-[60%] left-[calc(50%-24px-152px)]", //  left small 2
+            Point11: "top-[48%] left-[calc(50%-24px-210px)]", //  left small 1
+            Point12: "top-[35%] left-[calc(50%-24px-152px)]", //  left big
+            Point13: "top-[60%] left-[calc(50%-24px+152px)]", //  right small 2
+            Point14: "top-[48%] left-[calc(50%-24px+210px)]", //  right small 1
+            Point15: "top-[35%] left-[calc(50%-24px+152px)]", //  right big
+            Point16: "top-[2%] left-[calc(50%-24px)]", //  down small 2
+            Point17: "top-[11%]  left-[calc(50%-24px-96px)]", //  top left small
+            Point18: "top-[11%]  left-[calc(50%-24px+96px)]", //  top right small
+          },
+        },
+      });
     case "Harmony":
       return cva("absolute", {
         variants: {
@@ -199,7 +357,30 @@ function getTraceVariants(path: Props["path"]) {
         },
       });
     case "Abundance":
-      return cva("");
+      return cva("absolute", {
+        variants: {
+          anchor: {
+            Point01: "top-[47%] left-[calc(50%-24px-84px)]", //  basic
+            Point02: "top-[47%] left-[calc(50%-24px+84px)]", //  skill
+            Point03: "top-[43%] left-[calc(50%-24px)]", //  ult
+            Point04: "top-[25%] left-[calc(50%-24px)]", //  talent
+            Point05: "top-[62%] left-[calc(50%-24px)]", //  tech
+            Point06: "top-[72%] left-[calc(50%-24px+84px)]", //  right small 2
+            Point07: "top-[72%] left-[calc(50%-24px-84px)]", //  left small 3
+            Point08: "top-[7%]  left-[calc(50%-24px)]", //  up big
+            Point09: "top-[80%] left-[calc(50%-24px+64px)]", //  down small 1
+            Point10: "top-[60%] left-[calc(50%-24px+152px)]", //  right small 2
+            Point11: "top-[48%] left-[calc(50%-24px+210px)]", //  right small 1
+            Point12: "top-[35%] left-[calc(50%-24px+152px)]", //  right big
+            Point13: "top-[60%] left-[calc(50%-24px-152px)]", //  left small 2
+            Point14: "top-[48%] left-[calc(50%-24px-210px)]", //  left small 1
+            Point15: "top-[35%] left-[calc(50%-24px-152px)]", //  left big
+            Point16: "top-[11%]  left-[calc(50%-24px+96px)]", //  down small 2
+            Point17: "top-[11%] left-[calc(50%-24px-96px)]", //  top left small
+            Point18: "top-[80%] left-[calc(50%-24px-64px)]", //  top right small
+          },
+        },
+      });
   }
 }
 

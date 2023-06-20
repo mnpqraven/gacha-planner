@@ -30,14 +30,14 @@ const CharacterTabWrapper = ({
           <div className="absolute w-full h-full text-center before:inline-block before:align-middle before:h-full -z-50 -mx-6 pt-[72px] pb-6 top-0">
             <Image
               className="inline-block align-middle opacity-10"
-              src={pathUrl('Harmony')}
+              src={pathUrl('Abundance')}
               alt={path}
               quality={100}
               width={384}
               height={384}
             />
           </div>
-          <TraceTable characterId={1101} path={'Harmony'} />
+          <TraceTable characterId={1105} path={'Abundance'} />
         </TabsContent>
         <TabsContent value="eidolons"></TabsContent>
       </Tabs>
