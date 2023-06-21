@@ -1,10 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: "class",
-  content: [
-    './src/app/components/**/*.{ts,tsx}',
-    './src/app/**/*.{ts,tsx}',
-  ],
+  content: ["./src/app/components/**/*.{ts,tsx}", "./src/app/**/*.{ts,tsx}"],
   theme: {
     container: {
       center: true,
@@ -48,6 +45,13 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        fire: "#F84F36",
+        ice: "#47C7FD",
+        wind: "#00FF9C",
+        lightning: "#8872F1",
+        physical: "#FFFFFF",
+        quantum: "#1C29BA",
+        imaginary: "#F4D258",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -70,5 +74,8 @@ module.exports = {
       },
     },
   },
+  safelist: [
+    { pattern: /(border)-(fire|ice|wind|lightning|physical|quantum|imaginary)/ },
+  ],
   plugins: [require("tailwindcss-animate")],
 };

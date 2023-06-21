@@ -23,7 +23,9 @@ const JadeRewardTable = ({ data }: Props) => {
 
   return (
     <Table>
-      <TableCaption>Breakdown of where you're getting the jades</TableCaption>
+      <TableCaption>
+        Breakdown of where you{"'"}re getting the jades
+      </TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead>
@@ -36,8 +38,8 @@ const JadeRewardTable = ({ data }: Props) => {
                 <HoverCardContent side="top">
                   These are repeatable rewards that are guaranteed to you and
                   does not include one-off rewards like events or redemption
-                  codes/promotions. You're bound to receive more than the table
-                  shows as you play the game
+                  codes/promotions. You{"'"}re bound to receive more than the
+                  table shows as you play the game
                 </HoverCardContent>
               </HoverCard>
             </div>

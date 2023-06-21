@@ -44,7 +44,7 @@ const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {
           </Link>
         ))}
       </nav>
-      <CommandCenter routes={menu} />
+      {/* <CommandCenter routes={menu} /> */}
       <div className="flex flex-1 items-center space-x-4 lg:space-x-6 justify-end">
         <a
           href="https://github.com/mnpqraven/gacha-planner"
