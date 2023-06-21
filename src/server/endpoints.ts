@@ -171,22 +171,22 @@ const ENDPOINT = {
     }),
   },
   mhyCharacter: {
-    path: "/honkai/mhy/character/", // :id
+    path: "/honkai/mhy/character", // :id
     payload: undefined,
     response: z.any(),
   },
   mhyTrace: {
-    path: "/honkai/mhy/trace/", // :id
+    path: "/honkai/mhy/trace", // :id
     payload: undefined,
     response: z.any(),
   },
   mhyEidolon: {
-    path: "/honkai/mhy/eidolon/", // :id
+    path: "/honkai/mhy/eidolon", // :id
     payload: undefined,
     response: z.any(),
   },
   mhySimpleSkill: {
-    path: "/honkai/mhy/skill/", // :id
+    path: "/honkai/mhy/skill", // :id
     payload: undefined,
     response: z.any(),
   },

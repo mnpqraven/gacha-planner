@@ -21,8 +21,10 @@ const EidolonTable = ({ characterId }: Props) => {
         characterId
       ),
   });
-  const bottom = data?.list.sort((a, b) => a.rank - b.rank).slice(3);
-  const top = data?.list.sort((a, b) => a.rank - b.rank).slice(0, 3);
+  if (!data) return null;
+
+  const bottom = data.list.sort((a, b) => a.rank - b.rank).slice(3);
+  const top = data.list.sort((a, b) => a.rank - b.rank).slice(0, 3);
 
   return (
     <>
