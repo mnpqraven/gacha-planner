@@ -33,6 +33,7 @@ export interface CharacterElement {
 
 export interface SimpleSkill {
   description: string[];
+  id: number;
   name: string;
   params: string[][];
   ttype: SkillType;

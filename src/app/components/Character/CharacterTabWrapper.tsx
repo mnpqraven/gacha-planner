@@ -3,7 +3,6 @@ import { SkillOverview } from "./SkillOverview";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
 import Image from "next/image";
 import { TraceTable } from "./TraceTable";
-import { anchorType } from "react-xarrows";
 import { EidolonTable } from "./EidolonTable";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { typedFetch } from "@/server/fetchHelper";
@@ -28,9 +27,12 @@ const CharacterTabWrapper = ({ skills, characterId }: Props) => {
 
   const client = useQueryClient();
   client.prefetchQuery({
-    queryKey: ['attribute_property'],
-    queryFn: async () => await typedFetch<undefined, {list: DbAttributeProperty[]}>(ENDPOINT.mhyAttributeProperty)
-  })
+    queryKey: ["attribute_property"],
+    queryFn: async () =>
+      await typedFetch<undefined, { list: DbAttributeProperty[] }>(
+        ENDPOINT.mhyAttributeProperty
+      ),
+  });
 
   if (!data) return null;
   return (
@@ -48,14 +50,14 @@ const CharacterTabWrapper = ({ skills, characterId }: Props) => {
           <div className="absolute w-full h-full text-center before:inline-block before:align-middle before:h-full -z-50 -mx-6 pt-[72px] pb-6 top-0">
             <Image
               className="inline-block align-middle opacity-10"
-              src={pathUrl('Erudition')}
+              src={pathUrl(data.path)}
               alt={data.path}
               quality={100}
               width={384}
               height={384}
             />
           </div>
-          <TraceTable characterId={1204} path={'Erudition'} />
+          <TraceTable characterId={characterId} path={data.path} />
         </TabsContent>
         <TabsContent value="eidolons">
           <EidolonTable characterId={characterId} />

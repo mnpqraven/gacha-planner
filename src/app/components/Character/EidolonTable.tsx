@@ -5,7 +5,6 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useState } from "react";
 import { Toggle } from "../ui/Toggle";
-import { Card, CardContent } from "../ui/Card";
 
 type Props = {
   characterId: number;
@@ -27,16 +26,15 @@ const EidolonTable = ({ characterId }: Props) => {
 
   return (
     <>
-      <div className="flex">
+      <div className="flex gap-2">
         {top &&
           top.map((eidolon) => (
             <Toggle
               key={eidolon.id}
               className="h-fit flex-1"
               pressed={selectedEidolon === eidolon.rank}
-              onPressedChange={(_e) => setSelectedEidolon(eidolon.rank)}
+              onPressedChange={() => setSelectedEidolon(eidolon.rank)}
             >
-              {eidolon.name}
               <Image
                 src={url(characterId, eidolon.rank)}
                 alt={eidolon.name}
@@ -44,22 +42,22 @@ const EidolonTable = ({ characterId }: Props) => {
                 width={64}
                 height={64}
               />
+              {eidolon.name}
             </Toggle>
           ))}
       </div>
       <div className="border rounded-md p-4 my-4 min-h-[8rem]">
         {data?.list.find((e) => e.rank == selectedEidolon)?.desc}
       </div>
-      <div className="flex">
+      <div className="flex gap-2">
         {bottom &&
           bottom.map((eidolon) => (
             <Toggle
               key={eidolon.id}
               className="h-fit flex-1"
               pressed={selectedEidolon === eidolon.rank}
-              onPressedChange={(_e) => setSelectedEidolon(eidolon.rank)}
+              onPressedChange={() => setSelectedEidolon(eidolon.rank)}
             >
-              {eidolon.name}
               <Image
                 src={url(characterId, eidolon.rank)}
                 onClick={() => setSelectedEidolon(eidolon.rank)}
@@ -67,6 +65,7 @@ const EidolonTable = ({ characterId }: Props) => {
                 width={64}
                 height={64}
               />
+              {eidolon.name}
             </Toggle>
           ))}
       </div>

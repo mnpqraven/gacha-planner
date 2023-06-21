@@ -2,13 +2,17 @@ import { SimpleSkill, SkillType } from "@/bindings/PatchBanner";
 import Image from "next/image";
 import { useState } from "react";
 import { Slider } from "../ui/Slider";
+import { parseSkillType } from "@/lib/utils";
+import { Toggle } from "../ui/Toggle";
 
 type Props = {
   skills: SimpleSkill[];
   characterId: number;
 };
 const SkillOverview = ({ skills, characterId }: Props) => {
-  const [selectedSkill, setSelectedSkill] = useState<SimpleSkill>(skills[0]);
+  const [selectedSkill, setSelectedSkill] = useState<SimpleSkill>(
+    skills.find((e) => e.ttype === "BPSkill") ?? skills[0]
+  );
   const [selectedSlv, setSelectedSlv] = useState(0);
 
   const skillDescription = selectedSkill.description.reduce((a, b, index) => {
@@ -37,24 +41,35 @@ const SkillOverview = ({ skills, characterId }: Props) => {
             return toInt(a.ttype) - toInt(b.ttype);
           })
           .map((skill, index) => (
-            <div className="flex flex-col" key={index}>
-              {getImagePath(characterId, skill.ttype) && (
-                <Image
-                  src={`${getImagePath(characterId, skill.ttype)}`}
-                  alt={skill.name}
-                  width={64}
-                  height={64}
-                  onClick={() => setSelectedSkill(skills[index])}
-                />
-              )}
-              <span className="self-center">{skill.ttype}</span>
-            </div>
+            <Toggle
+              key={index}
+              className="h-fit"
+              pressed={skill.ttype === selectedSkill.ttype}
+              onPressedChange={() => setSelectedSkill(skill)}
+            >
+              <div className="flex flex-col">
+                {getImagePath(characterId, skill.ttype) && (
+                  <Image
+                    src={`${getImagePath(characterId, skill.ttype)}`}
+                    alt={skill.name}
+                    className="min-h-[64px] min-w-[64px]"
+                    width={64}
+                    height={64}
+                  />
+                )}
+                <span className="self-center">
+                  {parseSkillType(skill.ttype)}
+                </span>
+              </div>
+            </Toggle>
           ))}
         <div className="flex flex-col px-4">
-          <div>
-            {selectedSkill.name} - {selectedSkill.ttype} - Slv.{" "}
-            {selectedSlv + 1}
-          </div>
+          <h3 className="text-lg font-semibold leading-none tracking-tight">
+            <span>
+              {selectedSkill.name} - {parseSkillType(selectedSkill.ttype)}
+            </span>
+            {selectedSkill.ttype !== "Maze" && <span>{selectedSlv + 1}</span>}
+          </h3>
           {selectedSkill.params.length > 1 && (
             <Slider
               className="py-4"

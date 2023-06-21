@@ -185,6 +185,11 @@ const ENDPOINT = {
     payload: undefined,
     response: z.any(),
   },
+  mhySimpleSkill: {
+    path: "/honkai/mhy/skill/", // :id
+    payload: undefined,
+    response: z.any(),
+  },
   mhyAttributeProperty: {
     path: "/honkai/mhy/attribute_property_list", // :id
     payload: undefined,
