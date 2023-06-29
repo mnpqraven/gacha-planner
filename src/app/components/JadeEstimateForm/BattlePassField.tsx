@@ -72,6 +72,7 @@ const BattlePassField = ({ form }: Props) => {
                     className="w-20"
                     type="number"
                     min={0}
+                    max={50}
                     onKeyDown={(e) => {
                       if (e.code === "Minus") e.preventDefault();
                     }}
