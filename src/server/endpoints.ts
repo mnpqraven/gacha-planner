@@ -180,6 +180,11 @@ const ENDPOINT = {
     payload: undefined,
     response: z.any(),
   },
+  mhyBigTrace: {
+    path: "/honkai/mhy/big_trace",
+    pyaload: undefined,
+    response: z.any()
+  },
   mhyEidolon: {
     path: "/honkai/mhy/eidolon", // :id
     payload: undefined,
