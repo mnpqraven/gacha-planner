@@ -182,7 +182,7 @@ const ENDPOINT = {
   },
   mhyBigTrace: {
     path: "/honkai/mhy/big_trace",
-    pyaload: undefined,
+    payload: undefined,
     response: z.any()
   },
   mhyEidolon: {
