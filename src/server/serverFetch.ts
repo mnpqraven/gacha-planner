@@ -25,6 +25,7 @@ export async function serverFetch<TPayload, TResponse>(
       return res.json();
     } else {
       console.error("api fetch failed, code:", res.status);
+      console.error("url:", url);
       const errText = await res.text();
       console.error("unknown error", errText);
       return Promise.reject(`unknown error ${errText}`);
@@ -42,7 +43,8 @@ export async function serverFetch<TPayload, TResponse>(
       return res.json();
     } else {
       console.error("api fetch failed, code:", res.status);
-      return Promise.reject(`unknown error ${res.text()}`);
+      console.error("url:", url);
+      return Promise.reject(`unknown error ${await res.text()}`);
     }
   }
 }
