@@ -34,6 +34,17 @@ const TraceTable = ({ characterId, path }: Props) => {
         characterId
       ),
   });
+
+  const bigTraceList = useQuery({
+    queryKey: ["big_trace", characterId],
+    queryFn: async () =>
+      await typedFetch<undefined, { list: SimpleSkill[] }>(
+        ENDPOINT.mhyBigTrace,
+        undefined,
+        characterId
+      ),
+  });
+
   const skillDescriptions = useQuery({
     queryKey: ["skill_description"],
     queryFn: async () =>
@@ -76,6 +87,7 @@ const TraceTable = ({ characterId, path }: Props) => {
       <Xwrapper>
         {data &&
           skillDescriptions.data &&
+          bigTraceList.data &&
           data.list.map((traceNode) => (
             <div
               id={traceNode.anchor}
@@ -107,11 +119,20 @@ const TraceTable = ({ characterId, path }: Props) => {
                     isSkillNode(traceNode) ? "md:w-[50vw]" : ""
                   )}
                 >
-                  <TraceDescription
-                    trace={traceNode}
-                    propertyBucket={properties.data?.list}
-                    skills={skillDescriptions.data.list}
-                  />
+                  {!isBigTrace(traceNode) ? (
+                    <TraceDescription
+                      trace={traceNode}
+                      propertyBucket={properties.data?.list}
+                      skills={skillDescriptions.data.list}
+                    />
+                  ) : (
+                    <BigTraceDescription
+                      trace={traceNode}
+                      bigTraces={bigTraceList.data.list.find(
+                        (e) => e.id === traceNode.id
+                      )}
+                    />
+                  )}
                 </PopoverContent>
               </Popover>
             </div>
@@ -137,6 +158,46 @@ const TraceTable = ({ characterId, path }: Props) => {
     </div>
   );
 };
+
+interface BigTraceDescriptionProps {
+  trace: DbCharacterSkillTree;
+  bigTraces: SimpleSkill | undefined;
+}
+const BigTraceDescription = ({
+  trace,
+  bigTraces,
+}: BigTraceDescriptionProps) => {
+  const [selectedSlv, setSelectedSlv] = useState(0);
+  console.log(trace);
+  console.log(bigTraces);
+
+  if (!bigTraces) return null;
+
+  const skillDescription = bigTraces.description.reduce((a, b, index) => {
+    if (index === 0) return a + b; // index 0 is before a
+    else {
+      if (!bigTraces.params[selectedSlv])
+        return a + bigTraces.params[0][index - 1] + b;
+      return a + bigTraces.params[selectedSlv][index - 1] + b;
+    }
+  }, "");
+  return (
+    <div className="flex flex-col gap-2">
+      {bigTraces.params.length > 1 && (
+        <Slider
+          className="py-4"
+          defaultValue={[0]}
+          min={0}
+          max={bigTraces.params.length - 1}
+          onValueChange={(e) => setSelectedSlv(e[0])}
+        />
+      )}
+
+      <p>{skillDescription}</p>
+    </div>
+  );
+};
+
 const TraceDescription = ({
   trace,
   propertyBucket = [],
