@@ -15,7 +15,7 @@ const EidolonTable = ({ characterId }: Props) => {
   const { data } = useQuery({
     queryKey: ["eidolon", characterId],
     queryFn: async () =>
-      typedFetch<undefined, { list: DbCharacterEidolon[] }>(
+      await typedFetch<undefined, { list: DbCharacterEidolon[] }>(
         ENDPOINT.mhyEidolon,
         undefined,
         characterId
