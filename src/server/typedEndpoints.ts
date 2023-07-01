@@ -3,9 +3,11 @@ import { serverFetch } from "./serverFetch";
 import { DbCharacter } from "@/bindings/DbCharacter";
 
 const API = {
-  mhyCharacter: route<undefined, { list: DbCharacter[] }>(
+  mhyCharacterList: route<undefined, { list: DbCharacter[] }>(
     "/honkai/mhy/character"
   ),
+  mhyCharacter: route<undefined, DbCharacter>("/honkai/mhy/character"),
+  mhySkill: route<undefined, { list: SimpleSkill[] }>("/honkai/mhy/skill"),
   mhyBigTrace: route<undefined, { list: SimpleSkill[] }>(
     "/honkai/mhy/big_trace"
   ),
@@ -13,13 +15,13 @@ const API = {
 
 type ApiRoute<TPayload, TResponse> = {
   path: string;
-  call: (opt?: { payload?: TPayload; params?: string }) => Promise<TResponse>;
+  fetch: (opt?: { payload?: TPayload; params?: string }) => Promise<TResponse>;
 };
 
 function route<T, U>(path: string): ApiRoute<T, U> {
   return {
     path,
-    call: async (opt?: { payload?: T; params?: string }) =>
+    fetch: async (opt?: { payload?: T; params?: string }) =>
       await serverFetch<T, U>(
         path,
         opt?.payload ? { payload: opt.payload, method: "POST" } : undefined,

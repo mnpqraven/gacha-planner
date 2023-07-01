@@ -7,6 +7,7 @@ import Imaginary from "@public/element/Imaginary.svg";
 import Wind from "@public/element/Wind.svg";
 import Lightning from "@public/element/Lightning.svg";
 import { HTMLAttributes, forwardRef } from "react";
+import "./icon.css";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   element: Element;
@@ -16,7 +17,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   size: string;
 }
 const ElementIcon = forwardRef<HTMLDivElement, Props>(
-  ({ element, size , ...props}, ref) => {
+  ({ element, size, ...props }, ref) => {
     // original width in svg files ???????
     const sizes = { width: "100%", height: "100%", viewBox: "0 0 14 14" };
     return (

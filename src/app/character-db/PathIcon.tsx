@@ -7,6 +7,7 @@ import Hunt from "@public/path/Hunt.svg";
 import Nihility from "@public/path/Nihility.svg";
 import Preservation from "@public/path/Preservation.svg";
 import { HTMLAttributes, forwardRef } from "react";
+import "./icon.css";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   path: Path;

@@ -1,3 +1,5 @@
+"use client";
+
 import { DbCharacterSkillTree } from "@/bindings/DbCharacterSkillTree";
 import ENDPOINT, { IMAGE_URL } from "@/server/endpoints";
 import { typedFetch } from "@/server/fetchHelper";
@@ -5,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
 import { cn, parseSkillType } from "@/lib/utils";
-import { cva } from "class-variance-authority";
+import { VariantProps, cva } from "class-variance-authority";
 import Xarrow, { Xwrapper, useXarrow } from "react-xarrows";
 import { useEffect, useState } from "react";
 import { DbAttributeProperty } from "@/bindings/DbAttributeProperty";
@@ -14,6 +16,7 @@ import { Slider } from "../ui/Slider";
 
 type Props = {
   characterId: number;
+  wrapperSize?: number;
   path:
     | "Erudition"
     | "Nihility"
@@ -23,7 +26,7 @@ type Props = {
     | "Harmony"
     | "Abundance";
 };
-const TraceTable = ({ characterId, path }: Props) => {
+const TraceTable = ({ characterId, wrapperSize = 480, path }: Props) => {
   const updateLines = useXarrow();
   const { data } = useQuery({
     queryKey: ["trace", characterId],
@@ -82,6 +85,14 @@ const TraceTable = ({ characterId, path }: Props) => {
     },
   });
 
+  function getTraceType(
+    node: DbCharacterSkillTree
+  ): VariantProps<typeof iconVariants>["variant"] {
+    if (isSmallTrace(node)) return "smallNode";
+    if (isSkillNode(node)) return "skillNode";
+    return "bigNode";
+  }
+
   return (
     <div id="parent-wrapper" className="h-full w-full relative">
       <Xwrapper>
@@ -92,32 +103,32 @@ const TraceTable = ({ characterId, path }: Props) => {
             <div
               id={traceNode.anchor}
               key={traceNode.id}
-              // className={cn("Nihility", traceNode.anchor, "absolute")}
               className={cn(
                 getTraceVariants(path)({ anchor: traceNode.anchor })
               )}
+              style={{
+                marginLeft: `${wrapperSize / -16}px`,
+              }}
             >
               <Popover>
-                <PopoverTrigger>
+                <PopoverTrigger className="flex items-center justify-center">
                   <Image
                     className={iconVariants({
-                      variant: isSmallTrace(traceNode)
-                        ? "smallNode"
-                        : isSkillNode(traceNode)
-                        ? "skillNode"
-                        : "bigNode",
+                      variant: getTraceType(traceNode),
                     })}
                     src={IMAGE_URL + traceNode.icon}
                     alt={`${traceNode.id}`}
-                    width={64}
-                    height={64}
+                    width={wrapperSize / 8}
+                    height={wrapperSize / 8}
                   />
                 </PopoverTrigger>
                 <PopoverContent
-                  className={cn(
-                    "w-fit",
-                    isSkillNode(traceNode) ? "md:w-[50vw]" : ""
-                  )}
+                  // className={cn(
+                  //   "w-fit",
+                  //   isSkillNode(traceNode) ? "md:w-[50vw]" : ""
+                  // )}
+                  className="w-full"
+                  style={{maxWidth: `${wrapperSize}px`}}
                 >
                   {!isBigTrace(traceNode) ? (
                     <TraceDescription
@@ -424,24 +435,24 @@ function getTraceVariants(path: Props["path"]) {
       return cva("absolute", {
         variants: {
           anchor: {
-            Point01: "top-[46%] left-[calc(50%-32px-84px)]", //  basic
-            Point02: "top-[46%] left-[calc(50%-32px+84px)]", //  skill
-            Point03: "top-[46%] left-[calc(50%-32px)]", //  ult
-            Point04: "top-[28%] left-[calc(50%-32px)]", //  talent
-            Point05: "top-[77%] left-[calc(50%-32px)]", //  tech
-            Point06: "top-[46%] left-[calc(50%-32px-152px)]", //  left big
-            Point07: "top-[46%] left-[calc(50%-32px+152px)]", //  right big
-            Point08: "top-[8%]  left-[calc(50%-32px)]", //  up big
-            Point09: "top-[75%] left-[calc(50%-32px-84px)]", //  down small 1
-            Point10: "top-[46%] left-[calc(50%-32px-226px)]", //  left small 1
-            Point11: "top-[61%] left-[calc(50%-32px-200px)]", //  left small 2
-            Point12: "top-[32%] left-[calc(50%-32px-200px)]", //  left small 3
-            Point13: "top-[46%] left-[calc(50%-32px+226px)]", //  right small 1
-            Point14: "top-[61%] left-[calc(50%-32px+200px)]", //  right small 2
-            Point15: "top-[32%] left-[calc(50%-32px+200px)]", //  right small 2
-            Point16: "top-[12%]  left-[calc(50%-32px-96px)]", //  top left small
-            Point17: "top-[12%]  left-[calc(50%-32px+96px)]", //  top right small
-            Point18: "top-[75%] left-[calc(50%-32px+84px)]", //  down small 2
+            Point01: "top-[46%] left-[calc(50%-17.5%)]",
+            Point02: "top-[46%] left-[calc(50%+17.5%)]",
+            Point03: "top-[46%] left-[calc(50%)]",
+            Point04: "top-[28%] left-[calc(50%)]",
+            Point05: "top-[77%] left-[calc(50%)]",
+            Point06: "top-[46%] left-[calc(50%-32%)]",
+            Point07: "top-[46%] left-[calc(50%+32%)]",
+            Point08: "top-[8%]  left-[calc(50%)]",
+            Point09: "top-[75%] left-[calc(50%-17.5%)]",
+            Point10: "top-[46%] left-[calc(50%-47%)]",
+            Point11: "top-[61%] left-[calc(50%-41.67%)]",
+            Point12: "top-[32%] left-[calc(50%-41.67%)]",
+            Point13: "top-[46%] left-[calc(50%+47%)]",
+            Point14: "top-[61%] left-[calc(50%+41.67%)]",
+            Point15: "top-[32%] left-[calc(50%+41.67%)]",
+            Point16: "top-[12%] left-[calc(50%-20%)]",
+            Point17: "top-[12%] left-[calc(50%+20%)]",
+            Point18: "top-[75%] left-[calc(50%+17.5%)]",
           },
         },
       });
@@ -449,24 +460,24 @@ function getTraceVariants(path: Props["path"]) {
       return cva("absolute", {
         variants: {
           anchor: {
-            Point01: "top-[42%] left-[calc(50%-32px-84px)]", //  basic
-            Point02: "top-[42%] left-[calc(50%-32px+84px)]", //  skill
-            Point03: "top-[38%] left-[calc(50%-32px)]", //  ult
-            Point04: "top-[20%] left-[calc(50%-32px)]", //  talent
-            Point05: "top-[57%] left-[calc(50%-32px)]", //  tech
-            Point06: "top-[30%] left-[calc(50%-32px-152px)]", //  left big
-            Point07: "top-[30%] left-[calc(50%-32px+152px)]", //  right big
-            Point08: "top-[2%]  left-[calc(50%-32px)]", //  up big
-            Point09: "top-[70%] left-[calc(50%-32px)]", //  down small 1
-            Point10: "top-[43%] left-[calc(50%-32px-210px)]", //  left small 1
-            Point11: "top-[55%] left-[calc(50%-32px-152px)]", //  left small 2
-            Point12: "top-[67%] left-[calc(50%-32px-84px)]", //  left small 3
-            Point13: "top-[43%] left-[calc(50%-32px+210px)]", //  right small 1
-            Point14: "top-[55%] left-[calc(50%-32px+152px)]", //  right small 2
-            Point15: "top-[67%] left-[calc(50%-32px+84px)]", //  right small 2
-            Point16: "top-[6%]  left-[calc(50%-32px-96px)]", //  top left small
-            Point17: "top-[6%]  left-[calc(50%-32px+96px)]", //  top right small
-            Point18: "top-[85%] left-[calc(50%-32px)]", //  down small 2
+            Point01: "top-[42%] left-[calc(50%-17.5%)]", //  basic
+            Point02: "top-[42%] left-[calc(50%+17.5%)]", //  skill
+            Point03: "top-[38%] left-[calc(50%)]", //  ult
+            Point04: "top-[20%] left-[calc(50%)]", //  talent
+            Point05: "top-[57%] left-[calc(50%)]", //  tech
+            Point06: "top-[30%] left-[calc(50%-32%)]", //  left big
+            Point07: "top-[30%] left-[calc(50%+32%)]", //  right big
+            Point08: "top-[2%]  left-[calc(50%)]", //  up big
+            Point09: "top-[70%] left-[calc(50%)]", //  down small 1
+            Point10: "top-[43%] left-[calc(50%-43.75%)]", //  left small 1
+            Point11: "top-[55%] left-[calc(50%-32%)]", //  left small 2
+            Point12: "top-[67%] left-[calc(50%-17.5%)]", //  left small 3
+            Point13: "top-[43%] left-[calc(50%+43.75%)]", //  right small 1
+            Point14: "top-[55%] left-[calc(50%+32%)]", //  right small 2
+            Point15: "top-[67%] left-[calc(50%+17.5%)]", //  right small 2
+            Point16: "top-[6%]  left-[calc(50%-20%)]", //  top left small
+            Point17: "top-[6%]  left-[calc(50%+20%)]", //  top right small
+            Point18: "top-[85%] left-[calc(50%)]", //  down small 2
           },
         },
       });
@@ -474,24 +485,24 @@ function getTraceVariants(path: Props["path"]) {
       return cva("absolute", {
         variants: {
           anchor: {
-            Point01: "top-[47%] left-[calc(50%-32px-84px)]", //  basic
-            Point02: "top-[47%] left-[calc(50%-32px+84px)]", //  skill
-            Point03: "top-[47%] left-[calc(50%-32px)]", //  ult
-            Point04: "top-[32%] left-[calc(50%-32px)]", //  talent
-            Point05: "top-[62%] left-[calc(50%-32px)]", //  tech
-            Point06: "top-[72%] left-[calc(50%-32px-84px)]", //  left small 3
-            Point07: "top-[72%] left-[calc(50%-32px+84px)]", //  right small 2
-            Point08: "top-[15%]  left-[calc(50%-32px)]", //  up big
-            Point09: "top-[80%] left-[calc(50%-32px)]", //  down small 1
-            Point10: "top-[60%] left-[calc(50%-32px-152px)]", //  left small 2
-            Point11: "top-[48%] left-[calc(50%-32px-210px)]", //  left small 1
-            Point12: "top-[35%] left-[calc(50%-32px-152px)]", //  left big
-            Point13: "top-[60%] left-[calc(50%-32px+152px)]", //  right small 2
-            Point14: "top-[48%] left-[calc(50%-32px+210px)]", //  right small 1
-            Point15: "top-[35%] left-[calc(50%-32px+152px)]", //  right big
-            Point16: "top-[2%] left-[calc(50%-32px)]", //  down small 2
-            Point17: "top-[7%]  left-[calc(50%-32px-96px)]", //  top left small
-            Point18: "top-[7%]  left-[calc(50%-32px+96px)]", //  top right small
+            Point01: "top-[47%] left-[calc(50%-17.5%)]", //  basic
+            Point02: "top-[47%] left-[calc(50%+17.5%)]", //  skill
+            Point03: "top-[47%] left-[calc(50%)]", //  ult
+            Point04: "top-[32%] left-[calc(50%)]", //  talent
+            Point05: "top-[62%] left-[calc(50%)]", //  tech
+            Point06: "top-[72%] left-[calc(50%-17.5%)]", //  left small 3
+            Point07: "top-[72%] left-[calc(50%+17.5%)]", //  right small 2
+            Point08: "top-[15%] left-[calc(50%)]", //  up big
+            Point09: "top-[80%] left-[calc(50%)]", //  down small 1
+            Point10: "top-[60%] left-[calc(50%-31.67%)]", //  left small 2
+            Point11: "top-[48%] left-[calc(50%-43.75%)]", //  left small 1
+            Point12: "top-[35%] left-[calc(50%-31.67%)]", //  left big
+            Point13: "top-[60%] left-[calc(50%+31.67%)]", //  right small 2
+            Point14: "top-[48%] left-[calc(50%+43.75%)]", //  right small 1
+            Point15: "top-[35%] left-[calc(50%+31.67%)]", //  right big
+            Point16: "top-[2%]  left-[calc(50%)]", //  down small 2
+            Point17: "top-[7%]  left-[calc(50%-20%)]", //  top left small
+            Point18: "top-[7%]  left-[calc(50%+20%)]", //  top right small
           },
         },
       });
@@ -499,24 +510,24 @@ function getTraceVariants(path: Props["path"]) {
       return cva("absolute", {
         variants: {
           anchor: {
-            Point01: "top-[47%] left-[calc(50%-32px-84px)]", //  basic
-            Point02: "top-[47%] left-[calc(50%-32px+84px)]", //  skill
-            Point03: "top-[45%] left-[calc(50%-32px)]", //  ult
-            Point04: "top-[28%] left-[calc(50%-32px)]", //  talent
-            Point05: "top-[62%] left-[calc(50%-32px)]", //  tech
-            Point06: "top-[72%] left-[calc(50%-32px-84px)]", //  left small 3
-            Point07: "top-[72%] left-[calc(50%-32px+84px)]", //  right small 2
-            Point08: "top-[13%]  left-[calc(50%-32px)]", //  up big
-            Point09: "top-[80%] left-[calc(50%-32px)]", //  down small 1
-            Point10: "top-[60%] left-[calc(50%-32px-152px)]", //  left small 2
-            Point11: "top-[48%] left-[calc(50%-32px-210px)]", //  left small 1
-            Point12: "top-[35%] left-[calc(50%-32px-152px)]", //  left big
-            Point13: "top-[60%] left-[calc(50%-32px+152px)]", //  right small 2
-            Point14: "top-[48%] left-[calc(50%-32px+210px)]", //  right small 1
-            Point15: "top-[35%] left-[calc(50%-32px+152px)]", //  right big
-            Point16: "top-[0%] left-[calc(50%-32px)]", //  down small 2
-            Point17: "top-[5%]  left-[calc(50%-32px-96px)]", //  top left small
-            Point18: "top-[5%]  left-[calc(50%-32px+96px)]", //  top right small
+            Point01: "top-[47%] left-[calc(50%-17.5%)]", //  basic
+            Point02: "top-[47%] left-[calc(50%+17.5%)]", //  skill
+            Point03: "top-[45%] left-[calc(50%)]", //  ult
+            Point04: "top-[28%] left-[calc(50%)]", //  talent
+            Point05: "top-[62%] left-[calc(50%)]", //  tech
+            Point06: "top-[72%] left-[calc(50%-17.5%)]", //  left small 3
+            Point07: "top-[72%] left-[calc(50%+17.5%)]", //  right small 2
+            Point08: "top-[13%] left-[calc(50%)]", //  up big
+            Point09: "top-[80%] left-[calc(50%)]", //  down small 1
+            Point10: "top-[60%] left-[calc(50%-31.67%)]", //  left small 2
+            Point11: "top-[48%] left-[calc(50%-43.75%)]", //  left small 1
+            Point12: "top-[35%] left-[calc(50%-31.67%)]", //  left big
+            Point13: "top-[60%] left-[calc(50%+31.67%)]", //  right small 2
+            Point14: "top-[48%] left-[calc(50%+43.75%)]", //  right small 1
+            Point15: "top-[35%] left-[calc(50%+31.67%)]", //  right big
+            Point16: "top-[0%]  left-[calc(50%)]", //  down small 2
+            Point17: "top-[5%]  left-[calc(50%-20%)]", //  top left small
+            Point18: "top-[5%]  left-[calc(50%+20%)]", //  top right small
           },
         },
       });
@@ -524,24 +535,24 @@ function getTraceVariants(path: Props["path"]) {
       return cva("absolute", {
         variants: {
           anchor: {
-            Point01: "top-[47%] left-[calc(50%-32px-84px)]", //  basic
-            Point02: "top-[47%] left-[calc(50%-32px+84px)]", //  skill
-            Point03: "top-[46%] left-[calc(50%-32px)]", //  ult
-            Point04: "top-[30%] left-[calc(50%-32px)]", //  talent
-            Point05: "top-[62%] left-[calc(50%-32px)]", //  tech
-            Point06: "top-[72%] left-[calc(50%-32px-112px)]", //  left small 3
-            Point07: "top-[72%] left-[calc(50%-32px+112px)]", //  right small 2
-            Point08: "top-[14%]  left-[calc(50%-32px)]", //  up big
-            Point09: "top-[75%] left-[calc(50%-32px)]", //  down small 1
-            Point10: "top-[60%] left-[calc(50%-32px-180px)]", //  left small 2
-            Point11: "top-[48%] left-[calc(50%-32px-228px)]", //  left small 1
-            Point12: "top-[35%] left-[calc(50%-32px-152px)]", //  left big
-            Point13: "top-[60%] left-[calc(50%-32px+180px)]", //  right small 2
-            Point14: "top-[48%] left-[calc(50%-32px+228px)]", //  right small 1
-            Point15: "top-[35%] left-[calc(50%-32px+152px)]", //  right big
-            Point16: "top-[0%] left-[calc(50%-32px)]", //  down small 2
-            Point17: "top-[5%]  left-[calc(50%-32px-96px)]", //  top left small
-            Point18: "top-[5%]  left-[calc(50%-32px+96px)]", //  top right small
+            Point01: "top-[47%] left-[calc(50%-17.5%)]", //  basic
+            Point02: "top-[47%] left-[calc(50%+17.5%)]", //  skill
+            Point03: "top-[46%] left-[calc(50%)]", //  ult
+            Point04: "top-[30%] left-[calc(50%)]", //  talent
+            Point05: "top-[62%] left-[calc(50%)]", //  tech
+            Point06: "top-[72%] left-[calc(50%-23.5%)]", //  left small 3
+            Point07: "top-[72%] left-[calc(50%+23.5%)]", //  right small 2
+            Point08: "top-[14%] left-[calc(50%)]", //  up big
+            Point09: "top-[75%] left-[calc(50%)]", //  down small 1
+            Point10: "top-[60%] left-[calc(50%-37.5%)]", //  left small 2
+            Point11: "top-[48%] left-[calc(50%-47.5%)]", //  left small 1
+            Point12: "top-[35%] left-[calc(50%-31.67%)]", //  left big
+            Point13: "top-[60%] left-[calc(50%+37.5%)]", //  right small 2
+            Point14: "top-[48%] left-[calc(50%+47.5%)]", //  right small 1
+            Point15: "top-[35%] left-[calc(50%+31.67%)]", //  right big
+            Point16: "top-[0%]  left-[calc(50%)]", //  down small 2
+            Point17: "top-[5%]  left-[calc(50%-20%)]", //  top left small
+            Point18: "top-[5%]  left-[calc(50%+20%)]", //  top right small
           },
         },
       });
@@ -549,24 +560,24 @@ function getTraceVariants(path: Props["path"]) {
       return cva("absolute", {
         variants: {
           anchor: {
-            Point01: "top-[34%] left-[calc(50%-32px-84px)]", //  basic
-            Point02: "top-[34%] left-[calc(50%-32px+84px)]", //  skill
-            Point03: "top-[52%] left-[calc(50%-32px)]", //  ult
-            Point04: "top-[28%] left-[calc(50%-32px)]", //  talent
-            Point05: "top-[69%] left-[calc(50%-32px)]", //  tech
-            Point06: "top-[52%] left-[calc(50%-32px-152px)]", //  left big
-            Point07: "top-[52%] left-[calc(50%-32px+176px)]", //  right big
-            Point08: "top-[14%] left-[calc(50%-32px)]", //  up big
-            Point09: "top-[83%] left-[calc(50%-32px)]", //  down middle small
-            Point10: "top-[40%] left-[calc(50%-32px-210px)]", //  left small 1
-            Point11: "top-[27%] left-[calc(50%-32px-152px)]", //  left small 2
-            Point12: "top-[80%] left-[calc(50%-32px-84px)]", //  down left small
-            Point13: "top-[65%] left-[calc(50%-32px+122px)]", //  right small 1
-            Point14: "top-[55%] left-[calc(50%-32px+96px)]", //  right small 2
-            Point15: "top-[80%] left-[calc(50%-32px+84px)]", //  down right small
-            Point16: "top-[2%]  left-[calc(50%-32px)]", //  top middle
-            Point17: "top-[6%]  left-[calc(50%-32px-96px)]", //  top right small
-            Point18: "top-[6%]  left-[calc(50%-32px+96px)]", //  top left small
+            Point01: "top-[34%] left-[calc(50%-17.5%)]", //  basic
+            Point02: "top-[34%] left-[calc(50%+17.5%)]", //  skill
+            Point03: "top-[52%] left-[calc(50%)]", //  ult
+            Point04: "top-[28%] left-[calc(50%)]", //  talent
+            Point05: "top-[69%] left-[calc(50%)]", //  tech
+            Point06: "top-[52%] left-[calc(50%-31.67%)]", //  left big
+            Point07: "top-[52%] left-[calc(50%+36.67%)]", //  right big
+            Point08: "top-[14%] left-[calc(50%)]", //  up big
+            Point09: "top-[83%] left-[calc(50%)]", //  down middle small
+            Point10: "top-[40%] left-[calc(50%-43.75%)]", //  left small 1
+            Point11: "top-[27%] left-[calc(50%-31.67%)]", //  left small 2
+            Point12: "top-[80%] left-[calc(50%-17.5%)]", //  down left small
+            Point13: "top-[65%] left-[calc(50%+25.5%)]", //  right small 1
+            Point14: "top-[55%] left-[calc(50%+15%)]", //  right small 2
+            Point15: "top-[80%] left-[calc(50%+17.5%)]", //  down right small
+            Point16: "top-[2%]  left-[calc(50%)]", //  top middle
+            Point17: "top-[6%]  left-[calc(50%-20%)]", //  top right small
+            Point18: "top-[6%]  left-[calc(50%+20%)]", //  top left small
           },
         },
       });
@@ -574,24 +585,24 @@ function getTraceVariants(path: Props["path"]) {
       return cva("absolute", {
         variants: {
           anchor: {
-            Point01: "top-[37%] left-[calc(50%-32px-84px)]", //  basic
-            Point02: "top-[37%] left-[calc(50%-32px+84px)]", //  skill
-            Point03: "top-[43%] left-[calc(50%-32px)]", //  ult
-            Point04: "top-[25%] left-[calc(50%-32px)]", //  talent
-            Point05: "top-[62%] left-[calc(50%-32px)]", //  tech
-            Point06: "top-[72%] left-[calc(50%-32px+84px)]", //  right small 2
-            Point07: "top-[72%] left-[calc(50%-32px-84px)]", //  left small 3
-            Point08: "top-[4%]  left-[calc(50%-32px)]", //  up big
-            Point09: "top-[82%] left-[calc(50%-32px+48px)]", //  down small 1
-            Point10: "top-[60%] left-[calc(50%-32px+152px)]", //  right small 2
-            Point11: "top-[48%] left-[calc(50%-32px+210px)]", //  right small 1
-            Point12: "top-[35%] left-[calc(50%-32px+152px)]", //  right big
-            Point13: "top-[60%] left-[calc(50%-32px-152px)]", //  left small 2
-            Point14: "top-[48%] left-[calc(50%-32px-210px)]", //  left small 1
-            Point15: "top-[35%] left-[calc(50%-32px-152px)]", //  left big
-            Point16: "top-[7%]  left-[calc(50%-32px+96px)]", //  down small 2
-            Point17: "top-[7%] left-[calc(50%-32px-96px)]", //  top left small
-            Point18: "top-[82%] left-[calc(50%-32px-48px)]", //  top right small
+            Point01: "top-[37%] left-[calc(50%-17.5%)]", //  basic
+            Point02: "top-[37%] left-[calc(50%+17.5%)]", //  skill
+            Point03: "top-[43%] left-[calc(50%)]", //  ult
+            Point04: "top-[25%] left-[calc(50%)]", //  talent
+            Point05: "top-[62%] left-[calc(50%)]", //  tech
+            Point06: "top-[72%] left-[calc(50%+17.5%)]", //  right small 2
+            Point07: "top-[72%] left-[calc(50%-17.5%)]", //  left small 3
+            Point08: "top-[4%]  left-[calc(50%)]", //  up big
+            Point09: "top-[82%] left-[calc(50%+10%)]", //  down small 1
+            Point10: "top-[60%] left-[calc(50%+31.67%)]", //  right small 2
+            Point11: "top-[48%] left-[calc(50%+43.75%)]", //  right small 1
+            Point12: "top-[35%] left-[calc(50%+31.67%)]", //  right big
+            Point13: "top-[60%] left-[calc(50%-31.67%)]", //  left small 2
+            Point14: "top-[48%] left-[calc(50%-43.75%)]", //  left small 1
+            Point15: "top-[35%] left-[calc(50%-31.67%)]", //  left big
+            Point16: "top-[7%]  left-[calc(50%+20%)]", //  down small 2
+            Point17: "top-[7%]  left-[calc(50%-20%)]", //  top left small
+            Point18: "top-[82%] left-[calc(50%-10%)]", //  top right small
           },
         },
       });

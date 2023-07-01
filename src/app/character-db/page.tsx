@@ -8,7 +8,7 @@ import { ElementIcon } from "./ElementIcon";
 import { PathIcon } from "./PathIcon";
 
 export default async function CharacterDb() {
-  let { list } = await API.mhyCharacter.call();
+  let { list } = await API.mhyCharacterList.fetch();
   let sortedDb = list.sort((a, b) => {
     return (
       b.rarity - a.rarity ||
@@ -18,12 +18,12 @@ export default async function CharacterDb() {
   });
 
   return (
-    <main className="container grid 2xl:grid-cols-7 xl:grid-cols-6 lg:grid-cols-5 md:grid-cols-4 sm:grid-cols-3 grid-cols-2 scroll-m-4 gap-2 md:gap-6 sm:gap-4 items-center justify-center">
+    <main className="container grid scroll-m-4 grid-cols-2 items-center justify-center gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
       {sortedDb.map(({ id, name, rarity, path, element }) => (
         <div key={id} className="flex flex-col items-center justify-center">
           <Link
             href={`/character-db/${id}`}
-            className="flex flex-col items-center relative"
+            className="relative flex flex-col items-center"
           >
             <Image
               className="cursor-pointer"
@@ -36,14 +36,14 @@ export default async function CharacterDb() {
             <ElementIcon
               element={element}
               size="15%"
-              className="absolute top-0 right-0"
+              className="absolute left-0 top-0"
             />
             <PathIcon
               path={path}
               size="15%"
-              className="absolute top-0 left-0"
+              className="absolute right-0 top-0"
             />
-            <RarityIcon rarity={rarity} className="h-6 top-[85%]" />
+            <RarityIcon rarity={rarity} className="top-[85%] h-6" />
           </Link>
 
           <div>{name}</div>
