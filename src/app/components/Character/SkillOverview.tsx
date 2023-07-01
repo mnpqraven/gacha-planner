@@ -11,21 +11,13 @@ import { Separator } from "../ui/Separator";
 type Props = {
   skills: SimpleSkill[];
   characterId: number;
+  maxEnergy: number;
 };
-const SkillOverview = ({ skills, characterId }: Props) => {
+const SkillOverview = ({ skills, characterId, maxEnergy }: Props) => {
   const [selectedSkill, setSelectedSkill] = useState<SimpleSkill>(
     skills.find((e) => e.ttype === "BPSkill") ?? skills[0]
   );
   const [selectedSlv, setSelectedSlv] = useState(0);
-
-  const skillDescription = selectedSkill.description.reduce((a, b, index) => {
-    if (index === 0) return a + b; // index 0 is before a
-    else {
-      if (!selectedSkill.params[selectedSlv])
-        return a + selectedSkill.params[0][index - 1] + b;
-      return a + selectedSkill.params[selectedSlv][index - 1] + b;
-    }
-  }, "");
 
   const sortedSkills = skills
     .filter((skill) => skill.ttype !== "Normal" && skill.ttype !== "MazeNormal")
@@ -67,7 +59,7 @@ const SkillOverview = ({ skills, characterId }: Props) => {
 
         <Separator className="my-3 sm:hidden" />
 
-        <div className="flex w-full grow flex-col self-center px-4 sm:w-auto">
+        <div className="flex w-full grow flex-col px-4 py-2 sm:w-auto">
           <h3 className="text-lg font-semibold leading-none tracking-tight">
             <span>{selectedSkill.name}</span>
           </h3>
@@ -83,17 +75,45 @@ const SkillOverview = ({ skills, characterId }: Props) => {
               />
             </div>
           )}
+          {selectedSkill.ttype === "Ultra" && <p>Cost: {maxEnergy}</p>}
         </div>
       </div>
 
       <div className="flex flex-col gap-4">
         <div className="my-4 min-h-[8rem] rounded-md border p-4">
-          {skillDescription}
+          <SkillDescription skill={selectedSkill} slv={selectedSlv} />
         </div>
       </div>
     </div>
   );
 };
+
+type SkillDescriptionProps = {
+  skill: SimpleSkill;
+  slv: number;
+};
+const SkillDescription = ({ skill, slv }: SkillDescriptionProps) => {
+  const { description } = skill;
+  return (
+    <p>
+      {description.map((descPart, index) => (
+        <>
+          <span key={index}>{descPart}</span>
+          {!skill.params[slv] ? (
+            <span className="font-semibold text-yellow-300">
+              {skill.params[0][index]}
+            </span>
+          ) : (
+            <span className="font-semibold text-yellow-300">
+              {skill.params[slv][index]}
+            </span>
+          )}
+        </>
+      ))}
+    </p>
+  );
+};
+
 function getImagePath(
   characterId: number | null | undefined,
   iconType: SkillType

@@ -64,6 +64,7 @@ export default function GachaGraph() {
       form.reset(savedFormData);
       setPayload(savedFormData);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [savedFormData]);
   const eidolonSubscriber = form.watch("currentEidolon");
 

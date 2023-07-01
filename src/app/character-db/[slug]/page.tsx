@@ -22,14 +22,15 @@ export default async function Character({ params }: Props) {
           src={portraitUrl(characterId)}
           width={2048}
           height={2048}
-          className="object-contain sm:w-[50vw]"
+          className="object-contain sm:w-[50vw] place-self-start"
           alt={character.name}
         />
 
-        <div className="flex grow flex-col">
+        <div className="flex grow flex-col items-center">
           <SkillOverview
             skills={skills}
             characterId={characterId as unknown as number}
+            maxEnergy={character.max_sp}
           />
 
           <TraceTable

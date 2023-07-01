@@ -15,10 +15,11 @@ export interface PatchBanner {
 }
 
 export interface Character {
-  character_id?: number | null;
-  character_name?: string | null;
+  characterId?: number | null;
+  characterName?: string | null;
   element?: CharacterElement | null;
   icon?: AssetPath | null;
+  maxEnergy: number;
   skills: SimpleSkill[];
   [k: string]: unknown;
 }

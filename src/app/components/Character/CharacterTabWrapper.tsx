@@ -1,7 +1,6 @@
-import { SimpleSkill } from "@/bindings/PatchBanner";
+import { Character } from "@/bindings/PatchBanner";
 import { SkillOverview } from "./SkillOverview";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
-import Image from "next/image";
 import { TraceTable } from "./TraceTable";
 import { EidolonTable } from "./EidolonTable";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -11,10 +10,13 @@ import { DbCharacter } from "@/bindings/DbCharacter";
 import { DbAttributeProperty } from "@/bindings/DbAttributeProperty";
 
 type Props = {
-  skills: SimpleSkill[];
+  data: Character;
   characterId: number;
 };
-const CharacterTabWrapper = ({ skills, characterId }: Props) => {
+const CharacterTabWrapper = ({
+  data: { skills, maxEnergy },
+  characterId,
+}: Props) => {
   const { data } = useQuery({
     queryKey: ["character", characterId],
     queryFn: async () =>
@@ -44,7 +46,11 @@ const CharacterTabWrapper = ({ skills, characterId }: Props) => {
           <TabsTrigger value="traces">Traces</TabsTrigger>
         </TabsList>
         <TabsContent value="skills">
-          <SkillOverview skills={skills} characterId={characterId} />
+          <SkillOverview
+            skills={skills}
+            characterId={characterId}
+            maxEnergy={maxEnergy}
+          />
         </TabsContent>
         <TabsContent value="eidolons">
           <EidolonTable characterId={characterId} />

@@ -18,7 +18,7 @@ export default async function CharacterDb() {
   });
 
   return (
-    <main className="container grid scroll-m-4 grid-cols-2 items-center justify-center gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
+    <main className="container pt-4 grid scroll-m-4 grid-cols-2 items-center justify-center gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
       {sortedDb.map(({ id, name, rarity, path, element }) => (
         <div key={id} className="flex flex-col items-center justify-center">
           <Link
