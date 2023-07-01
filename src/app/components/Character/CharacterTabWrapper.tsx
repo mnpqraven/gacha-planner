@@ -46,29 +46,17 @@ const CharacterTabWrapper = ({ skills, characterId }: Props) => {
         <TabsContent value="skills">
           <SkillOverview skills={skills} characterId={characterId} />
         </TabsContent>
-        <TabsContent value="traces" className="h-[30rem]">
-          <div className="absolute w-full h-full text-center before:inline-block before:align-middle before:h-full -z-50 -mx-6 pt-[72px] pb-6 top-0">
-            <Image
-              className="inline-block align-middle opacity-10"
-              src={pathUrl(data.path)}
-              alt={data.path}
-              quality={100}
-              width={384}
-              height={384}
-            />
-          </div>
-          <TraceTable characterId={characterId} path={data.path} />
-        </TabsContent>
         <TabsContent value="eidolons">
           <EidolonTable characterId={characterId} />
+        </TabsContent>
+        <TabsContent value="traces" className="h-[30rem]">
+          <div className="flex justify-center">
+            <TraceTable characterId={characterId} path={data.path} />
+          </div>
         </TabsContent>
       </Tabs>
     </>
   );
 };
-
-function pathUrl(path: string) {
-  return `https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/icon/path/${path}.png`;
-}
 
 export { CharacterTabWrapper };

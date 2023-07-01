@@ -26,7 +26,32 @@ type Props = {
     | "Harmony"
     | "Abundance";
 };
+
 const TraceTable = ({ characterId, wrapperSize = 480, path }: Props) => {
+  return (
+    <div
+      id="trace-wrapper"
+      className="relative -mx-8 h-[30rem] w-screen sm:mx-0 sm:w-[30rem]"
+    >
+      <Image
+        className="absolute bottom-0 left-0 right-0 top-0 -z-50 m-auto opacity-10"
+        src={pathUrl(path)}
+        alt={path}
+        quality={100}
+        width={384}
+        height={384}
+      />
+
+      <TraceTableInner
+        characterId={characterId}
+        path={path}
+        wrapperSize={wrapperSize}
+      />
+    </div>
+  );
+};
+
+const TraceTableInner = ({ characterId, wrapperSize = 480, path }: Props) => {
   const updateLines = useXarrow();
   const { data } = useQuery({
     queryKey: ["trace", characterId],
@@ -94,7 +119,7 @@ const TraceTable = ({ characterId, wrapperSize = 480, path }: Props) => {
   }
 
   return (
-    <div id="parent-wrapper" className="h-full w-full relative">
+    <div id="parent-wrapper" className="relative h-full w-full">
       <Xwrapper>
         {data &&
           skillDescriptions.data &&
@@ -128,7 +153,7 @@ const TraceTable = ({ characterId, wrapperSize = 480, path }: Props) => {
                   //   isSkillNode(traceNode) ? "md:w-[50vw]" : ""
                   // )}
                   className="w-full"
-                  style={{maxWidth: `${wrapperSize}px`}}
+                  style={{ maxWidth: `${wrapperSize}px` }}
                 >
                   {!isBigTrace(traceNode) ? (
                     <TraceDescription
@@ -610,3 +635,7 @@ function getTraceVariants(path: Props["path"]) {
 }
 
 export { TraceTable };
+
+function pathUrl(path: string) {
+  return `https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/icon/path/${path}.png`;
+}

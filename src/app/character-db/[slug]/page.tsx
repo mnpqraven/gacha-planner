@@ -32,25 +32,11 @@ export default async function Character({ params }: Props) {
             characterId={characterId as unknown as number}
           />
 
-          <div
-            id="trace-wrapper"
-            className="relative -mx-8 h-[30rem] w-screen sm:mx-0 sm:w-[30rem]"
-          >
-            <Image
-              className="absolute bottom-0 left-0 right-0 top-0 -z-50 m-auto opacity-10"
-              src={pathUrl(character.path)}
-              alt={character.path}
-              quality={100}
-              width={384}
-              height={384}
-            />
-
-            <TraceTable
-              characterId={characterId as unknown as number}
-              wrapperSize={480}
-              path={character.path}
-            />
-          </div>
+          <TraceTable
+            characterId={characterId as unknown as number}
+            wrapperSize={480}
+            path={character.path}
+          />
         </div>
       </div>
     </>
