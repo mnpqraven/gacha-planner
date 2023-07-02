@@ -22,24 +22,26 @@ export default async function Character({ params }: Props) {
           src={portraitUrl(characterId)}
           width={2048}
           height={2048}
-          className="place-self-start object-contain sm:w-[40vw]"
+          className="place-self-start object-contain"
           alt={character.name}
         />
       </div>
 
-      <div className="flex grow flex-col items-center">
+      <div className="flex grow flex-col md:w-min">
         <SkillOverview
           skills={skills}
           characterId={characterId as unknown as number}
           maxEnergy={character.max_sp}
         />
 
-        <TraceTable
-          characterId={characterId as unknown as number}
-          wrapperSize={480}
-          path={character.path}
-          maxEnergy={character.max_sp}
-        />
+        <div className="self-center">
+          <TraceTable
+            characterId={characterId as unknown as number}
+            wrapperSize={480}
+            path={character.path}
+            maxEnergy={character.max_sp}
+          />
+        </div>
       </div>
     </>
   );
