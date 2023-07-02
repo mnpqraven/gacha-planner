@@ -77,7 +77,7 @@ export default function GachaGraph() {
         selectedBanner,
         theme,
       }),
-    [definedData]
+    [definedData, selectedBanner, theme]
   );
 
   function updateQuery(

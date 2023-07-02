@@ -17,28 +17,29 @@ export default async function Character({ params }: Props) {
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row">
+      <div className="aspect-square">
         <Image
           src={portraitUrl(characterId)}
           width={2048}
           height={2048}
-          className="object-contain sm:w-[50vw] place-self-start"
+          className="place-self-start object-contain sm:w-[40vw]"
           alt={character.name}
         />
+      </div>
 
-        <div className="flex grow flex-col items-center">
-          <SkillOverview
-            skills={skills}
-            characterId={characterId as unknown as number}
-            maxEnergy={character.max_sp}
-          />
+      <div className="flex grow flex-col items-center">
+        <SkillOverview
+          skills={skills}
+          characterId={characterId as unknown as number}
+          maxEnergy={character.max_sp}
+        />
 
-          <TraceTable
-            characterId={characterId as unknown as number}
-            wrapperSize={480}
-            path={character.path}
-          />
-        </div>
+        <TraceTable
+          characterId={characterId as unknown as number}
+          wrapperSize={480}
+          path={character.path}
+          maxEnergy={character.max_sp}
+        />
       </div>
     </>
   );

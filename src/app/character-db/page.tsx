@@ -6,6 +6,7 @@ import Link from "next/link";
 import { HTMLAttributes, forwardRef } from "react";
 import { ElementIcon } from "./ElementIcon";
 import { PathIcon } from "./PathIcon";
+import { cva } from "class-variance-authority";
 
 export default async function CharacterDb() {
   let { list } = await API.mhyCharacterList.fetch();
@@ -17,16 +18,32 @@ export default async function CharacterDb() {
     );
   });
 
+  const imageVariants = cva(
+    "cursor-pointer rounded-tr-3xl bg-gradient-to-b to-90% transition ease-in-out duration-1000",
+    {
+      variants: {
+        rarity: {
+          5: "bg-[#d0aa6e]/[0.6]  hover:bg-[#d0aa6e]",
+          4: "bg-[#9c65d7]/[0.6]  hover:bg-[#9c65d7]",
+        },
+      },
+      defaultVariants: { rarity: 5 },
+    }
+  );
+
   return (
-    <main className="container pt-4 grid scroll-m-4 grid-cols-2 items-center justify-center gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
+    <main className="container grid scroll-m-4 grid-cols-2 items-center justify-center gap-2 pt-4 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
       {sortedDb.map(({ id, name, rarity, path, element }) => (
         <div key={id} className="flex flex-col items-center justify-center">
           <Link
             href={`/character-db/${id}`}
-            className="relative flex flex-col items-center"
+            className={"relative flex flex-col items-center"}
           >
+            <div id="gradient-mask" className="absolute h-full w-full rounded-tr-3xl bg-gradient-to-b from-transparent to-background from-75% pointer-events-none" />
             <Image
-              className="cursor-pointer"
+              className={imageVariants({
+                rarity: rarity as unknown as 5 | 4 | null | undefined,
+              })}
               src={url(id)}
               alt={name}
               width={374}
@@ -36,12 +53,12 @@ export default async function CharacterDb() {
             <ElementIcon
               element={element}
               size="15%"
-              className="absolute left-0 top-0"
+              className="absolute left-1 top-0"
             />
             <PathIcon
               path={path}
               size="15%"
-              className="absolute right-0 top-0"
+              className="absolute left-1 top-[calc(15%+4px)]"
             />
             <RarityIcon rarity={rarity} className="top-[85%] h-6" />
           </Link>

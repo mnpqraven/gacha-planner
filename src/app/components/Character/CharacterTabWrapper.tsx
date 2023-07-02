@@ -57,7 +57,7 @@ const CharacterTabWrapper = ({
         </TabsContent>
         <TabsContent value="traces" className="h-[30rem]">
           <div className="flex justify-center">
-            <TraceTable characterId={characterId} path={data.path} />
+            <TraceTable characterId={characterId} path={data.path} maxEnergy={maxEnergy} />
           </div>
         </TabsContent>
       </Tabs>

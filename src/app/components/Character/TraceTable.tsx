@@ -13,10 +13,14 @@ import { useEffect, useState } from "react";
 import { DbAttributeProperty } from "@/bindings/DbAttributeProperty";
 import { SimpleSkill } from "@/bindings/PatchBanner";
 import { Slider } from "../ui/Slider";
+import { SkillDescription } from "./SkillDescription";
+
+const DEBUG = false;
 
 type Props = {
   characterId: number;
   wrapperSize?: number;
+  maxEnergy: number;
   path:
     | "Erudition"
     | "Nihility"
@@ -27,7 +31,12 @@ type Props = {
     | "Abundance";
 };
 
-const TraceTable = ({ characterId, wrapperSize = 480, path }: Props) => {
+const TraceTable = ({
+  characterId,
+  wrapperSize = 480,
+  path,
+  maxEnergy,
+}: Props) => {
   return (
     <div
       id="trace-wrapper"
@@ -46,12 +55,19 @@ const TraceTable = ({ characterId, wrapperSize = 480, path }: Props) => {
         characterId={characterId}
         path={path}
         wrapperSize={wrapperSize}
+        maxEnergy={maxEnergy}
       />
     </div>
   );
 };
 
-const TraceTableInner = ({ characterId, wrapperSize = 480, path }: Props) => {
+const TraceTableInner = ({
+  characterId,
+  wrapperSize = 480,
+  path,
+  maxEnergy,
+}: Props) => {
+  const [loadedNodes, setLoadedNodes] = useState(0);
   const updateLines = useXarrow();
   const { data } = useQuery({
     queryKey: ["trace", characterId],
@@ -90,12 +106,6 @@ const TraceTableInner = ({ characterId, wrapperSize = 480, path }: Props) => {
         ENDPOINT.mhyAttributeProperty
       ),
   });
-
-  useEffect(() => {
-    if (data) updateLines();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
 
   const iconVariants = cva("rounded-full", {
     variants: {
@@ -145,21 +155,25 @@ const TraceTableInner = ({ characterId, wrapperSize = 480, path }: Props) => {
                     alt={`${traceNode.id}`}
                     width={wrapperSize / 8}
                     height={wrapperSize / 8}
+                    style={{
+                      // disable icons at the edge getting squished
+                      minWidth: `${wrapperSize / 8}px`,
+                      minHeight: `${wrapperSize / 8}px`,
+                    }}
+                    onLoadingComplete={updateLines}
                   />
                 </PopoverTrigger>
                 <PopoverContent
-                  // className={cn(
-                  //   "w-fit",
-                  //   isSkillNode(traceNode) ? "md:w-[50vw]" : ""
-                  // )}
-                  className="w-full"
+                  className="w-screen sm:w-full"
                   style={{ maxWidth: `${wrapperSize}px` }}
                 >
+                  {DEBUG && traceNode.anchor}
                   {!isBigTrace(traceNode) ? (
                     <TraceDescription
                       trace={traceNode}
                       propertyBucket={properties.data?.list}
                       skills={skillDescriptions.data.list}
+                      maxEnergy={maxEnergy}
                     />
                   ) : (
                     <BigTraceDescription
@@ -238,10 +252,12 @@ const TraceDescription = ({
   trace,
   propertyBucket = [],
   skills,
+  maxEnergy,
 }: {
   trace: DbCharacterSkillTree;
   propertyBucket: DbAttributeProperty[] | undefined;
   skills: SimpleSkill[];
+  maxEnergy: number;
 }) => {
   const [selectedSlv, setSelectedSlv] = useState(0);
   const selectedSkill = skills.find(
@@ -263,32 +279,27 @@ const TraceDescription = ({
     }
   }
   if (isSkillNode(trace) && selectedSkill) {
-    const skillDescription = selectedSkill.description.reduce((a, b, index) => {
-      if (index === 0) return a + b; // index 0 is before a
-      else {
-        if (!selectedSkill.params[selectedSlv])
-          return a + selectedSkill.params[0][index - 1] + b;
-        return a + selectedSkill.params[selectedSlv][index - 1] + b;
-      }
-    }, "");
 
     return (
       <div className="flex flex-col gap-2">
         <h3 className="text-lg font-semibold leading-none tracking-tight">
-          {selectedSkill.name} - {parseSkillType(selectedSkill.ttype)} - Level{" "}
-          {selectedSlv + 1}
+          {selectedSkill.name} - {parseSkillType(selectedSkill.ttype)}
+          {selectedSkill.ttype === "Ultra" && ` (${maxEnergy} Energy)`}
         </h3>
         {selectedSkill.params.length > 1 && (
-          <Slider
-            className="py-4"
-            defaultValue={[0]}
-            min={0}
-            max={selectedSkill.params.length - 1}
-            onValueChange={(e) => setSelectedSlv(e[0])}
-          />
+          <div className="flex items-center">
+            <span className="w-24 font-semibold">Level: {selectedSlv + 1}</span>
+            <Slider
+              className="py-4"
+              defaultValue={[0]}
+              min={0}
+              max={selectedSkill.params.length - 1}
+              onValueChange={(e) => setSelectedSlv(e[0])}
+            />
+          </div>
         )}
 
-        <p>{skillDescription}</p>
+        <SkillDescription skill={selectedSkill} slv={selectedSlv}/>
       </div>
     );
   }

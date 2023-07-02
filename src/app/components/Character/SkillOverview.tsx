@@ -2,11 +2,12 @@
 
 import { SimpleSkill, SkillType } from "@/bindings/PatchBanner";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Slider } from "../ui/Slider";
 import { parseSkillType } from "@/lib/utils";
 import { Toggle } from "../ui/Toggle";
 import { Separator } from "../ui/Separator";
+import { SkillDescription } from "./SkillDescription";
 
 type Props = {
   skills: SimpleSkill[];
@@ -40,7 +41,10 @@ const SkillOverview = ({ skills, characterId, maxEnergy }: Props) => {
             <Toggle
               key={index}
               className="flex h-fit flex-col items-center px-1 py-1.5"
-              pressed={skill.ttype === selectedSkill.ttype}
+              pressed={
+                skill.ttype === selectedSkill.ttype &&
+                skill.name === selectedSkill.name
+              }
               onPressedChange={() => setSelectedSkill(skill)}
             >
               {getImagePath(characterId, skill.ttype) && (
@@ -62,6 +66,7 @@ const SkillOverview = ({ skills, characterId, maxEnergy }: Props) => {
         <div className="flex w-full grow flex-col px-4 py-2 sm:w-auto">
           <h3 className="text-lg font-semibold leading-none tracking-tight">
             <span>{selectedSkill.name}</span>
+          {selectedSkill.ttype === "Ultra" && ` (${maxEnergy} Energy)`}
           </h3>
           {selectedSkill.params.length > 1 && (
             <div className="flex items-center gap-4">
@@ -75,7 +80,6 @@ const SkillOverview = ({ skills, characterId, maxEnergy }: Props) => {
               />
             </div>
           )}
-          {selectedSkill.ttype === "Ultra" && <p>Cost: {maxEnergy}</p>}
         </div>
       </div>
 
@@ -85,32 +89,6 @@ const SkillOverview = ({ skills, characterId, maxEnergy }: Props) => {
         </div>
       </div>
     </div>
-  );
-};
-
-type SkillDescriptionProps = {
-  skill: SimpleSkill;
-  slv: number;
-};
-const SkillDescription = ({ skill, slv }: SkillDescriptionProps) => {
-  const { description } = skill;
-  return (
-    <p>
-      {description.map((descPart, index) => (
-        <>
-          <span key={index}>{descPart}</span>
-          {!skill.params[slv] ? (
-            <span className="font-semibold text-yellow-300">
-              {skill.params[0][index]}
-            </span>
-          ) : (
-            <span className="font-semibold text-yellow-300">
-              {skill.params[slv][index]}
-            </span>
-          )}
-        </>
-      ))}
-    </p>
   );
 };
 
