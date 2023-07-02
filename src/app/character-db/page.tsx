@@ -1,5 +1,3 @@
-"use client";
-
 import API from "@/server/typedEndpoints";
 import Link from "next/link";
 import { CharacterCard } from "./CharacterCard";

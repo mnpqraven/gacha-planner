@@ -1,3 +1,5 @@
+"use client";
+
 import { DbCharacter } from "@/bindings/DbCharacter";
 import { IMAGE_URL } from "@/server/endpoints";
 import Image from "next/image";
