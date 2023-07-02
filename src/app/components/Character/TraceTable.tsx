@@ -40,7 +40,7 @@ const TraceTable = ({
   return (
     <div
       id="trace-wrapper"
-      className="relative -mx-8 h-[30rem] w-screen sm:mx-0 sm:w-[30rem]"
+      className="relative -mx-8 h-[30rem] w-screen overflow-hidden sm:mx-0 sm:w-[30rem]"
     >
       <Image
         className="absolute bottom-0 left-0 right-0 top-0 -z-50 m-auto opacity-10"
@@ -67,7 +67,6 @@ const TraceTableInner = ({
   path,
   maxEnergy,
 }: Props) => {
-  const [loadedNodes, setLoadedNodes] = useState(0);
   const updateLines = useXarrow();
   const { data } = useQuery({
     queryKey: ["trace", characterId],
@@ -177,8 +176,7 @@ const TraceTableInner = ({
                     />
                   ) : (
                     <BigTraceDescription
-                      trace={traceNode}
-                      bigTraces={bigTraceList.data.list.find(
+                      data={bigTraceList.data.list.find(
                         (e) => e.id === traceNode.id
                       )}
                     />
@@ -210,41 +208,22 @@ const TraceTableInner = ({
 };
 
 interface BigTraceDescriptionProps {
-  trace: DbCharacterSkillTree;
-  bigTraces: SimpleSkill | undefined;
+  data: SimpleSkill | undefined;
 }
-const BigTraceDescription = ({
-  trace,
-  bigTraces,
-}: BigTraceDescriptionProps) => {
-  const [selectedSlv, setSelectedSlv] = useState(0);
-  console.log(trace);
-  console.log(bigTraces);
+const BigTraceDescription = ({ data: bigTrace }: BigTraceDescriptionProps) => {
+  if (!bigTrace) return null;
 
-  if (!bigTraces) return null;
-
-  const skillDescription = bigTraces.description.reduce((a, b, index) => {
-    if (index === 0) return a + b; // index 0 is before a
-    else {
-      if (!bigTraces.params[selectedSlv])
-        return a + bigTraces.params[0][index - 1] + b;
-      return a + bigTraces.params[selectedSlv][index - 1] + b;
-    }
-  }, "");
   return (
-    <div className="flex flex-col gap-2">
-      {bigTraces.params.length > 1 && (
-        <Slider
-          className="py-4"
-          defaultValue={[0]}
-          min={0}
-          max={bigTraces.params.length - 1}
-          onValueChange={(e) => setSelectedSlv(e[0])}
-        />
-      )}
-
-      <p>{skillDescription}</p>
-    </div>
+    <p className="text-justify">
+      {bigTrace.description.map((descPart, index) => (
+        <>
+          <span key={index}>{descPart}</span>
+          <span className="font-semibold text-yellow-300">
+            {bigTrace.params[0][index]}
+          </span>
+        </>
+      ))}
+    </p>
   );
 };
 
@@ -279,7 +258,6 @@ const TraceDescription = ({
     }
   }
   if (isSkillNode(trace) && selectedSkill) {
-
     return (
       <div className="flex flex-col gap-2">
         <h3 className="text-lg font-semibold leading-none tracking-tight">
@@ -299,7 +277,7 @@ const TraceDescription = ({
           </div>
         )}
 
-        <SkillDescription skill={selectedSkill} slv={selectedSlv}/>
+        <SkillDescription skill={selectedSkill} slv={selectedSlv} />
       </div>
     );
   }

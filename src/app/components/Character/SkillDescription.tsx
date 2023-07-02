@@ -9,7 +9,7 @@ export const SkillDescription = ({ skill, slv }: SkillDescriptionProps) => {
   const { description } = skill;
 
   return (
-    <p>
+    <p className="text-justify">
       {description.map((descPart, index) => (
         <>
           <span key={index}>{descPart}</span>
