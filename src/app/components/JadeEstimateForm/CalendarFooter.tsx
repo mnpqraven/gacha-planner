@@ -40,18 +40,15 @@ const CalendarFooter = ({ date }: Props) => {
           <DialogTrigger>
             <Image
               src={`https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/${banner.characterData.icon}`}
-              alt={banner.characterData.character_name ?? ""}
-              className={cn("rounded-full w-20 h-20 border-2", color)}
+              alt={banner.characterData.characterName ?? ""}
+              className={cn("h-20 w-20 rounded-full border-2", color)}
               width={128}
               height={128}
             />
           </DialogTrigger>
-          <DialogContent className="sm:max-w-4xl min-h-[16rem]">
-            {banner.characterData.character_id && (
-              <CharacterTabWrapper
-                skills={banner.characterData.skills}
-                characterId={banner.characterData.character_id}
-              />
+          <DialogContent className="min-h-[16rem] sm:max-w-4xl">
+            {banner.characterData.characterId && (
+              <CharacterTabWrapper data={banner.characterData} characterId={banner.characterData.characterId} />
             )}
           </DialogContent>
         </Dialog>
@@ -60,7 +57,7 @@ const CalendarFooter = ({ date }: Props) => {
         {start && <li>Start of patch {start.version}</li>}
         {banner && (
           <>
-            <li>{banner.characterData.character_name} Banner</li>
+            <li>{banner.characterData.characterName} Banner</li>
             <li>Click to view</li>
           </>
         )}

@@ -105,6 +105,7 @@ export default function JadeEstimateForm({
 
   useEffect(() => {
     debounceOnChange(null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [untilDateSubscription]);
 
   useEffect(() => {
@@ -115,11 +116,12 @@ export default function JadeEstimateForm({
       setMonthController(updatedDate);
       setUncontrolledQueryPayload(savedFormData);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [savedFormData]);
 
   useEffect(() => {
     if (data) updateTable(data);
-  }, [data]);
+  }, [data, updateTable]);
 
   function onSubmit(values: FormSchema) {
     if (!equal(values, defaultFormValues)) {
