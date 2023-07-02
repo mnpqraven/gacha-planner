@@ -51,7 +51,7 @@ export function GachaForm({
         onInvalid={(e) => console.log(e)}
         onChange={debounceOnChange}
       >
-        <div className="flex flex-col md:flex-row flex-wrap md:space-x-4 gap-y-4 rounded-md border p-4 justify-evenly">
+        <div className="flex flex-col flex-wrap justify-evenly gap-y-4 rounded-md border p-4 md:flex-row md:space-x-4">
           <FormField
             control={form.control}
             name="banner"
@@ -149,7 +149,8 @@ export function GachaForm({
                       )
                     ).map((e) => (
                       <SelectItem value={String(e)} key={e}>
-                        {selectedBanner.constPrefix} {e}
+                        {selectedBanner.constPrefix}{" "}
+                        {selectedBanner.bannerType === "LC" ? e + 1 : e}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -163,13 +164,13 @@ export function GachaForm({
             name="nextGuaranteed"
             render={({ field }) => (
               <FormItem>
-                <div className="flex flex-col h-full">
+                <div className="flex h-full flex-col">
                   <div>
                     <FormLabel htmlFor="isGuaranteed">
                       Next 5✦ Guaranteed
                     </FormLabel>
                   </div>
-                  <div className="flex flex-col justify-center h-full mt-2">
+                  <div className="mt-2 flex h-full flex-col justify-center">
                     <FormControl>
                       <Switch
                         checked={field.value}
