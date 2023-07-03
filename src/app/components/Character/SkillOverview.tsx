@@ -2,7 +2,7 @@
 
 import { SimpleSkill, SkillType } from "@/bindings/PatchBanner";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Slider } from "../ui/Slider";
 import { parseSkillType } from "@/lib/utils";
 import { Toggle } from "../ui/Toggle";

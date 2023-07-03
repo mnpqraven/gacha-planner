@@ -9,7 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
 import { cn, parseSkillType } from "@/lib/utils";
 import { VariantProps, cva } from "class-variance-authority";
 import Xarrow, { Xwrapper, useXarrow } from "react-xarrows";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { DbAttributeProperty } from "@/bindings/DbAttributeProperty";
 import { SimpleSkill } from "@/bindings/PatchBanner";
 import { Slider } from "../ui/Slider";
@@ -106,22 +106,25 @@ const TraceTableInner = ({
       ),
   });
 
-  const iconVariants = cva("rounded-full", {
-    variants: {
-      variant: {
-        smallNode: "bg-zinc-700 invert scale-50",
-        bigNode: "bg-zinc-700 invert scale-90",
-        skillNode: "bg-zinc-700 scale-75",
+  const iconWrapVariants = cva(
+    "flex items-center justify-center rounded-full transition duration-500 hover:ring-2 hover:ring-offset-2 ring-offset-transparent",
+    {
+      variants: {
+        variant: {
+          smallNode: "bg-zinc-300 scale-50",
+          bigNode: "bg-zinc-300 scale-[.85]",
+          skillNode: "bg-zinc-700 scale-75",
+        },
       },
-    },
-    defaultVariants: {
-      variant: "smallNode",
-    },
-  });
+      defaultVariants: {
+        variant: "skillNode",
+      },
+    }
+  );
 
   function getTraceType(
     node: DbCharacterSkillTree
-  ): VariantProps<typeof iconVariants>["variant"] {
+  ): VariantProps<typeof iconWrapVariants>["variant"] {
     if (isSmallTrace(node)) return "smallNode";
     if (isSkillNode(node)) return "skillNode";
     return "bigNode";
@@ -145,11 +148,16 @@ const TraceTableInner = ({
               }}
             >
               <Popover>
-                <PopoverTrigger className="flex items-center justify-center">
+                <PopoverTrigger
+                  className={iconWrapVariants({
+                    variant: getTraceType(traceNode),
+                  })}
+                >
                   <Image
-                    className={iconVariants({
-                      variant: getTraceType(traceNode),
-                    })}
+                    className={cn(
+                      "rounded-full",
+                      !isSkillNode(traceNode) ? "scale-90 invert" : ""
+                    )}
                     src={IMAGE_URL + traceNode.icon}
                     alt={`${traceNode.id}`}
                     width={wrapperSize / 8}
@@ -218,7 +226,7 @@ const BigTraceDescription = ({ data: bigTrace }: BigTraceDescriptionProps) => {
       {bigTrace.description.map((descPart, index) => (
         <>
           <span key={index}>{descPart}</span>
-          <span className="font-semibold text-yellow-300">
+          <span className="font-semibold text-accent-foreground">
             {bigTrace.params[0][index]}
           </span>
         </>
@@ -281,8 +289,6 @@ const TraceDescription = ({
       </div>
     );
   }
-
-  // TODO: big traces + skill
 
   return null;
 };

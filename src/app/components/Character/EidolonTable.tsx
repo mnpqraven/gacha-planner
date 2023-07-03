@@ -1,3 +1,5 @@
+"use client";
+
 import { DbCharacterEidolon } from "@/bindings/DbCharacterEidolon";
 import ENDPOINT from "@/server/endpoints";
 import { typedFetch } from "@/server/fetchHelper";
@@ -5,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useState } from "react";
 import { Toggle } from "../ui/Toggle";
+import { sanitizeNewline } from "@/lib/utils";
 
 type Props = {
   characterId: number;
@@ -48,8 +51,8 @@ const EidolonTable = ({ characterId }: Props) => {
             </Toggle>
           ))}
       </div>
-      <div className="border rounded-md p-4 my-4 min-h-[8rem]">
-        {data?.list.find((e) => e.rank == selectedEidolon)?.desc}
+      <div className="border rounded-md p-4 my-4 min-h-[8rem] whitespace-pre-wrap">
+        {sanitizeNewline(data?.list.find((e) => e.rank == selectedEidolon)?.desc)}
       </div>
       <div className="flex gap-2">
         {bottom &&

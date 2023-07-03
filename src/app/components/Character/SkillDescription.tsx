@@ -14,11 +14,11 @@ export const SkillDescription = ({ skill, slv }: SkillDescriptionProps) => {
         <>
           <span key={index}>{descPart}</span>
           {!skill.params[slv] ? (
-            <span className="font-semibold text-yellow-300">
+            <span className="font-semibold text-accent-foreground">
               {skill.params[0] && skill.params[0][index]}
             </span>
           ) : (
-            <span className="font-semibold text-yellow-300">
+            <span className="font-semibold text-accent-foreground">
               {skill.params[slv][index]}
             </span>
           )}

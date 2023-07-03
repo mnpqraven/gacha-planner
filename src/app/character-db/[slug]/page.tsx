@@ -1,6 +1,12 @@
+import { EidolonTable } from "@/app/components/Character/EidolonTable";
 import { SkillOverview } from "@/app/components/Character/SkillOverview";
 import { TraceTable } from "@/app/components/Character/TraceTable";
-import { AspectRatio } from "@/app/components/ui/AspectRatio";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/app/components/ui/Tabs";
 import API from "@/server/typedEndpoints";
 import Image from "next/image";
 
@@ -28,11 +34,22 @@ export default async function Character({ params }: Props) {
       </div>
 
       <div className="flex grow flex-col md:w-min">
-        <SkillOverview
-          skills={skills}
-          characterId={characterId as unknown as number}
-          maxEnergy={character.max_sp}
-        />
+        <Tabs defaultValue="skill">
+          <TabsList>
+            <TabsTrigger value="skill">Skills</TabsTrigger>
+            <TabsTrigger value="eidolon">Eidolons</TabsTrigger>
+          </TabsList>
+          <TabsContent value="skill">
+            <SkillOverview
+              skills={skills}
+              characterId={characterId as unknown as number}
+              maxEnergy={character.max_sp}
+            />
+          </TabsContent>
+          <TabsContent value="eidolon">
+            <EidolonTable characterId={characterId as unknown as number} />
+          </TabsContent>
+        </Tabs>
 
         <div className="self-center">
           <TraceTable
@@ -49,8 +66,4 @@ export default async function Character({ params }: Props) {
 
 function portraitUrl(charId: number | string): string {
   return `https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/image/character_portrait/${charId}.png`;
-}
-
-function pathUrl(path: string) {
-  return `https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/icon/path/${path}.png`;
 }
