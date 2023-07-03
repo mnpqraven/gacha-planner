@@ -38,7 +38,7 @@ const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {
     <div className="flex items-center h-12 border-b px-4">
       <nav
         className={cn(
-          "flex flex-1 items-center space-x-4 lg:space-x-6",
+          "flex grow items-center space-x-4 lg:space-x-6",
           className
         )}
         {...props}
@@ -50,7 +50,7 @@ const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {
         ))}
       </nav>
       {/* <CommandCenter routes={menu} /> */}
-      <div className="flex flex-1 items-center space-x-4 lg:space-x-6 justify-end">
+      <div className="flex items-center space-x-4 lg:space-x-6 justify-end">
         <a
           href="https://github.com/mnpqraven/gacha-planner"
           target="_blank"

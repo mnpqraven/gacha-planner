@@ -29,3 +29,8 @@ export function parseSkillType(ttype: SkillType) {
       return "Technique";
   }
 }
+
+export function sanitizeNewline(data?: string) {
+  if (!data) return "";
+  return data.replaceAll("\\n", "\n");
+}
