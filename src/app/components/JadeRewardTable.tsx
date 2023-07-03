@@ -33,7 +33,7 @@ const JadeRewardTable = ({ data }: Props) => {
               Source
               <HoverCard openDelay={0}>
                 <HoverCardTrigger>
-                  <AlertCircle className="scale-75 mx-1 align-text-bottom rounded-md hover:bg-accent hover:text-accent-foreground" />
+                  <AlertCircle className="scale-75 mx-1 align-text-bottom rounded-full hover:bg-accent hover:text-accent-foreground" />
                 </HoverCardTrigger>
                 <HoverCardContent side="top">
                   These are repeatable rewards that are guaranteed to you and
@@ -60,7 +60,7 @@ const JadeRewardTable = ({ data }: Props) => {
                   {source.source}
                   <HoverCard openDelay={0}>
                     <HoverCardTrigger className="inline-flex">
-                      <AlertCircle className="scale-75 mx-1 align-text-bottom rounded-md hover:bg-accent hover:text-accent-foreground" />
+                      <AlertCircle className="scale-75 mx-1 align-text-bottom rounded-full hover:bg-accent hover:text-accent-foreground" />
                     </HoverCardTrigger>
                     <HoverCardContent side="top">
                       {source.description}

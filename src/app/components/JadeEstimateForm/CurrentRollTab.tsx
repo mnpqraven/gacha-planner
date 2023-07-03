@@ -14,10 +14,10 @@ const CurrentRollTab = ({ form }: Props) => {
       <Tabs defaultValue="currentRolls" className="w-full">
         <TabsList className="w-full">
           <TabsTrigger value="currentRolls" className="w-full">
-            Special Passes
+            Sp. Passes
           </TabsTrigger>
           <TabsTrigger value="currentJades" className="w-full">
-            Stellar Jades
+            Jades
           </TabsTrigger>
           <TabsTrigger value="dailyRefills" className="w-full">
             Daily Refills

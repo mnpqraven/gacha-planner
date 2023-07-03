@@ -20,22 +20,22 @@ const BattlePassField = ({ form }: Props) => {
         name="battlePass.battlePassType"
         render={({ field }) => (
           <F.FormItem>
-            <div className="flex items-center">
-              <div className="flex-1 space-y-1">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+              <div className="sm:w-3/4 space-y-1">
                 <F.FormLabel>Nameless Honor</F.FormLabel>
-                <F.FormDescription>
-                  If not selecting F2P, this assumes you{'\''}ve received the current
-                  patch{'\''}s first time purchase rewards and those won{'\''}t be
-                  calculated.
+                <F.FormDescription className="text-justify">
+                  If not selecting F2P, this assumes you{"'"}ve received the
+                  current patch{"'"}s first time purchase rewards and those won
+                  {"'"}t be calculated.
                 </F.FormDescription>
               </div>
               <S.Select
                 onValueChange={field.onChange}
-                value={String(form.watch('battlePass.battlePassType'))}
+                value={String(form.watch("battlePass.battlePassType"))}
                 defaultValue={field.value}
               >
                 <F.FormControl>
-                  <S.SelectTrigger className="w-fit">
+                  <S.SelectTrigger className="max-w-fit">
                     <S.SelectValue />
                   </S.SelectTrigger>
                 </F.FormControl>
@@ -57,19 +57,19 @@ const BattlePassField = ({ form }: Props) => {
           name="battlePass.currentLevel"
           render={({ field }) => (
             <F.FormItem className="w-full">
-              <div className="flex items-center">
-                <div className="flex-1 space-y-1">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+                <div className="sm:w-3/4 space-y-1">
                   <F.FormLabel>Current Nameless Honor Level</F.FormLabel>
-                  <F.FormDescription>
+                  <F.FormDescription className="text-justify">
                     This assumes you level up by 10 every Monday.
                     <br />
-                    If you select {'Nameless Medal'} then keep in mind you also
+                    If you select {"Nameless Medal"} then keep in mind you also
                     get 10 levels for free, please update the level accordingly.
                   </F.FormDescription>
                 </div>
                 <F.FormControl>
                   <Input
-                    className="w-20"
+                    className="w-20 max-w-fit"
                     type="number"
                     min={0}
                     max={50}
