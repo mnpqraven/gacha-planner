@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { HTMLAttributes } from "react";
 import { Button } from "./ui/Button";
-import { Github, LineChart, Moon, Sun, Ticket, UserSquare } from "lucide-react";
+import { Github, LineChart, Moon, Sun, Ticket, UserSquare, GalleryHorizontalEnd } from "lucide-react";
 import { useTheme } from "next-themes";
 import { usePathname } from "next/navigation";
 import { CommandCenter } from "./CommandCenter";
@@ -24,6 +24,11 @@ const menu = [
     path: "/character-db",
     label: "Character DB",
     icon: <UserSquare className="h-4 w-4" />,
+  },
+  {
+    path: "/lightcone-db",
+    label: "Light Cone DB",
+    icon: <GalleryHorizontalEnd className="h-4 w-4" />
   },
 ];
 const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {

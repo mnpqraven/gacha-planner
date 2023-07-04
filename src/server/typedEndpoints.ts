@@ -1,6 +1,7 @@
 import { SimpleSkill } from "@/bindings/PatchBanner";
 import { serverFetch } from "./serverFetch";
 import { DbCharacter } from "@/bindings/DbCharacter";
+import { LightCone } from "@/bindings/LightConeFull";
 
 const API = {
   mhyCharacterList: route<undefined, { list: DbCharacter[] }>(
@@ -11,6 +12,8 @@ const API = {
   mhyBigTrace: route<undefined, { list: SimpleSkill[] }>(
     "/honkai/mhy/big_trace"
   ),
+  lightConeList: route<undefined, { list: LightCone[] }>("/honkai/light_cone"),
+  lightCone: route<undefined, LightCone>("/honkai/light_cone"),
 };
 
 type ApiRoute<TPayload, TResponse> = {

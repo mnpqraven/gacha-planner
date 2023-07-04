@@ -1,6 +1,7 @@
 import API from "@/server/typedEndpoints";
 import Link from "next/link";
 import { CharacterCard } from "./CharacterCard";
+import { IMAGE_URL } from "@/server/endpoints";
 
 export default async function CharacterDb() {
   let { list } = await API.mhyCharacterList.fetch();
@@ -24,7 +25,7 @@ export default async function CharacterDb() {
             href={`/character-db/${chara.id}`}
             className={"relative flex flex-col items-center"}
           >
-            <CharacterCard data={chara} />
+            <CharacterCard imgUrl={url(chara.id)} {...chara} />
           </Link>
 
           <p className="font-semibold">{chara.name}</p>
@@ -32,4 +33,8 @@ export default async function CharacterDb() {
       ))}
     </main>
   );
+}
+
+function url(id: string | number): string {
+  return IMAGE_URL + `image/character_preview/${id}.png`;
 }

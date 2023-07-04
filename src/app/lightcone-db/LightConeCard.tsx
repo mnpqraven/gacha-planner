@@ -1,11 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { ElementIcon } from "./ElementIcon";
-import { PathIcon } from "./PathIcon";
+import { ElementIcon } from "../character-db/ElementIcon";
+import { PathIcon } from "../character-db/PathIcon";
 import { HTMLAttributes, MouseEventHandler, forwardRef, useRef } from "react";
 import { cn, range } from "@/lib/utils";
-import "./characterCard.css";
+import "../character-db/characterCard.css";
 import { Path } from "@/bindings/LightConeFull";
 import { Element } from "@/bindings/PatchBanner";
 
@@ -17,13 +17,13 @@ type Props = {
   imgUrl: string;
 };
 
-const CharacterCard = ({ rarity, element, path, name, imgUrl }: Props) => {
+const LightConeCard = ({ rarity, element, path, name, imgUrl }: Props) => {
   let bounds: DOMRect | undefined = undefined;
-  const inputRef = useRef<HTMLDivElement>(null);
+  const flowRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
 
   const rotateToMouse: MouseEventHandler<HTMLDivElement> = (e) => {
-    bounds = inputRef.current?.getBoundingClientRect();
+    bounds = flowRef.current?.getBoundingClientRect();
     const mouseX = e.clientX;
     const mouseY = e.clientY;
     const leftX = mouseX - (bounds?.x ?? 0);
@@ -34,8 +34,8 @@ const CharacterCard = ({ rarity, element, path, name, imgUrl }: Props) => {
     };
     const distance = Math.sqrt(center.x ** 2 + center.y ** 2);
 
-    if (inputRef.current) {
-      inputRef.current.style.transform = `
+    if (flowRef.current) {
+      flowRef.current.style.transform = `
       scale3d(1.07, 1.07, 1.07)
       rotate3d(
         ${center.y / 100},
@@ -59,27 +59,23 @@ const CharacterCard = ({ rarity, element, path, name, imgUrl }: Props) => {
     }
   };
   const removeListener: MouseEventHandler<HTMLDivElement> = (_) => {
-    if (inputRef.current) {
-      inputRef.current.style.transform = "";
-      inputRef.current.style.background = "";
+    if (flowRef.current) {
+      flowRef.current.style.transform = "";
+      flowRef.current.style.background = "";
     }
   };
   return (
     <div style={{ perspective: "1500px" }}>
       <div
-        ref={inputRef}
-        className={cn(
-          "card relative h-full w-full rounded-tr-3xl border-b-2 bg-gradient-to-b from-transparent from-80%  to-black/50",
-          rarity === 5 ? "border-[#ffc870]" : "border-[#c199fd]"
-        )}
+        ref={flowRef}
+        className="relative h-full w-full bg-gradient-to-b from-transparent from-80% to-black/50"
         onMouseLeave={removeListener}
         onMouseMove={(e) => rotateToMouse(e)}
       >
+        <div className="card absolute left-[18%] top-[14%] h-[76%] w-[65%] rotate-[13deg]">
+          <div ref={glowRef} className="glow" />
+        </div>
         <Image
-          className={cn(
-            "rounded-tr-3xl bg-gradient-to-b",
-            rarity === 5 ? "bg-[#d0aa6e]/[0.7]" : "bg-[#9c65d7]/[0.7]"
-          )}
           src={imgUrl}
           alt={name}
           width={374}
@@ -93,6 +89,7 @@ const CharacterCard = ({ rarity, element, path, name, imgUrl }: Props) => {
             className="absolute left-1 top-0"
           />
         )}
+      </div>
         <PathIcon
           path={path}
           size="15%"
@@ -101,13 +98,11 @@ const CharacterCard = ({ rarity, element, path, name, imgUrl }: Props) => {
             element ? "top-[15%]" : "top-0"
           )}
         />
-        <RarityIcon rarity={rarity} className="top-[85%] h-6 w-full" />
-        <div ref={glowRef} className="glow rounded-tr-3xl" />
-      </div>
+      <RarityIcon rarity={rarity} className="-my-4 h-6 w-full" />
     </div>
   );
 };
-export { CharacterCard };
+export { LightConeCard };
 
 interface RarityIconProps extends HTMLAttributes<HTMLDivElement> {
   rarity: number;
