@@ -56,6 +56,11 @@ export type Property =
   | "SpeedDelta"
   | "SpeedAddedRatio"
   | "AllDamageTypeAddedRatio";
+/**
+ * Usually served to the front end and connect string slices there
+ */
+
+export type ParameterizedDescription = string[];
 
 export interface LightCone {
   metadata: EquipmentConfigMerged;
@@ -89,12 +94,8 @@ export interface EquipmentSkillConfigMerged {
   /**
    * merge
    */
-  level: number[];
-  /**
-   * merge
-   */
-  param_list: Param[][];
-  skill_desc: string;
+  param_list: string[][];
+  skill_desc: ParameterizedDescription;
   skill_id: number;
   /**
    * merge

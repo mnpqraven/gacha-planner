@@ -8,6 +8,7 @@ import { cn, range } from "@/lib/utils";
 import "./characterCard.css";
 import { Path } from "@/bindings/LightConeFull";
 import { Element } from "@/bindings/PatchBanner";
+import useCardEffect from "@/hooks/animation/useCardEffect";
 
 type Props = {
   rarity: number;
@@ -18,62 +19,17 @@ type Props = {
 };
 
 const CharacterCard = ({ rarity, element, path, name, imgUrl }: Props) => {
-  let bounds: DOMRect | undefined = undefined;
-  const inputRef = useRef<HTMLDivElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
-
-  const rotateToMouse: MouseEventHandler<HTMLDivElement> = (e) => {
-    bounds = inputRef.current?.getBoundingClientRect();
-    const mouseX = e.clientX;
-    const mouseY = e.clientY;
-    const leftX = mouseX - (bounds?.x ?? 0);
-    const topY = mouseY - (bounds?.y ?? 0);
-    const center = {
-      x: leftX - (bounds?.width ?? 0) / 2,
-      y: topY - (bounds?.height ?? 0) / 2,
-    };
-    const distance = Math.sqrt(center.x ** 2 + center.y ** 2);
-
-    if (inputRef.current) {
-      inputRef.current.style.transform = `
-      scale3d(1.07, 1.07, 1.07)
-      rotate3d(
-        ${center.y / 100},
-        ${-center.x / 100},
-        0,
-        ${Math.log(distance) * 2}deg
-      )
-    `;
-    }
-
-    if (glowRef.current) {
-      glowRef.current.style.backgroundImage = `
-      radial-gradient(
-        circle at
-        ${center.x * 2 + (bounds?.width ?? 0) / 2}px
-        ${center.y * 2 + (bounds?.height ?? 0) / 2}px,
-        #ffffff55,
-        #0000000f
-      )
-    `;
-    }
-  };
-  const removeListener: MouseEventHandler<HTMLDivElement> = (_) => {
-    if (inputRef.current) {
-      inputRef.current.style.transform = "";
-      inputRef.current.style.background = "";
-    }
-  };
+  const { glowRef, flowRef, rotateToMouse, removeListener } = useCardEffect();
   return (
     <div style={{ perspective: "1500px" }}>
       <div
-        ref={inputRef}
+        ref={flowRef}
         className={cn(
           "card relative h-full w-full rounded-tr-3xl border-b-2 bg-gradient-to-b from-transparent from-80%  to-black/50",
           rarity === 5 ? "border-[#ffc870]" : "border-[#c199fd]"
         )}
         onMouseLeave={removeListener}
-        onMouseMove={(e) => rotateToMouse(e)}
+        onMouseMove={rotateToMouse}
       >
         <Image
           className={cn(

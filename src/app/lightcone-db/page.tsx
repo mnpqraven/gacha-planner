@@ -1,4 +1,3 @@
-import { IMAGE_URL } from "@/server/endpoints";
 import API from "@/server/typedEndpoints";
 import LightConeCatalogue from "./LightConeCatalogue";
 
