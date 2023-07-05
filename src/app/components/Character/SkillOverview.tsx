@@ -16,7 +16,7 @@ type Props = {
 };
 const SkillOverview = ({ skills, characterId, maxEnergy }: Props) => {
   const [selectedSkill, setSelectedSkill] = useState<SimpleSkill>(
-    skills.find((e) => e.ttype === "BPSkill") ?? skills[0]
+    skills.find((e) => e.ttype === "Talent") ?? skills[0]
   );
   const [selectedSlv, setSelectedSlv] = useState(0);
 
@@ -24,10 +24,10 @@ const SkillOverview = ({ skills, characterId, maxEnergy }: Props) => {
     .filter((skill) => skill.ttype !== "Normal" && skill.ttype !== "MazeNormal")
     .sort((a, b) => {
       const toInt = (ttype: SimpleSkill["ttype"]) => {
-        if (ttype === "Ultra") return 4;
-        if (ttype === "BPSkill") return 3;
-        if (ttype === "Talent") return 2;
-        if (ttype === "Maze") return 1;
+        if (ttype === "Maze") return 4;
+        if (ttype === "Ultra") return 3;
+        if (ttype === "BPSkill") return 2;
+        if (ttype === "Talent") return 1;
         return 0;
       };
       return toInt(a.ttype) - toInt(b.ttype);
@@ -66,7 +66,7 @@ const SkillOverview = ({ skills, characterId, maxEnergy }: Props) => {
         <div className="flex w-full grow flex-col px-4 py-2 sm:w-auto">
           <h3 className="text-lg font-semibold leading-none tracking-tight">
             <span>{selectedSkill.name}</span>
-          {selectedSkill.ttype === "Ultra" && ` (${maxEnergy} Energy)`}
+            {selectedSkill.ttype === "Ultra" && ` (${maxEnergy} Energy)`}
           </h3>
           {selectedSkill.params.length > 1 && (
             <div className="flex items-center gap-4">

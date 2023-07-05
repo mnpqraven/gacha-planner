@@ -1,7 +1,5 @@
 import API from "@/server/typedEndpoints";
-import Link from "next/link";
-import { CharacterCard } from "./CharacterCard";
-import { IMAGE_URL } from "@/server/endpoints";
+import CharacterCatalogue from "./CharacterCatalogue";
 
 export default async function CharacterDb() {
   let { list } = await API.mhyCharacterList.fetch();
@@ -14,27 +12,8 @@ export default async function CharacterDb() {
   });
 
   return (
-    <main className="container grid scroll-m-4 grid-cols-2 items-center justify-center gap-2 pt-4 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
-      {sortedDb.map((chara) => (
-        <div
-          id="character-card"
-          key={chara.id}
-          className="flex flex-col items-center justify-center gap-3"
-        >
-          <Link
-            href={`/character-db/${chara.id}`}
-            className={"relative flex flex-col items-center"}
-          >
-            <CharacterCard imgUrl={url(chara.id)} {...chara} />
-          </Link>
-
-          <p className="font-semibold">{chara.name}</p>
-        </div>
-      ))}
+    <main className="container py-4">
+      <CharacterCatalogue data={sortedDb} />
     </main>
   );
-}
-
-function url(id: string | number): string {
-  return IMAGE_URL + `image/character_preview/${id}.png`;
 }
