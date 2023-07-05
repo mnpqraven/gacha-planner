@@ -42,11 +42,11 @@ const LightConeCatalogue = ({ data }: Props) => {
           <div
             id="lc-card"
             key={lc.metadata.equipment_id}
-            className="flex flex-col items-center justify-center gap-3"
+            className="flex flex-col items-center gap-3 self-start"
           >
             <Link
               href={`/lightcone-db/${lc.metadata.equipment_id}`}
-              className="relative flex flex-col items-center"
+              className="relative"
             >
               <LightConeCard
                 rarity={lc.metadata.rarity}
@@ -56,7 +56,7 @@ const LightConeCatalogue = ({ data }: Props) => {
               />
             </Link>
 
-            <p className="font-semibold">{lc.metadata.equipment_name}</p>
+            <p className="font-semibold text-center">{lc.metadata.equipment_name}</p>
           </div>
         ))}
       </div>

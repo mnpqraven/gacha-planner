@@ -21,7 +21,7 @@ type Props = {
 const LightConeCard = ({ rarity, element, path, name, imgUrl }: Props) => {
   const { flowRef, glowRef, removeListener, rotateToMouse } = useCardEffect();
   return (
-    <div >
+    <div>
       <div
         ref={flowRef}
         className="relative h-full w-full bg-gradient-to-b from-transparent from-80% to-black/50"

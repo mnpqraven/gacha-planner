@@ -15,7 +15,7 @@ export default async function LightConePage({ params }: Props) {
       <div className="aspect-[5/7] p-12 md:max-w-[50%]">
         <Portrait data={lc} />
       </div>
-      <div className="flex flex-row">
+      <div className="md:max-w-[50%]">
         <Content data={lc} />
       </div>
     </>
