@@ -40,7 +40,7 @@ const TraceTable = ({
   return (
     <div
       id="trace-wrapper"
-      className="relative -mx-8 h-[30rem] w-screen overflow-hidden sm:mx-0 sm:w-[30rem]"
+      className="relative -mx-8 p-2 h-[30rem] w-screen overflow-hidden sm:mx-0 sm:w-[30rem]"
     >
       <Image
         className="absolute bottom-0 left-0 right-0 top-0 -z-50 m-auto opacity-10"
