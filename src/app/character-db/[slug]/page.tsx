@@ -61,23 +61,25 @@ export default async function Character({ params }: Props) {
           </TabsContent>
         </Tabs>
 
-        <div className="flex flex-col self-center">
-          <TraceTable
-            characterId={characterId}
-            wrapperSize={480}
-            path={character.path}
-            maxEnergy={character.max_sp}
-          />
-        </div>
+        <div className="flex flex-wrap justify-around gap-4">
+          <div className="flex w-[30rem] grow justify-center">
+            <TraceTable
+              characterId={characterId}
+              wrapperSize={480}
+              path={character.path}
+              maxEnergy={character.max_sp}
+            />
+          </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Total gain from traces</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <TraceSummary characterId={characterId} />
-          </CardContent>
-        </Card>
+          <Card className="h-min w-full md:w-fit">
+            <CardHeader>
+              <CardTitle>Total gain from traces</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TraceSummary characterId={characterId} />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </>
   );

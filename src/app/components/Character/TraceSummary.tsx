@@ -71,7 +71,7 @@ function TraceSummary({ characterId }: Props) {
                 height={128}
                 className="aspect-square h-8 w-8"
               />
-              {properties?.list.find((e) => e.type == (key as Property))?.name}:
+              {properties?.list.find((e) => e.type == (key as Property))?.name}:{' '}
             </div>
             <div>
               {formatNumber(
