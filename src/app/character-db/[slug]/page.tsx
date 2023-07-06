@@ -1,6 +1,13 @@
 import { EidolonTable } from "@/app/components/Character/EidolonTable";
 import { SkillOverview } from "@/app/components/Character/SkillOverview";
+import { TraceSummary } from "@/app/components/Character/TraceSummary";
 import { TraceTable } from "@/app/components/Character/TraceTable";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/app/components/ui/Card";
 import {
   Tabs,
   TabsContent,
@@ -15,11 +22,14 @@ interface Props {
 }
 
 export default async function Character({ params }: Props) {
-  const { slug: characterId } = params;
+  const { slug } = params;
+  const characterId = parseInt(slug);
   const character = await API.mhyCharacter.fetch({
-    params: characterId,
+    params: `${characterId}`,
   });
-  const { list: skills } = await API.mhySkill.fetch({ params: characterId });
+  const { list: skills } = await API.mhySkill.fetch({
+    params: `${characterId}`,
+  });
 
   return (
     <>
@@ -42,23 +52,32 @@ export default async function Character({ params }: Props) {
           <TabsContent value="skill">
             <SkillOverview
               skills={skills}
-              characterId={characterId as unknown as number}
+              characterId={characterId}
               maxEnergy={character.max_sp}
             />
           </TabsContent>
           <TabsContent value="eidolon">
-            <EidolonTable characterId={characterId as unknown as number} />
+            <EidolonTable characterId={characterId} />
           </TabsContent>
         </Tabs>
 
-        <div className="self-center">
+        <div className="flex flex-col self-center">
           <TraceTable
-            characterId={characterId as unknown as number}
+            characterId={characterId}
             wrapperSize={480}
             path={character.path}
             maxEnergy={character.max_sp}
           />
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Total gain from traces</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TraceSummary characterId={characterId} />
+          </CardContent>
+        </Card>
       </div>
     </>
   );
