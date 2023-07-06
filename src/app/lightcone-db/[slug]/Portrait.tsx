@@ -22,8 +22,8 @@ export function Portrait({ data }: Props) {
     >
       <Image
         src={url(metadata.equipment_id)}
-        width={2048}
-        height={2048}
+        width={902}
+        height={1260}
         className="place-self-start object-contain"
         alt={metadata.equipment_name}
       />
