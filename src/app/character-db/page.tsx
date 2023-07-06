@@ -1,6 +1,11 @@
 import API from "@/server/typedEndpoints";
 import CharacterCatalogue from "./CharacterCatalogue";
 
+export const metadata = {
+  title: "Character Database",
+  description: "Honkai Star Rail Character Database",
+};
+
 export default async function CharacterDb() {
   let { list } = await API.mhyCharacterList.fetch();
   let sortedDb = list.sort((a, b) => {
