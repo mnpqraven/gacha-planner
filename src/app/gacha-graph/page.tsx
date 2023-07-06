@@ -64,7 +64,7 @@ export default function GachaGraph() {
       form.reset(savedFormData);
       setPayload(savedFormData);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [savedFormData]);
   const eidolonSubscriber = form.watch("currentEidolon");
 
@@ -93,7 +93,7 @@ export default function GachaGraph() {
   }
 
   return (
-    <main className="flex flex-col items-center">
+    <>
       <div className="py-4">
         <GachaForm
           updateQuery={updateQuery}
@@ -109,7 +109,7 @@ export default function GachaGraph() {
           settings={{ replaceMerge: "series", notMerge: true }}
         />
       )}
-    </main>
+    </>
   );
 }
 

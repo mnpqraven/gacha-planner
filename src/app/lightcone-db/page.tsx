@@ -1,6 +1,11 @@
 import API from "@/server/typedEndpoints";
 import LightConeCatalogue from "./LightConeCatalogue";
 
+export const metadata = {
+  title: "Light Cone Database",
+  description: "Honkai Star Rail Light Cone Database",
+};
+
 export default async function LightConeDb() {
   let { list } = await API.lightConeList.fetch();
   let sortedDb = list.sort((a, b) => {
