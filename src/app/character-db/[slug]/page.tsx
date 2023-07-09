@@ -3,6 +3,12 @@ import { SkillOverview } from "@/app/components/Character/SkillOverview";
 import { TraceSummary } from "@/app/components/Character/TraceSummary";
 import { TraceTable } from "@/app/components/Character/TraceTable";
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/app/components/ui/Accordion";
+import {
   Card,
   CardContent,
   CardHeader,
@@ -43,7 +49,7 @@ export default async function Character({ params }: Props) {
         />
       </div>
 
-      <div className="flex grow flex-col md:w-min">
+      <div className="flex w-full grow flex-col">
         <Tabs defaultValue="skill">
           <TabsList>
             <TabsTrigger value="skill">Skills</TabsTrigger>
@@ -61,8 +67,21 @@ export default async function Character({ params }: Props) {
           </TabsContent>
         </Tabs>
 
-        <div className="flex flex-wrap justify-around gap-4">
-          <div className="flex w-[30rem] grow justify-center">
+        <div className="mt-2 flex flex-col items-center gap-4">
+          <Accordion
+            type="single"
+            collapsible
+            className="w-full rounded-md border p-4"
+          >
+            <AccordionItem value="item-1" className="border-none">
+              <AccordionTrigger>Total gain from traces</AccordionTrigger>
+              <AccordionContent>
+                <TraceSummary characterId={characterId} />
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
+          <div className="flex w-[30rem] grow">
             <TraceTable
               characterId={characterId}
               wrapperSize={480}
@@ -70,15 +89,6 @@ export default async function Character({ params }: Props) {
               maxEnergy={character.max_sp}
             />
           </div>
-
-          <Card className="h-min w-full md:w-fit">
-            <CardHeader>
-              <CardTitle>Total gain from traces</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <TraceSummary characterId={characterId} />
-            </CardContent>
-          </Card>
         </div>
       </div>
     </>
