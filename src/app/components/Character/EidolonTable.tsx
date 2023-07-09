@@ -8,6 +8,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { Toggle } from "../ui/Toggle";
 import { sanitizeNewline } from "@/lib/utils";
+import { Badge } from "../ui/Badge";
 
 type Props = {
   characterId: number;
@@ -31,50 +32,70 @@ const EidolonTable = ({ characterId }: Props) => {
 
   return (
     <>
-      <div className="flex gap-2">
-        {top &&
-          top.map((eidolon) => (
-            <Toggle
-              key={eidolon.id}
-              className="h-fit flex-1"
-              pressed={selectedEidolon === eidolon.rank}
-              onPressedChange={() => setSelectedEidolon(eidolon.rank)}
-            >
-              <Image
-                src={url(characterId, eidolon.rank)}
-                alt={eidolon.name}
-                onClick={() => setSelectedEidolon(eidolon.rank)}
-                width={64}
-                height={64}
-              />
-              {eidolon.name}
-            </Toggle>
-          ))}
+      {top && (
+        <EidolonRow
+          data={top}
+          selectedEidolon={selectedEidolon}
+          setSelectedEidolon={setSelectedEidolon}
+          characterId={characterId}
+        />
+      )}
+
+      <div className="my-2 min-h-[8rem] whitespace-pre-wrap rounded-md border p-4">
+        {sanitizeNewline(
+          data?.list.find((e) => e.rank == selectedEidolon)?.desc
+        )}
       </div>
-      <div className="border rounded-md p-4 my-4 min-h-[8rem] whitespace-pre-wrap">
-        {sanitizeNewline(data?.list.find((e) => e.rank == selectedEidolon)?.desc)}
-      </div>
-      <div className="flex gap-2">
-        {bottom &&
-          bottom.map((eidolon) => (
-            <Toggle
-              key={eidolon.id}
-              className="h-fit flex-1"
-              pressed={selectedEidolon === eidolon.rank}
-              onPressedChange={() => setSelectedEidolon(eidolon.rank)}
-            >
-              <Image
-                src={url(characterId, eidolon.rank)}
-                onClick={() => setSelectedEidolon(eidolon.rank)}
-                alt={eidolon.name}
-                width={64}
-                height={64}
-              />
-              {eidolon.name}
-            </Toggle>
-          ))}
-      </div>
+
+      {bottom && (
+        <EidolonRow
+          data={bottom.reverse()}
+          selectedEidolon={selectedEidolon}
+          setSelectedEidolon={setSelectedEidolon}
+          characterId={characterId}
+        />
+      )}
     </>
+  );
+};
+
+type EidolonRowProps = {
+  data: DbCharacterEidolon[];
+  selectedEidolon: number;
+  setSelectedEidolon: (value: number) => void;
+  characterId: number;
+};
+const EidolonRow = ({
+  data,
+  selectedEidolon,
+  setSelectedEidolon,
+  characterId,
+}: EidolonRowProps) => {
+  return (
+    <div className="grid grid-cols-3 gap-2">
+      {data.map((eidolon) => (
+        <Toggle
+          key={eidolon.id}
+          className="flex h-full flex-1 flex-col justify-start gap-2 py-2 sm:flex-row"
+          pressed={selectedEidolon === eidolon.rank}
+          onPressedChange={() => setSelectedEidolon(eidolon.rank)}
+        >
+          <div className="flex flex-col items-center gap-1">
+            <Image
+              src={url(characterId, eidolon.rank)}
+              alt={eidolon.name}
+              onClick={() => setSelectedEidolon(eidolon.rank)}
+              width={64}
+              height={64}
+              className="min-w-[64px] aspect-square"
+            />
+            <Badge className="w-fit sm:inline">E{eidolon.rank}</Badge>
+          </div>
+
+          <span className="md:text-lg">{eidolon.name}</span>
+        </Toggle>
+      ))}
+    </div>
   );
 };
 

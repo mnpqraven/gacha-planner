@@ -84,7 +84,7 @@ const SkillOverview = ({ skills, characterId, maxEnergy }: Props) => {
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="my-4 min-h-[8rem] rounded-md border p-4">
+        <div className="mt-2 min-h-[8rem] rounded-md border p-4">
           <SkillDescription skill={selectedSkill} slv={selectedSlv} />
         </div>
       </div>
