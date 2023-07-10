@@ -5,7 +5,7 @@ import { ElementIcon } from "../character-db/ElementIcon";
 import { PathIcon } from "../character-db/PathIcon";
 import { HTMLAttributes, forwardRef } from "react";
 import { cn, range } from "@/lib/utils";
-import "../character-db/characterCard.css";
+import styles from "@/css/floating-card.module.css";
 import { Path } from "@/bindings/LightConeFull";
 import { Element } from "@/bindings/PatchBanner";
 import useCardEffect from "@/hooks/animation/useCardEffect";
@@ -29,8 +29,13 @@ const LightConeCard = ({ rarity, element, path, name, imgUrl }: Props) => {
         onMouseMove={rotateToMouse}
         style={{ perspective: "1500px" }}
       >
-        <div className="card absolute left-[18%] top-[14%] h-[76%] w-[65%] rotate-[13deg]">
-          <div ref={glowRef} className="glow" />
+        <div
+          className={cn(
+            "absolute left-[18%] top-[14%] h-[76%] w-[65%] rotate-[13deg]",
+            styles.card
+          )}
+        >
+          <div ref={glowRef} className={styles.glow} />
         </div>
         <Image
           src={imgUrl}

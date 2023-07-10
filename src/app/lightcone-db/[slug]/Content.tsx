@@ -30,7 +30,7 @@ function Content({ data: lc }: Props) {
           {/* <div className="mr-6 flex w-48 flex-col"> */}
 
           <CardHeader>
-            <CardTitle>Superimpose {promotion + 1}</CardTitle>
+            <CardTitle className="w-32">Superimpose {promotion + 1}</CardTitle>
             <CardDescription>
               <Slider
                 className="my-1.5"

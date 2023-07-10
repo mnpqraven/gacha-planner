@@ -4,31 +4,49 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { HTMLAttributes } from "react";
 import { Button } from "./ui/Button";
-import { Github, LineChart, Moon, Sun, Ticket, UserSquare, GalleryHorizontalEnd } from "lucide-react";
+import {
+  Github,
+  LineChart,
+  Moon,
+  Sun,
+  Ticket,
+  UserSquare,
+  GalleryHorizontalEnd,
+} from "lucide-react";
 import { useTheme } from "next-themes";
 import { usePathname } from "next/navigation";
 import { CommandCenter } from "./CommandCenter";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/Tooltip";
 
 const menu = [
   {
     path: "/",
     label: "Stellar Jade Tracker",
     icon: <Ticket className="h-4 w-4" />,
+    keybind: "q",
   },
   {
     path: "/gacha-graph",
     label: "Gacha Estimation",
     icon: <LineChart className="h-4 w-4" />,
+    keybind: "w",
   },
   {
     path: "/character-db",
     label: "Character DB",
     icon: <UserSquare className="h-4 w-4" />,
+    keybind: "e",
   },
   {
     path: "/lightcone-db",
     label: "Light Cone DB",
-    icon: <GalleryHorizontalEnd className="h-4 w-4" />
+    icon: <GalleryHorizontalEnd className="h-4 w-4" />,
+    keybind: "r",
   },
 ];
 const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {
@@ -40,26 +58,35 @@ const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {
     cn(defaultLinkClass, pathname !== path ? "text-muted-foreground" : "");
 
   return (
-    <div className="flex items-center h-12 border-b px-4">
+    <div className="flex h-12 items-center border-b px-4">
       <nav
         className={cn(
-          "flex grow items-center space-x-4 lg:space-x-6",
+          "mr-auto flex flex-1 items-center space-x-4 lg:space-x-6",
           className
         )}
         {...props}
       >
-        {menu.map(({ path, label, icon }) => (
-          <Link href={path} className={pathnameClass(path)} key={path}>
-            {icon} <span className="hidden sm:inline-block">{label}</span>
-          </Link>
-        ))}
+        <TooltipProvider delayDuration={0}>
+          {menu.map(({ path, label, icon }) => (
+            <Link href={path} key={path}>
+              <Tooltip>
+                <TooltipTrigger className={pathnameClass(path)}>
+                  {icon} <span className="hidden xl:inline-block">{label}</span>
+                </TooltipTrigger>
+                <TooltipContent>{label}</TooltipContent>
+              </Tooltip>
+            </Link>
+          ))}
+        </TooltipProvider>
       </nav>
-      {/* <CommandCenter routes={menu} /> */}
-      <div className="flex items-center space-x-4 lg:space-x-6 justify-end">
+
+      <CommandCenter routes={menu} />
+
+      <div className="flex flex-1 items-center justify-end space-x-4 lg:space-x-6">
         <a
           href="https://github.com/mnpqraven/gacha-planner"
           target="_blank"
-          className={cn(defaultLinkClass, "text-muted-foreground")}
+          className={cn(defaultLinkClass, "ml-auto text-muted-foreground")}
         >
           <Github />
         </a>

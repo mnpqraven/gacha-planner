@@ -5,6 +5,8 @@ import { Toggle } from "../ui/Toggle";
 import Image from "next/image";
 import { PathIcon } from "@/app/character-db/PathIcon";
 import { ElementIcon } from "@/app/character-db/ElementIcon";
+import { useEffect, useRef } from "react";
+import { Button } from "../ui/Button";
 
 type Props = {
   text?: boolean;
@@ -42,14 +44,35 @@ const DbFilter = ({
     "Imaginary",
   ];
 
+  // keybinds
+  const searchInput = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "f" && (e.ctrlKey || e.metaKey)) {
+        // focus input
+        e.preventDefault();
+        searchInput.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
+
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+    <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
       {text && updateText && (
-        <Input
-          placeholder="Search"
-          className="h-12 text-lg"
-          onChange={(e) => updateText(e.currentTarget.value)}
-        />
+        <div className="relative h-full">
+          <Input
+            ref={searchInput}
+            placeholder="Search"
+            className="h-12 text-lg"
+            onChange={(e) => updateText(e.currentTarget.value)}
+          />
+
+          <kbd className="pointer-events-none absolute right-2 top-[calc(50%-10px)] inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+            <span className="text-xs">⌘/Ctrl + F</span>
+          </kbd>
+        </div>
       )}
       {minRarity && updateRarity && (
         <div className="flex rounded-md border p-1">
