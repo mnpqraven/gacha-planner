@@ -5,10 +5,10 @@ import { Toggle } from "../ui/Toggle";
 import Image from "next/image";
 import { PathIcon } from "@/app/character-db/PathIcon";
 import { ElementIcon } from "@/app/character-db/ElementIcon";
-import { useEffect, useRef } from "react";
-import { Button } from "../ui/Button";
+import { useEffect, useRef, useState } from "react";
 
 type Props = {
+  onEnterKey?: (searchText: string) => void;
   text?: boolean;
   minRarity?: number;
   updateText?: (query: string) => void;
@@ -17,6 +17,7 @@ type Props = {
   updateElement?: (value: Element) => void;
 };
 const DbFilter = ({
+  onEnterKey,
   text = true,
   minRarity,
   updateText,
@@ -53,10 +54,14 @@ const DbFilter = ({
         e.preventDefault();
         searchInput.current?.focus();
       }
+      if (e.key === "Enter" && onEnterKey) {
+        e.preventDefault();
+        onEnterKey(searchInput.current?.value ?? "");
+      }
     };
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, []);
+  }, [onEnterKey]);
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
