@@ -8,12 +8,14 @@ import { useState } from "react";
 import { LightCone } from "@/bindings/LightConeFull";
 import { LightConeCard } from "./LightConeCard";
 import useLightConeFilter from "../components/Db/useLightConeFilter";
+import { useRouter } from "next/navigation";
 
 type Props = {
   data: LightCone[];
 };
 
 const LightConeCatalogue = ({ data }: Props) => {
+  const router = useRouter();
   const filter = useLightConeFilter();
   const [searchData, setSearchData] = useState(data);
   const processedData = searchData
@@ -34,9 +36,19 @@ const LightConeCatalogue = ({ data }: Props) => {
     }
   }
 
+  function onEnter(_query: string) {
+    if (processedData.length > 0)
+      router.push(`/lightcone-db/${processedData[0].id}`);
+  }
+
   return (
     <div className="flex flex-col gap-4">
-      <DbFilter minRarity={4} updateText={updateSearch} {...filter} />
+      <DbFilter
+        minRarity={4}
+        updateText={updateSearch}
+        onEnterKey={onEnter}
+        {...filter}
+      />
       <div className="grid scroll-m-4 grid-cols-2 items-center justify-center gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
         {processedData.map((lc) => (
           <div
@@ -56,7 +68,9 @@ const LightConeCatalogue = ({ data }: Props) => {
               />
             </Link>
 
-            <p className="font-semibold text-center">{lc.metadata.equipment_name}</p>
+            <p className="text-center font-semibold">
+              {lc.metadata.equipment_name}
+            </p>
           </div>
         ))}
       </div>
