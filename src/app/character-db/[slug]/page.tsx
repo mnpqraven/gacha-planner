@@ -9,12 +9,6 @@ import {
   AccordionTrigger,
 } from "@/app/components/ui/Accordion";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/app/components/ui/Card";
-import {
   Tabs,
   TabsContent,
   TabsList,
@@ -81,7 +75,7 @@ export default async function Character({ params }: Props) {
             </AccordionItem>
           </Accordion>
 
-          <div className="flex w-[30rem] grow">
+          <div className="flex w-[30rem] grow justify-center">
             <TraceTable
               characterId={characterId}
               wrapperSize={480}
