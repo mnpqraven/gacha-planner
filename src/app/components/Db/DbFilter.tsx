@@ -48,7 +48,7 @@ const DbFilter = ({
   const searchInput = useRef<HTMLInputElement>(null);
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === "f" && e.ctrlKey) {
+      if (e.key === "f" && (e.ctrlKey || e.metaKey)) {
         // focus input
         e.preventDefault();
         searchInput.current?.focus();
