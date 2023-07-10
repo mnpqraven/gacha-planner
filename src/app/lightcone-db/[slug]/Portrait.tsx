@@ -4,7 +4,8 @@ import { LightCone } from "@/bindings/LightConeFull";
 import useCardEffect from "@/hooks/animation/useCardEffect";
 import { IMAGE_URL } from "@/server/endpoints";
 import Image from "next/image";
-import "../../character-db/characterCard.css";
+import styles from "@/css/floating-card.module.css";
+import { cn } from "@/lib/utils";
 
 type Props = {
   data: LightCone;
@@ -16,7 +17,7 @@ export function Portrait({ data }: Props) {
   return (
     <div
       ref={flowRef}
-      className="card relative h-fit w-full"
+      className={cn("relative h-fit w-full", styles.card)}
       onMouseLeave={removeListener}
       onMouseMove={rotateToMouse}
     >
@@ -27,7 +28,7 @@ export function Portrait({ data }: Props) {
         className="place-self-start object-contain"
         alt={metadata.equipment_name}
       />
-      <div ref={glowRef} className="glow" />
+      <div ref={glowRef} className={styles.glow} />
     </div>
   );
 }

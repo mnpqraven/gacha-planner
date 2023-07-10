@@ -3,9 +3,9 @@
 import Image from "next/image";
 import { ElementIcon } from "./ElementIcon";
 import { PathIcon } from "./PathIcon";
-import { HTMLAttributes, MouseEventHandler, forwardRef, useRef } from "react";
+import { HTMLAttributes, forwardRef } from "react";
 import { cn, range } from "@/lib/utils";
-import "./characterCard.css";
+import styles from "@/css/floating-card.module.css";
 import { Path } from "@/bindings/LightConeFull";
 import { Element } from "@/bindings/PatchBanner";
 import useCardEffect from "@/hooks/animation/useCardEffect";
@@ -25,8 +25,9 @@ const CharacterCard = ({ rarity, element, path, name, imgUrl }: Props) => {
       <div
         ref={flowRef}
         className={cn(
-          "card relative h-full w-full rounded-tr-3xl border-b-2 bg-gradient-to-b from-transparent from-80%  to-black/50",
-          rarity === 5 ? "border-[#ffc870]" : "border-[#c199fd]"
+          "relative h-full w-full rounded-tr-3xl border-b-2 bg-gradient-to-b from-transparent from-80%  to-black/50",
+          rarity === 5 ? "border-[#ffc870]" : "border-[#c199fd]",
+          styles.card
         )}
         onMouseLeave={removeListener}
         onMouseMove={rotateToMouse}
@@ -58,7 +59,7 @@ const CharacterCard = ({ rarity, element, path, name, imgUrl }: Props) => {
           )}
         />
         <RarityIcon rarity={rarity} className="top-[85%] h-6 w-full" />
-        <div ref={glowRef} className="glow rounded-tr-3xl" />
+        <div ref={glowRef} className={cn("rounded-tr-3xl", styles.glow)} />
       </div>
     </div>
   );
