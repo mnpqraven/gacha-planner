@@ -34,3 +34,15 @@ export function sanitizeNewline(data?: string) {
   if (!data) return "";
   return data.replaceAll("\\n", "\n");
 }
+
+/**
+ * This function removes trailing zeroes if it's a whole number (eg. 18.00)
+ * Otherwise a float percent with 2 decimals is returned
+ * undefined number will return '0 %'
+ */
+export function asPercentage(data: number | undefined): string {
+  if (!data) return "0 %";
+  else {
+    return Number(`${(data * 100).toFixed(2)}`).toString() + " %";
+  }
+}

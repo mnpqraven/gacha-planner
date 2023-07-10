@@ -1,13 +1,6 @@
 import { EidolonTable } from "@/app/components/Character/EidolonTable";
 import { SkillOverview } from "@/app/components/Character/SkillOverview";
-import { TraceSummary } from "@/app/components/Character/TraceSummary";
 import { TraceTable } from "@/app/components/Character/TraceTable";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/app/components/ui/Accordion";
 import {
   Tabs,
   TabsContent,
@@ -16,6 +9,7 @@ import {
 } from "@/app/components/ui/Tabs";
 import API from "@/server/typedEndpoints";
 import Image from "next/image";
+import { TraceSummaryWrapper } from "./TraceSummaryWrapper";
 
 interface Props {
   params: { slug: string };
@@ -62,18 +56,7 @@ export default async function Character({ params }: Props) {
         </Tabs>
 
         <div className="mt-2 flex flex-col items-center gap-4">
-          <Accordion
-            type="single"
-            collapsible
-            className="w-full rounded-md border p-4"
-          >
-            <AccordionItem value="item-1" className="border-none">
-              <AccordionTrigger>Total gain from traces</AccordionTrigger>
-              <AccordionContent>
-                <TraceSummary characterId={characterId} />
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+          <TraceSummaryWrapper characterId={characterId} />
 
           <div className="flex w-[30rem] grow justify-center">
             <TraceTable

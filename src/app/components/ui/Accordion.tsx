@@ -39,10 +39,14 @@ const AccordionTrigger = React.forwardRef<
 ));
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
 
+interface ContentProps
+  extends React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content> {
+  bottomPadding?: boolean;
+}
 const AccordionContent = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  ContentProps
+>(({ bottomPadding = false, className, children, ...props }, ref) => (
   <AccordionPrimitive.Content
     ref={ref}
     className={cn(
@@ -51,7 +55,7 @@ const AccordionContent = React.forwardRef<
     )}
     {...props}
   >
-    <div className="pb-4 pt-0">{children}</div>
+    <div className={cn(bottomPadding ? "pb-4 pt-0" : "")}>{children}</div>
   </AccordionPrimitive.Content>
 ));
 AccordionContent.displayName = AccordionPrimitive.Content.displayName;
