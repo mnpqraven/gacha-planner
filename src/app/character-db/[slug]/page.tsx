@@ -10,6 +10,7 @@ import {
 import API from "@/server/typedEndpoints";
 import Image from "next/image";
 import { TraceSummaryWrapper } from "./TraceSummaryWrapper";
+import { SignatureLightCone } from "./SignatureLightCone";
 
 interface Props {
   params: { slug: string };
@@ -37,37 +38,46 @@ export default async function Character({ params }: Props) {
         />
       </div>
 
-      <div className="flex w-full grow flex-col">
-        <Tabs defaultValue="skill">
-          <TabsList>
-            <TabsTrigger value="skill">Skills</TabsTrigger>
-            <TabsTrigger value="eidolon">Eidolons</TabsTrigger>
-          </TabsList>
-          <TabsContent value="skill">
-            <SkillOverview
-              skills={skills}
-              characterId={characterId}
-              maxEnergy={character.max_sp}
-            />
-          </TabsContent>
-          <TabsContent value="eidolon">
-            <EidolonTable characterId={characterId} />
-          </TabsContent>
-        </Tabs>
+      <Tabs defaultValue="skill">
+        <TabsList className="h-fit [&>*]:whitespace-pre-wrap">
+          <TabsTrigger value="skill">Skills</TabsTrigger>
+          <TabsTrigger value="eidolon">Eidolons</TabsTrigger>
+          <TabsTrigger value="sig-lc">Signature Light Cone</TabsTrigger>
+          <TabsTrigger value="trace">Traces</TabsTrigger>
+        </TabsList>
+        <TabsContent value="skill">
+          <SkillOverview
+            skills={skills}
+            characterId={characterId}
+            maxEnergy={character.max_sp}
+          />
+        </TabsContent>
 
-        <div className="mt-2 flex flex-col items-center gap-4">
-          <TraceSummaryWrapper characterId={characterId} />
+        <TabsContent value="eidolon">
+          <EidolonTable characterId={characterId} />
+        </TabsContent>
 
-          <div className="flex w-[30rem] grow justify-center">
-            <TraceTable
-              characterId={characterId}
-              wrapperSize={480}
-              path={character.path}
-              maxEnergy={character.max_sp}
-            />
+        <TabsContent value="sig-lc">
+          <SignatureLightCone characterId={characterId} />
+        </TabsContent>
+
+        <TabsContent value="trace">
+          <div className="mt-2 flex flex-col items-center gap-4 xl:flex-row xl:items-start">
+            <div className="flex w-[30rem] grow justify-center">
+              <TraceTable
+                characterId={characterId}
+                wrapperSize={480}
+                path={character.path}
+                maxEnergy={character.max_sp}
+              />
+            </div>
+
+            <div className="w-full">
+              <TraceSummaryWrapper characterId={characterId} />
+            </div>
           </div>
-        </div>
-      </div>
+        </TabsContent>
+      </Tabs>
     </>
   );
 }

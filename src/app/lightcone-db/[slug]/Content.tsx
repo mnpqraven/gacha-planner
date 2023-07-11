@@ -14,14 +14,15 @@ import { useState } from "react";
 
 type Props = {
   data: LightCone;
+  ranking?: boolean;
 };
-function Content({ data: lc }: Props) {
+function Content({ data: lc, ranking = false }: Props) {
   const [promotion, setPromotion] = useState(0);
 
   return (
-    <div className="flex gap-4 flex-col">
+    <div className="flex flex-col gap-4">
       <Card className="flex-1">
-        <div className="flex items-center">
+        <div className="flex items-center justify-between">
           <CardHeader>
             <CardTitle>{lc.metadata.equipment_name}</CardTitle>
             <CardDescription>{lc.skill.skill_name}</CardDescription>
@@ -50,12 +51,14 @@ function Content({ data: lc }: Props) {
         </CardContent>
       </Card>
 
-      <Card className="flex-1">
-        <CardHeader>
-          <CardTitle>Stat Ranking</CardTitle>
-        </CardHeader>
-        <CardContent>Coming soon!</CardContent>
-      </Card>
+      {ranking && (
+        <Card className="flex-1">
+          <CardHeader>
+            <CardTitle>Stat Ranking</CardTitle>
+          </CardHeader>
+          <CardContent>Coming soon!</CardContent>
+        </Card>
+      )}
     </div>
   );
 }

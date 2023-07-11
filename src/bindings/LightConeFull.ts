@@ -63,12 +63,12 @@ export type Property =
 export type ParameterizedDescription = string[];
 
 export interface LightCone {
-  metadata: EquipmentConfigMerged;
-  skill: EquipmentSkillConfigMerged;
+  metadata: EquipmentConfig;
+  skill: EquipmentSkillConfig;
   [k: string]: unknown;
 }
 
-export interface EquipmentConfigMerged {
+export interface EquipmentConfig {
   avatar_base_type: Path;
   coin_cost: number;
   equipment_desc: string;
@@ -85,7 +85,7 @@ export interface EquipmentConfigMerged {
   [k: string]: unknown;
 }
 
-export interface EquipmentSkillConfigMerged {
+export interface EquipmentSkillConfig {
   ability_name: string;
   /**
    * merge
