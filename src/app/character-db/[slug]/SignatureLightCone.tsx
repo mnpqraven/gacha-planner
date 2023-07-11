@@ -47,7 +47,10 @@ const SignatureLightCone = ({ characterId }: Props) => {
 
   return (
     <div className="block">
-      <div id="flexcontainer" className="grid grid-cols-3 gap-4">
+      <div
+        id="flexcontainer"
+        className="flex flex-col gap-4 sm:grid sm:grid-cols-3"
+      >
         <div className="col-span-1 flex flex-col">
           {selectedLc && (
             <div className="p-6">
@@ -63,7 +66,7 @@ const SignatureLightCone = ({ characterId }: Props) => {
                 <div
                   key={index}
                   onClick={() => setSelectedLc(lc)}
-                  className="relative p-4"
+                  className="relative p-2"
                 >
                   <LightConeCard
                     name={lc.metadata.equipment_name}
