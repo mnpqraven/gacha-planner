@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Command,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -69,10 +68,10 @@ const CommandCenter = ({ routes }: Props) => {
         setOpen((open) => !open);
       }
 
-      routes.forEach((route) => {
-        if (e.key === route.keybind && (e.altKey || e.metaKey)) {
+      routes.forEach(({ keybind, path }) => {
+        if (e.key === keybind && (e.altKey || e.metaKey)) {
           e.preventDefault();
-          router.push(route.path);
+          router.push(path);
           setOpen((open) => !open);
         }
       });
@@ -113,9 +112,11 @@ const CommandCenter = ({ routes }: Props) => {
       >
         <span className="mr-4 hidden md:inline-block">Command Center</span>
         <span className="m-0 sm:mr-4 md:hidden">Cmd</span>
-        <kbd className={kbdVariants({ size: "sm" })}>
-          <span className="text-xs">⌘/Ctrl + K</span>
-        </kbd>
+        <div className="flex">
+          <kbd className={kbdVariants()}>⌘/Ctrl</kbd>
+          {" + "}
+          <kbd className={kbdVariants()}>K</kbd>
+        </div>
       </Button>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
@@ -127,10 +128,10 @@ const CommandCenter = ({ routes }: Props) => {
           <CommandEmpty>No results found.</CommandEmpty>
           {filteredChar.length > 0 && (
             <CommandGroup heading="Character">
-              {filteredChar.map(({ id, name, element, path, rarity }) => (
+              {filteredChar.map(({ id, name, element, path, rarity, tag }) => (
                 <CommandItem
                   key={id}
-                  value={name}
+                  value={`${name}-${tag}`}
                   className="w-full justify-between"
                   onSelect={() => {
                     router.push(`/character-db/${id}`);
@@ -160,10 +161,10 @@ const CommandCenter = ({ routes }: Props) => {
           )}
           {filteredLc.length > 0 && (
             <CommandGroup heading="Light Cone">
-              {filteredLc.map(({ metadata }) => (
+              {filteredLc.map(({ metadata } ) => (
                 <CommandItem
                   key={metadata.equipment_id}
-                  value={metadata.equipment_name}
+                  value={`${metadata.equipment_name}-${metadata.equipment_id}`}
                   className="w-full justify-between"
                   onSelect={() => {
                     router.push(`/lightcone-db/${metadata.equipment_id}`);
@@ -211,15 +212,4 @@ const CommandCenter = ({ routes }: Props) => {
   );
 };
 
-const Loader = () => {
-  return (
-    <div className="flex items-center space-x-4">
-      <Skeleton className="h-12 w-12 rounded-full" />
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-[250px]" />
-        <Skeleton className="h-4 w-[200px]" />
-      </div>
-    </div>
-  );
-};
 export { CommandCenter };
