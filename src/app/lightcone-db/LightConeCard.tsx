@@ -11,9 +11,9 @@ import { Element } from "@/bindings/PatchBanner";
 import useCardEffect from "@/hooks/animation/useCardEffect";
 
 type Props = {
-  rarity: number;
+  rarity?: number;
   element?: Element;
-  path: Path;
+  path?: Path;
   name: string;
   imgUrl: string;
 };
@@ -24,7 +24,7 @@ const LightConeCard = ({ rarity, element, path, name, imgUrl }: Props) => {
     <div>
       <div
         ref={flowRef}
-        className="relative h-full w-full bg-gradient-to-b from-transparent from-80% to-black/50"
+        className="relative h-full w-full transition-all"
         onMouseLeave={removeListener}
         onMouseMove={rotateToMouse}
         style={{ perspective: "1500px" }}
@@ -52,15 +52,17 @@ const LightConeCard = ({ rarity, element, path, name, imgUrl }: Props) => {
           />
         )}
       </div>
-      <PathIcon
-        path={path}
-        size="15%"
-        className={cn(
-          "absolute left-1 text-white",
-          element ? "top-[15%]" : "top-0"
-        )}
-      />
-      <RarityIcon rarity={rarity} className="-my-4 h-6 w-full" />
+      {path && (
+        <PathIcon
+          path={path}
+          size="15%"
+          className={cn(
+            "absolute left-1 text-white",
+            element ? "top-[15%]" : "top-0"
+          )}
+        />
+      )}
+      {rarity && <RarityIcon rarity={rarity} className="-my-4 h-6 w-full" />}
     </div>
   );
 };

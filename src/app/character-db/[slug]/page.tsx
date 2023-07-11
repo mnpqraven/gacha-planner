@@ -10,6 +10,7 @@ import {
 import API from "@/server/typedEndpoints";
 import Image from "next/image";
 import { TraceSummaryWrapper } from "./TraceSummaryWrapper";
+import { SignatureLightCone } from "./SignatureLightCone";
 
 interface Props {
   params: { slug: string };
@@ -42,6 +43,8 @@ export default async function Character({ params }: Props) {
           <TabsList>
             <TabsTrigger value="skill">Skills</TabsTrigger>
             <TabsTrigger value="eidolon">Eidolons</TabsTrigger>
+            <TabsTrigger value="sig-lc">Signature Light Cone</TabsTrigger>
+            <TabsTrigger value="trace">Traces</TabsTrigger>
           </TabsList>
           <TabsContent value="skill">
             <SkillOverview
@@ -50,23 +53,32 @@ export default async function Character({ params }: Props) {
               maxEnergy={character.max_sp}
             />
           </TabsContent>
+
           <TabsContent value="eidolon">
             <EidolonTable characterId={characterId} />
           </TabsContent>
+
+          <TabsContent value="sig-lc">
+            <SignatureLightCone characterId={characterId} />
+          </TabsContent>
+
+          <TabsContent value="trace">
+            <div className="mt-2 flex flex-col items-center gap-4 xl:flex-row xl:items-start">
+              <div className="flex w-[30rem] grow justify-center">
+                <TraceTable
+                  characterId={characterId}
+                  wrapperSize={480}
+                  path={character.path}
+                  maxEnergy={character.max_sp}
+                />
+              </div>
+
+              <div className="w-full">
+                <TraceSummaryWrapper characterId={characterId} />
+              </div>
+            </div>
+          </TabsContent>
         </Tabs>
-
-        <div className="mt-2 flex flex-col items-center gap-4">
-          <TraceSummaryWrapper characterId={characterId} />
-
-          <div className="flex w-[30rem] grow justify-center">
-            <TraceTable
-              characterId={characterId}
-              wrapperSize={480}
-              path={character.path}
-              maxEnergy={character.max_sp}
-            />
-          </div>
-        </div>
       </div>
     </>
   );

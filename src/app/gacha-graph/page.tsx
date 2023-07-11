@@ -77,6 +77,7 @@ export default function GachaGraph() {
         selectedBanner,
         theme,
       }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [definedData, selectedBanner, theme]
   );
 
