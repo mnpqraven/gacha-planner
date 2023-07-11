@@ -24,7 +24,7 @@ const LightConeCard = ({ rarity, element, path, name, imgUrl }: Props) => {
     <div>
       <div
         ref={flowRef}
-        className="relative h-full w-full transition-all"
+        className="relative h-full w-full transition-all ease-out"
         onMouseLeave={removeListener}
         onMouseMove={rotateToMouse}
         style={{ perspective: "1500px" }}
