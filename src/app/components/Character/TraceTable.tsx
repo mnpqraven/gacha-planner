@@ -14,6 +14,7 @@ import { DbAttributeProperty } from "@/bindings/DbAttributeProperty";
 import { SimpleSkill } from "@/bindings/PatchBanner";
 import { Slider } from "../ui/Slider";
 import { SkillDescription } from "./SkillDescription";
+import { useTheme } from "next-themes";
 
 const DEBUG = false;
 
@@ -37,13 +38,17 @@ const TraceTable = ({
   path,
   maxEnergy,
 }: Props) => {
+  const { theme } = useTheme();
   return (
     <div
       id="trace-wrapper"
-      className="relative -mx-8 p-2 h-[30rem] w-screen overflow-hidden sm:mx-0 sm:w-[30rem]"
+      className="relative -mx-8 h-[30rem] w-screen overflow-hidden p-2 sm:mx-0 sm:w-[30rem]"
     >
       <Image
-        className="absolute bottom-0 left-0 right-0 top-0 -z-50 m-auto opacity-10"
+        className={cn(
+          "absolute bottom-0 left-0 right-0 top-0 -z-50 m-auto opacity-10",
+          theme !== "dark" ? "invert" : ""
+        )}
         src={pathUrl(path)}
         alt={path}
         quality={100}
@@ -68,6 +73,7 @@ const TraceTableInner = ({
   maxEnergy,
 }: Props) => {
   const updateLines = useXarrow();
+  const { theme } = useTheme();
   const { data } = useQuery({
     queryKey: ["trace", characterId],
     queryFn: async () =>
@@ -201,7 +207,7 @@ const TraceTableInner = ({
               key={index}
               start={a}
               end={b}
-              color="white"
+              color={theme !== "dark" ? "black" : "white"}
               zIndex={-1}
               showHead={false}
               curveness={0}

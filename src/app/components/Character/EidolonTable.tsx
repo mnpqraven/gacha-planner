@@ -7,8 +7,9 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useState } from "react";
 import { Toggle } from "../ui/Toggle";
-import { sanitizeNewline } from "@/lib/utils";
+import { cn, sanitizeNewline } from "@/lib/utils";
 import { Badge } from "../ui/Badge";
+import { useTheme } from "next-themes";
 
 type Props = {
   characterId: number;
@@ -71,6 +72,7 @@ const EidolonRow = ({
   setSelectedEidolon,
   characterId,
 }: EidolonRowProps) => {
+  const { theme } = useTheme();
   return (
     <div className="grid grid-cols-3 gap-2">
       {data.map((eidolon) => (
@@ -87,7 +89,10 @@ const EidolonRow = ({
               onClick={() => setSelectedEidolon(eidolon.rank)}
               width={64}
               height={64}
-              className="min-w-[64px] aspect-square"
+              className={cn(
+                "aspect-square min-w-[64px]",
+                theme !== "dark" ? "invert" : ""
+              )}
             />
             <Badge className="w-fit sm:inline">E{eidolon.rank}</Badge>
           </div>

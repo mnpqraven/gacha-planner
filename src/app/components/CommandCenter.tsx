@@ -113,9 +113,7 @@ const CommandCenter = ({ routes }: Props) => {
         <span className="mr-4 hidden md:inline-block">Command Center</span>
         <span className="m-0 sm:mr-4 md:hidden">Cmd</span>
         <div className="flex">
-          <kbd className={kbdVariants()}>⌘/Ctrl</kbd>
-          {" + "}
-          <kbd className={kbdVariants()}>K</kbd>
+          <kbd className={kbdVariants()}>⌘/Ctrl + K</kbd>
         </div>
       </Button>
 
@@ -198,9 +196,7 @@ const CommandCenter = ({ routes }: Props) => {
                 <span>{label}</span>
                 {keybind && (
                   <CommandShortcut>
-                    <kbd className={kbdVariants()}>⌘/Alt</kbd>
-                    {" + "}
-                    <kbd className={kbdVariants()}>{keybind.toUpperCase()}</kbd>
+                    <kbd className={kbdVariants()}>⌘/Alt + {keybind.toUpperCase()}</kbd>
                   </CommandShortcut>
                 )}
               </CommandItem>

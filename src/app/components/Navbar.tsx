@@ -73,7 +73,7 @@ const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {
                 <TooltipTrigger className={pathnameClass(path)}>
                   {icon} <span className="hidden xl:inline-block">{label}</span>
                 </TooltipTrigger>
-                <TooltipContent>{label}</TooltipContent>
+                <TooltipContent className="xl:hidden">{label}</TooltipContent>
               </Tooltip>
             </Link>
           ))}
