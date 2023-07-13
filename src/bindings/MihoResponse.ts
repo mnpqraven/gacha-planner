@@ -83,7 +83,7 @@ export type MainAffixType =
 export interface MihoResponse {
   characters: Character[];
   player: Player;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface Character {
@@ -107,7 +107,7 @@ export interface Character {
   relics: Relic[];
   skill_trees: SkillTree[];
   skills: Skill[];
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface Attribute {
@@ -117,7 +117,7 @@ export interface Attribute {
   name: string;
   percent: boolean;
   value: number;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface CharacterElement {
@@ -125,7 +125,7 @@ export interface CharacterElement {
   icon: AssetPath;
   id: string;
   name: Element;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface LightCone {
@@ -141,7 +141,7 @@ export interface LightCone {
   properties: LightConeProperty[];
   rank: number;
   rarity: number;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface LightConeAttribute {
@@ -151,14 +151,14 @@ export interface LightConeAttribute {
   name: string;
   percent: boolean;
   value: number;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface CharacterPath {
   icon: AssetPath;
   id: string;
   name: string;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface LightConeProperty {
@@ -169,7 +169,7 @@ export interface LightConeProperty {
   percent: boolean;
   type: string;
   value: number;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface AttributeProperty {
@@ -180,7 +180,7 @@ export interface AttributeProperty {
   percent: boolean;
   type: Property;
   value: number;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface RelicSet {
@@ -190,7 +190,7 @@ export interface RelicSet {
   name: string;
   num: number;
   properties: AffixProperty[];
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface AffixProperty {
@@ -201,7 +201,7 @@ export interface AffixProperty {
   percent: boolean;
   type: MainAffixType;
   value: number;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface Relic {
@@ -214,7 +214,7 @@ export interface Relic {
   set_id: number;
   set_name: string;
   sub_affix: SubAffix[];
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface SubAffix {
@@ -227,14 +227,14 @@ export interface SubAffix {
   step: number;
   type: string;
   value: number;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface SkillTree {
   icon: AssetPath;
   id: string;
   level: number;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface Skill {
@@ -250,7 +250,7 @@ export interface Skill {
   simple_desc: string;
   type: string;
   type_text: string;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface Player {
@@ -263,14 +263,14 @@ export interface Player {
   space_info: SpaceInfo;
   uid: string;
   world_level: number;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface Avatar {
   icon: AssetPath;
   id: string;
   name: string;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface SpaceInfo {
@@ -279,12 +279,12 @@ export interface SpaceInfo {
   challenge_data: ChallengeData;
   light_cone_count: number;
   pass_area_progress: number;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface ChallengeData {
   maze_group_id: number;
   maze_group_index: number;
   pre_maze_group_index: number;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }

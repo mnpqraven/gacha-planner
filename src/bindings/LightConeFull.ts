@@ -65,7 +65,7 @@ export type ParameterizedDescription = string[];
 export interface LightCone {
   metadata: EquipmentConfig;
   skill: EquipmentSkillConfig;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface EquipmentConfig {
@@ -82,7 +82,7 @@ export interface EquipmentConfig {
   rarity: number;
   release: boolean;
   skill_id: number;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface EquipmentSkillConfig {
@@ -101,16 +101,16 @@ export interface EquipmentSkillConfig {
    * merge
    */
   skill_name: string;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface AbilityProperty {
   property_type: Property;
   value: Param;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
 
 export interface Param {
   value: number;
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }

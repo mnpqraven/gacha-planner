@@ -3,5 +3,5 @@ export interface BigTraceInfo {
   id: number;
   name: string;
   params: number[];
-  [k: string]: unknown;
+  [k: string]: unknown | undefined;
 }
