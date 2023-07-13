@@ -8,7 +8,6 @@ import { cn, parseSkillType } from "@/lib/utils";
 import { Toggle } from "../ui/Toggle";
 import { Separator } from "../ui/Separator";
 import { SkillDescription } from "./SkillDescription";
-import { useTheme } from "next-themes";
 
 type Props = {
   skills: SimpleSkill[];
@@ -20,7 +19,6 @@ const SkillOverview = ({ skills, characterId, maxEnergy }: Props) => {
     skills.find((e) => e.ttype === "Talent") ?? skills[0]
   );
   const [selectedSlv, setSelectedSlv] = useState(0);
-  const { theme } = useTheme();
 
   const sortedSkills = skills
     .filter((skill) => skill.ttype !== "Normal" && skill.ttype !== "MazeNormal")

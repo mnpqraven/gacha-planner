@@ -19,12 +19,8 @@ interface Props {
 export default async function Character({ params }: Props) {
   const { slug } = params;
   const characterId = parseInt(slug);
-  const character = await API.mhyCharacter.fetch({
-    params: `${characterId}`,
-  });
-  const { list: skills } = await API.mhySkill.fetch({
-    params: `${characterId}`,
-  });
+  const character = await API.mhyCharacter.get(characterId);
+  const { list: skills } = await API.mhySkill.get(characterId);
 
   return (
     <>

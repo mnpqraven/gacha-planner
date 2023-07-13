@@ -7,7 +7,7 @@ export const metadata = {
 };
 
 export default async function LightConeDb() {
-  let { list } = await API.lightConeList.fetch();
+  let { list } = await API.lightConeList.get();
   let sortedDb = list.sort((a, b) => {
     return (
       b.metadata.rarity - a.metadata.rarity ||

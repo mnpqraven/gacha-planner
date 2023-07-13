@@ -16,7 +16,7 @@ interface Props {
 const SignatureLightCone = ({ characterId }: Props) => {
   const { data: atlas } = useQuery({
     queryKey: ["signature_atlas"],
-    queryFn: async () => await API.signatureAtlas.fetch(),
+    queryFn: async () => await API.signatureAtlas.get(),
   });
 
   const lc_ids = atlas?.list.find((e) => e.char_id === characterId)?.lc_id;
@@ -24,7 +24,7 @@ const SignatureLightCone = ({ characterId }: Props) => {
   const { data: lcs } = useQuery({
     queryKey: ["lightcones", lc_ids],
     queryFn: async () =>
-      await API.lightCones.fetch({ payload: { ids: lc_ids ?? [] } }),
+      await API.lightCones.post({ payload: { ids: lc_ids ?? [] } }),
     enabled: !!lc_ids,
     initialData: { list: [] },
   });

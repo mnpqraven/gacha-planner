@@ -5,7 +5,7 @@ export const useCharacterList = () => {
   const { data: characterList } = useQuery({
     queryKey: ["characterList"],
     queryFn: async () => {
-      const { list } = await API.mhyCharacterList.fetch();
+      const { list } = await API.mhyCharacterList.get();
       return list;
     },
     initialData: [],

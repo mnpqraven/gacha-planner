@@ -12,7 +12,6 @@ import {
 } from "./ui/Command";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/Button";
-import { Skeleton } from "./ui/Skeleton";
 import { useRouter } from "next/navigation";
 import { useLightConeList } from "@/hooks/queries/useLightConeList";
 import { useCharacterList } from "@/hooks/queries/useCharacterList";

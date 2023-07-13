@@ -9,7 +9,6 @@ import { useState } from "react";
 import { Toggle } from "../ui/Toggle";
 import { cn, sanitizeNewline } from "@/lib/utils";
 import { Badge } from "../ui/Badge";
-import { useTheme } from "next-themes";
 
 type Props = {
   characterId: number;
@@ -72,7 +71,6 @@ const EidolonRow = ({
   setSelectedEidolon,
   characterId,
 }: EidolonRowProps) => {
-  const { theme } = useTheme();
   return (
     <div className="grid grid-cols-3 gap-2">
       {data.map((eidolon) => (
