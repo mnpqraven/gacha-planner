@@ -107,6 +107,7 @@ const CommandCenter = ({ routes }: Props) => {
     <>
       <Button
         variant="outline"
+        size='sm'
         className="w-fit text-muted-foreground"
         onClick={() => setOpen(true)}
       >
