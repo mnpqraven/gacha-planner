@@ -38,17 +38,13 @@ const TraceTable = ({
   path,
   maxEnergy,
 }: Props) => {
-  const { theme } = useTheme();
   return (
     <div
       id="trace-wrapper"
       className="relative -mx-8 h-[30rem] w-screen overflow-hidden p-2 sm:mx-0 sm:w-[30rem]"
     >
       <Image
-        className={cn(
-          "absolute bottom-0 left-0 right-0 top-0 -z-50 m-auto opacity-10",
-          theme !== "dark" ? "invert" : ""
-        )}
+        className="absolute bottom-0 left-0 right-0 top-0 -z-50 m-auto opacity-10 invert-0 dark:invert-0"
         src={pathUrl(path)}
         alt={path}
         quality={100}

@@ -53,7 +53,7 @@ const SkillOverview = ({ skills, characterId, maxEnergy }: Props) => {
                 <Image
                   src={`${getImagePath(characterId, skill.ttype)}`}
                   alt={skill.name}
-                  className={theme !== "dark" ? "invert" : ""}
+                  className="invert dark:invert-0"
                   width={64}
                   height={64}
                 />

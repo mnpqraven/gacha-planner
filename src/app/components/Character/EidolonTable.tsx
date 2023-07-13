@@ -89,10 +89,7 @@ const EidolonRow = ({
               onClick={() => setSelectedEidolon(eidolon.rank)}
               width={64}
               height={64}
-              className={cn(
-                "aspect-square min-w-[64px]",
-                theme !== "dark" ? "invert" : ""
-              )}
+              className="aspect-square min-w-[64px] invert dark:invert-0"
             />
             <Badge className="w-fit sm:inline">E{eidolon.rank}</Badge>
           </div>
