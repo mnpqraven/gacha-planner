@@ -4,6 +4,7 @@ import { DbCharacter } from "@/bindings/DbCharacter";
 import { LightCone } from "@/bindings/LightConeFull";
 import { SignatureAtlas } from "@/bindings/SignatureAtlas";
 import { List } from "@/lib/generics";
+import { AvatarConfig } from "@/bindings/AvatarConfig";
 
 const API = {
   mhyCharacterList: route<{ list: DbCharacter[] }>(
@@ -14,11 +15,8 @@ const API = {
   mhySkill: route<List<SimpleSkill>>("/honkai/mhy/skill", "GET"),
   mhyBigTrace: route<List<SimpleSkill>>("/honkai/mhy/big_trace", "GET"),
   lightConeList: route<List<LightCone>>("/honkai/light_cone", "GET"),
-  lightCone: route<LightCone>("/honkai/light_cone", "GET"),
-  lightCones: route<{ ids: number[] }, List<LightCone>>(
-    "/honkai/light_cones",
-    "POST"
-  ),
+  character: route<List<number>, List<AvatarConfig>>("/honkai/avatar"),
+  lightCone: route<List<number>, List<LightCone>>("/honkai/light_cone"),
   signatureAtlas: route<List<SignatureAtlas>>("/honkai/signature_atlas", "GET"),
 };
 
@@ -37,6 +35,7 @@ type Post<TReq, TRes> = ApiRoute & ApiPost<TReq, TRes>;
 type GetPost<TReq, TRes> = ApiRoute & ApiGet<TRes> & ApiPost<TReq, TRes>;
 
 type Method = "GET" | "POST" | undefined;
+function route<TReq, TRes>(path: string): GetPost<TReq, TRes>;
 function route<TRes>(path: string, method: "GET"): Get<TRes>;
 function route<TReq, TRes>(path: string, method: "POST"): Post<TReq, TRes>;
 function route<TReq, TRes>(

@@ -24,7 +24,7 @@ const SignatureLightCone = ({ characterId }: Props) => {
   const { data: lcs } = useQuery({
     queryKey: ["lightcones", lc_ids],
     queryFn: async () =>
-      await API.lightCones.post({ payload: { ids: lc_ids ?? [] } }),
+      await API.lightCone.post({ payload: { list: lc_ids ?? [] } }),
     enabled: !!lc_ids,
     initialData: { list: [] },
   });

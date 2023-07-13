@@ -6,7 +6,7 @@ export async function serverFetch<TPayload, TResponse>(
   },
   params?: string | number
 ): Promise<TResponse> {
-  let url = process.env.NEXT_PUBLIC_WORKER_API + endpoint;
+  let url = process.env["NEXT_PUBLIC_WORKER_API"] + endpoint;
   if (params) url += `/${params}`;
 
   // POST

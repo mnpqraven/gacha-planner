@@ -8,7 +8,9 @@ interface Props {
 
 export default async function LightConePage({ params }: Props) {
   const { slug: lightConeId } = params;
-  const lc = await API.lightCone.get(lightConeId);
+  const {
+    list: [lc],
+  } = await API.lightCone.get(lightConeId);
 
   return (
     <>

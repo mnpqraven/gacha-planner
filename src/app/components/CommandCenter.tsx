@@ -17,12 +17,12 @@ import { useLightConeList } from "@/hooks/queries/useLightConeList";
 import { useCharacterList } from "@/hooks/queries/useCharacterList";
 import Fuse from "fuse.js";
 import { LightCone } from "@/bindings/LightConeFull";
-import { DbCharacter } from "@/bindings/DbCharacter";
 import { range } from "@/lib/utils";
 import Image from "next/image";
 import { PathIcon } from "../character-db/PathIcon";
 import { ElementIcon } from "../character-db/ElementIcon";
 import { cva } from "class-variance-authority";
+import { AvatarConfig } from "@/bindings/AvatarConfig";
 
 const kbdVariants = cva(
   "pointer-events-none hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono font-medium text-muted-foreground opacity-100 sm:inline-block",
@@ -49,7 +49,7 @@ const CommandCenter = ({ routes }: Props) => {
   const { lightConeList } = useLightConeList();
   const { characterList } = useCharacterList();
   const [filteredLc, setFilteredLc] = useState<LightCone[]>([]);
-  const [filteredChar, setFilteredChar] = useState<DbCharacter[]>([]);
+  const [filteredChar, setFilteredChar] = useState<AvatarConfig[]>([]);
 
   const fzLc = new Fuse(lightConeList, {
     keys: ["avatar_base_type", "metadata.equipment_name"],
@@ -106,7 +106,7 @@ const CommandCenter = ({ routes }: Props) => {
     <>
       <Button
         variant="outline"
-        size='sm'
+        size="sm"
         className="w-fit text-muted-foreground"
         onClick={() => setOpen(true)}
       >
@@ -126,40 +126,49 @@ const CommandCenter = ({ routes }: Props) => {
           <CommandEmpty>No results found.</CommandEmpty>
           {filteredChar.length > 0 && (
             <CommandGroup heading="Character">
-              {filteredChar.map(({ id, name, element, path, rarity, tag }) => (
-                <CommandItem
-                  key={id}
-                  value={`${name}-${tag}`}
-                  className="w-full justify-between"
-                  onSelect={() => {
-                    router.push(`/character-db/${id}`);
-                    setOpen(false);
-                  }}
-                >
-                  <div className="flex gap-2">
-                    <PathIcon path={path} size="auto" />
-                    <ElementIcon element={element} size="auto" />
-                    <span>{name}</span>
-                  </div>
+              {filteredChar.map(
+                ({
+                  avatar_id,
+                  avatar_name,
+                  damage_type,
+                  rarity,
+                  avatar_votag,
+                  avatar_base_type,
+                }) => (
+                  <CommandItem
+                    key={avatar_id}
+                    value={`${avatar_name}-${avatar_votag}`}
+                    className="w-full justify-between"
+                    onSelect={() => {
+                      router.push(`/character-db/${avatar_id}`);
+                      setOpen(false);
+                    }}
+                  >
+                    <div className="flex gap-2">
+                      <PathIcon path={avatar_base_type} size="auto" />
+                      <ElementIcon element={damage_type} size="auto" />
+                      <span>{avatar_name}</span>
+                    </div>
 
-                  <div className="flex">
-                    {Array.from(range(1, rarity, 1)).map((rarity) => (
-                      <Image
-                        key={rarity}
-                        width={20}
-                        height={20}
-                        src="/Star.png"
-                        alt={`${rarity} *`}
-                      />
-                    ))}
-                  </div>
-                </CommandItem>
-              ))}
+                    <div className="flex">
+                      {Array.from(range(1, rarity, 1)).map((rarity) => (
+                        <Image
+                          key={rarity}
+                          width={20}
+                          height={20}
+                          src="/Star.png"
+                          alt={`${rarity} *`}
+                        />
+                      ))}
+                    </div>
+                  </CommandItem>
+                )
+              )}
             </CommandGroup>
           )}
           {filteredLc.length > 0 && (
             <CommandGroup heading="Light Cone">
-              {filteredLc.map(({ metadata } ) => (
+              {filteredLc.map(({ metadata }) => (
                 <CommandItem
                   key={metadata.equipment_id}
                   value={`${metadata.equipment_name}-${metadata.equipment_id}`}
@@ -196,7 +205,9 @@ const CommandCenter = ({ routes }: Props) => {
                 <span>{label}</span>
                 {keybind && (
                   <CommandShortcut>
-                    <kbd className={kbdVariants()}>⌘/Alt + {keybind.toUpperCase()}</kbd>
+                    <kbd className={kbdVariants()}>
+                      ⌘/Alt + {keybind.toUpperCase()}
+                    </kbd>
                   </CommandShortcut>
                 )}
               </CommandItem>

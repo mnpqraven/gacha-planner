@@ -1,17 +1,17 @@
 "use client";
 
-import { DbCharacter } from "@/bindings/DbCharacter";
 import Link from "next/link";
 import { CharacterCard } from "./CharacterCard";
 import { IMAGE_URL } from "@/server/endpoints";
 import { DbFilter } from "../components/Db/DbFilter";
 import Fuse from "fuse.js";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import useCharacterFilter from "../components/Db/useCharacterFilter";
 import { useRouter } from "next/navigation";
+import { AvatarConfig } from "@/bindings/AvatarConfig";
 
 type Props = {
-  data: DbCharacter[];
+  data: AvatarConfig[];
 };
 
 const CharacterCatalogue = ({ data }: Props) => {
@@ -39,8 +39,10 @@ const CharacterCatalogue = ({ data }: Props) => {
 
   function onEnter(_query: string) {
     if (processedData.length > 0)
-      router.push(`/character-db/${processedData[0].id}`);
+      router.push(`/character-db/${processedData[0].avatar_id}`);
   }
+
+  console.log(processedData);
 
   return (
     <div className="flex flex-col gap-4">
@@ -54,17 +56,17 @@ const CharacterCatalogue = ({ data }: Props) => {
         {processedData.map((chara, index) => (
           <div
             id="character-card"
-            key={chara.id}
+            key={chara.avatar_id}
             className="flex flex-col items-center justify-center gap-3"
           >
             <Link
-              href={`/character-db/${chara.id}`}
+              href={`/character-db/${chara.avatar_id}`}
               className={"relative flex flex-col items-center"}
             >
-              <CharacterCard imgUrl={url(chara.id)} {...chara} />
+              <CharacterCard imgUrl={url(chara.avatar_id)} {...chara} />
             </Link>
 
-            <p className="font-semibold">{chara.name}</p>
+            <p className="font-semibold">{chara.avatar_name}</p>
           </div>
         ))}
       </div>

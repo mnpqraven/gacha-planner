@@ -6,8 +6,8 @@ import { EidolonTable } from "./EidolonTable";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { typedFetch } from "@/server/fetchHelper";
 import ENDPOINT from "@/server/endpoints";
-import { DbCharacter } from "@/bindings/DbCharacter";
 import { DbAttributeProperty } from "@/bindings/DbAttributeProperty";
+import API from "@/server/typedEndpoints";
 
 type Props = {
   data: Character;
@@ -19,12 +19,7 @@ const CharacterTabWrapper = ({
 }: Props) => {
   const { data } = useQuery({
     queryKey: ["character", characterId],
-    queryFn: async () =>
-      await typedFetch<undefined, DbCharacter>(
-        ENDPOINT.mhyCharacter,
-        undefined,
-        characterId
-      ),
+    queryFn: async () => await API.character.get(characterId),
   });
 
   const client = useQueryClient();
@@ -37,6 +32,11 @@ const CharacterTabWrapper = ({
   });
 
   if (!data) return null;
+
+  const {
+    list: [{ avatar_base_type }],
+  } = data;
+
   return (
     <>
       <Tabs defaultValue="skills">
@@ -57,7 +57,11 @@ const CharacterTabWrapper = ({
         </TabsContent>
         <TabsContent value="traces" className="h-[30rem]">
           <div className="flex justify-center">
-            <TraceTable characterId={characterId} path={data.path} maxEnergy={maxEnergy} />
+            <TraceTable
+              characterId={characterId}
+              path={avatar_base_type}
+              maxEnergy={maxEnergy}
+            />
           </div>
         </TabsContent>
       </Tabs>

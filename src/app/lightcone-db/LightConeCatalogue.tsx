@@ -38,7 +38,7 @@ const LightConeCatalogue = ({ data }: Props) => {
 
   function onEnter(_query: string) {
     if (processedData.length > 0)
-      router.push(`/lightcone-db/${processedData[0].id}`);
+      router.push(`/lightcone-db/${processedData[0].metadata.equipment_id}`);
   }
 
   return (

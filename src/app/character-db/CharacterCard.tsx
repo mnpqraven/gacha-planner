@@ -12,13 +12,19 @@ import useCardEffect from "@/hooks/animation/useCardEffect";
 
 type Props = {
   rarity: number;
-  element?: Element;
-  path: Path;
-  name: string;
+  damage_type?: Element;
+  avatar_base_type: Path;
+  avatar_name: string;
   imgUrl: string;
 };
 
-const CharacterCard = ({ rarity, element, path, name, imgUrl }: Props) => {
+const CharacterCard = ({
+  rarity,
+  avatar_base_type,
+  avatar_name,
+  damage_type,
+  imgUrl,
+}: Props) => {
   const { glowRef, flowRef, rotateToMouse, removeListener } = useCardEffect();
   return (
     <div style={{ perspective: "1500px" }}>
@@ -27,7 +33,7 @@ const CharacterCard = ({ rarity, element, path, name, imgUrl }: Props) => {
         className={cn(
           "relative h-full w-full rounded-tr-3xl border-b-2 bg-gradient-to-b from-transparent from-80%  to-black/50",
           rarity === 5 ? "border-[#ffc870]" : "border-[#c199fd]",
-          styles.card
+          styles["card"]
         )}
         onMouseLeave={removeListener}
         onMouseMove={rotateToMouse}
@@ -38,28 +44,28 @@ const CharacterCard = ({ rarity, element, path, name, imgUrl }: Props) => {
             rarity === 5 ? "bg-[#d0aa6e]/[0.7]" : "bg-[#9c65d7]/[0.7]"
           )}
           src={imgUrl}
-          alt={name}
+          alt={avatar_name}
           width={374}
           height={512}
           priority={rarity === 5}
         />
-        {element && (
+        {damage_type && (
           <ElementIcon
-            element={element}
+            element={damage_type}
             size="15%"
             className="absolute left-1 top-0"
           />
         )}
         <PathIcon
-          path={path}
+          path={avatar_base_type}
           size="15%"
           className={cn(
             "absolute left-1 text-white",
-            element ? "top-[15%]" : "top-0"
+            damage_type ? "top-[15%]" : "top-0"
           )}
         />
         <RarityIcon rarity={rarity} className="top-[85%] h-6 w-full" />
-        <div ref={glowRef} className={cn("rounded-tr-3xl", styles.glow)} />
+        <div ref={glowRef} className={cn("rounded-tr-3xl", styles["glow"])} />
       </div>
     </div>
   );

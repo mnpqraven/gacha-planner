@@ -1,4 +1,5 @@
-import { DbCharacter, Element, Path } from "@/bindings/DbCharacter";
+import { AvatarConfig } from "@/bindings/AvatarConfig";
+import { Element, Path } from "@/bindings/DbCharacter";
 import { useState } from "react";
 
 export default function useCharacterFilter() {
@@ -6,19 +7,19 @@ export default function useCharacterFilter() {
   const [path, setPath] = useState<Path[]>([]);
   const [element, setElement] = useState<Element[]>([]);
 
-  const rarityFilter = (e: DbCharacter) => {
+  const rarityFilter = (e: AvatarConfig) => {
     if (rarity.length === 0) return true;
     return rarity.includes(e.rarity);
   };
 
-  const pathFilter = (e: DbCharacter) => {
+  const pathFilter = (e: AvatarConfig) => {
     if (path.length === 0) return true;
-    return path.includes(e.path);
+    return path.includes(e.avatar_base_type);
   };
 
-  const elementFilter = (e: DbCharacter) => {
+  const elementFilter = (e: AvatarConfig) => {
     if (element.length === 0) return true;
-    return element.includes(e.element);
+    return element.includes(e.damage_type);
   };
 
   function updateRarity(value: number) {

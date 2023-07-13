@@ -17,7 +17,7 @@ export function Portrait({ data }: Props) {
   return (
     <div
       ref={flowRef}
-      className={cn("relative h-fit w-full", styles.card)}
+      className={cn("relative h-fit w-full", styles["card"])}
       onMouseLeave={removeListener}
       onMouseMove={rotateToMouse}
     >
@@ -28,7 +28,7 @@ export function Portrait({ data }: Props) {
         className="place-self-start object-contain"
         alt={metadata.equipment_name}
       />
-      <div ref={glowRef} className={styles.glow} />
+      <div ref={glowRef} className={styles["glow"]} />
     </div>
   );
 }
