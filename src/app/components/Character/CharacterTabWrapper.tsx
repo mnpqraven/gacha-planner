@@ -45,6 +45,7 @@ const CharacterTabWrapper = ({
           <TabsTrigger value="eidolons">Eidolons</TabsTrigger>
           <TabsTrigger value="traces">Traces</TabsTrigger>
         </TabsList>
+
         <TabsContent value="skills">
           <SkillOverview
             skills={skills}
@@ -52,9 +53,11 @@ const CharacterTabWrapper = ({
             maxEnergy={maxEnergy}
           />
         </TabsContent>
+
         <TabsContent value="eidolons">
           <EidolonTable characterId={characterId} />
         </TabsContent>
+
         <TabsContent value="traces" className="h-[30rem]">
           <div className="flex justify-center">
             <TraceTable
