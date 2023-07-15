@@ -5,6 +5,8 @@ import { LightCone } from "@/bindings/LightConeFull";
 import { SignatureAtlas } from "@/bindings/SignatureAtlas";
 import { List } from "@/lib/generics";
 import { AvatarConfig } from "@/bindings/AvatarConfig";
+import { SkillTreeConfig } from "@/bindings/SkillTreeConfig";
+import { AvatarSkillConfig } from "@/bindings/AvatarSkillConfig";
 
 const API = {
   mhyCharacterList: route<{ list: DbCharacter[] }>(
@@ -19,6 +21,9 @@ const API = {
   characters: route<List<number>, List<AvatarConfig>>("/honkai/avatar"),
   lightCone: route<List<number>, List<LightCone>>("/honkai/light_cone"),
   signatureAtlas: route<List<SignatureAtlas>>("/honkai/signature_atlas", "GET"),
+  trace: route<List<SkillTreeConfig>>("/honkai/trace", "GET"),
+  skillsByCharId: route<List<AvatarSkillConfig>>("/honkai/skill", "GET"),
+  skills: route<List<number>, List<AvatarSkillConfig>>("/honkai/skills", "POST"),
 };
 
 type ApiRoute = {
