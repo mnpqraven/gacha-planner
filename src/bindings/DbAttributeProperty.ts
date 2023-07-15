@@ -66,5 +66,4 @@ export interface DbAttributeProperty {
   percent: boolean;
   ratio: boolean;
   type: Property;
-  [k: string]: unknown | undefined;
 }

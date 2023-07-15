@@ -15,16 +15,13 @@ export interface AvatarConfig {
   release: boolean;
   skill_list: number[];
   spneed: number;
-  [k: string]: unknown | undefined;
 }
 
 export interface DamageTypeResistance {
   damage_type: Element;
   value: Param;
-  [k: string]: unknown | undefined;
 }
 
 export interface Param {
   value: number;
-  [k: string]: unknown | undefined;
 }

@@ -15,7 +15,8 @@ const API = {
   mhySkill: route<List<SimpleSkill>>("/honkai/mhy/skill", "GET"),
   mhyBigTrace: route<List<SimpleSkill>>("/honkai/mhy/big_trace", "GET"),
   lightConeList: route<List<LightCone>>("/honkai/light_cone", "GET"),
-  character: route<List<number>, List<AvatarConfig>>("/honkai/avatar"),
+  character: route<AvatarConfig>("/honkai/avatar", "GET"),
+  characters: route<List<number>, List<AvatarConfig>>("/honkai/avatar"),
   lightCone: route<List<number>, List<LightCone>>("/honkai/light_cone"),
   signatureAtlas: route<List<SignatureAtlas>>("/honkai/signature_atlas", "GET"),
 };

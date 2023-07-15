@@ -21,5 +21,4 @@ export interface DbCharacter {
    */
   skills: string[];
   tag: string;
-  [k: string]: unknown | undefined;
 }

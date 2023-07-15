@@ -85,30 +85,25 @@ export interface DbCharacterSkillTree {
   levels: SkillLevel[];
   max_level: number;
   pre_points: string[];
-  [k: string]: unknown | undefined;
 }
 
 export interface SkillKV {
   id: number;
   num: number;
-  [k: string]: unknown | undefined;
 }
 
 export interface SkillLevel {
   materials: MaterialKV[];
   promotion: number;
   properties: PropertyKV[];
-  [k: string]: unknown | undefined;
 }
 
 export interface MaterialKV {
   id: number;
   num: number;
-  [k: string]: unknown | undefined;
 }
 
 export interface PropertyKV {
   ttype: Property;
   value: number;
-  [k: string]: unknown | undefined;
 }
