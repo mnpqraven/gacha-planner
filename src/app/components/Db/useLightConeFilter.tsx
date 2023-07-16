@@ -1,19 +1,19 @@
 import { Path } from "@/bindings/DbCharacter";
-import { LightCone } from "@/bindings/LightConeFull";
+import { EquipmentConfig } from "@/bindings/EquipmentConfig";
 import { useState } from "react";
 
 export default function useLightConeFilter() {
   const [rarity, setRarity] = useState<number[]>([]);
   const [path, setPath] = useState<Path[]>([]);
 
-  const rarityFilter = (e: LightCone) => {
+  const rarityFilter = (e: EquipmentConfig) => {
     if (rarity.length === 0) return true;
-    return rarity.includes(e.metadata.rarity);
+    return rarity.includes(e.rarity);
   };
 
-  const pathFilter = (e: LightCone) => {
+  const pathFilter = (e: EquipmentConfig) => {
     if (path.length === 0) return true;
-    return path.includes(e.metadata.avatar_base_type);
+    return path.includes(e.avatar_base_type);
   };
 
   function updateRarity(value: number) {

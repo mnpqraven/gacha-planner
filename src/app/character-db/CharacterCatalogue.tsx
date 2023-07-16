@@ -1,17 +1,17 @@
 "use client";
 
-import { DbCharacter } from "@/bindings/DbCharacter";
 import Link from "next/link";
 import { CharacterCard } from "./CharacterCard";
 import { IMAGE_URL } from "@/server/endpoints";
 import { DbFilter } from "../components/Db/DbFilter";
 import Fuse from "fuse.js";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import useCharacterFilter from "../components/Db/useCharacterFilter";
 import { useRouter } from "next/navigation";
+import { AvatarConfig } from "@/bindings/AvatarConfig";
 
 type Props = {
-  data: DbCharacter[];
+  data: AvatarConfig[];
 };
 
 const CharacterCatalogue = ({ data }: Props) => {
@@ -22,8 +22,14 @@ const CharacterCatalogue = ({ data }: Props) => {
     .filter(filter.byRarity)
     .filter(filter.byPath)
     .filter(filter.byElement);
+
+  const keys: (keyof AvatarConfig)[] = [
+    "avatar_name",
+    "avatar_id",
+    "avatar_votag",
+  ];
   const fz = new Fuse(data, {
-    keys: ["name", "id", "max_sp"],
+    keys,
     threshold: 0.4,
   });
 
@@ -39,7 +45,7 @@ const CharacterCatalogue = ({ data }: Props) => {
 
   function onEnter(_query: string) {
     if (processedData.length > 0)
-      router.push(`/character-db/${processedData[0].id}`);
+      router.push(`/character-db/${processedData[0].avatar_id}`);
   }
 
   return (
@@ -51,20 +57,25 @@ const CharacterCatalogue = ({ data }: Props) => {
         {...filter}
       />
       <div className="grid scroll-m-4 grid-cols-2 items-center justify-center gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
-        {processedData.map((chara, index) => (
+        {processedData.map((chara) => (
           <div
             id="character-card"
-            key={chara.id}
-            className="flex flex-col items-center justify-center gap-3"
+            key={chara.avatar_id}
+            className="flex flex-col items-center justify-center gap-4"
           >
             <Link
-              href={`/character-db/${chara.id}`}
+              href={`/character-db/${chara.avatar_id}`}
               className={"relative flex flex-col items-center"}
             >
-              <CharacterCard imgUrl={url(chara.id)} {...chara} />
+              <CharacterCard imgUrl={url(chara.avatar_id)} {...chara} />
             </Link>
 
-            <p className="font-semibold">{chara.name}</p>
+            <Link
+              href={`/character-db/${chara.avatar_id}`}
+              className="font-semibold"
+            >
+              {chara.avatar_name}
+            </Link>
           </div>
         ))}
       </div>

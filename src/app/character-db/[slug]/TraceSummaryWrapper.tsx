@@ -8,9 +8,9 @@ import {
   AccordionTrigger,
 } from "@/app/components/ui/Accordion";
 import { DbAttributeProperty } from "@/bindings/DbAttributeProperty";
-import { DbCharacterSkillTree } from "@/bindings/DbCharacterSkillTree";
 import ENDPOINT from "@/server/endpoints";
 import { typedFetch } from "@/server/fetchHelper";
+import API from "@/server/typedEndpoints";
 import { useQuery } from "@tanstack/react-query";
 
 type Props = {
@@ -19,12 +19,7 @@ type Props = {
 const TraceSummaryWrapper = ({ characterId }: Props) => {
   const { data } = useQuery({
     queryKey: ["trace", characterId],
-    queryFn: async () =>
-      await typedFetch<undefined, { list: DbCharacterSkillTree[] }>(
-        ENDPOINT.mhyTrace,
-        undefined,
-        characterId
-      ),
+    queryFn: async () => await API.trace.get(characterId),
   });
 
   const { data: properties } = useQuery({

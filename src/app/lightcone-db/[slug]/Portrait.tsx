@@ -1,34 +1,33 @@
 "use client";
 
-import { LightCone } from "@/bindings/LightConeFull";
 import useCardEffect from "@/hooks/animation/useCardEffect";
 import { IMAGE_URL } from "@/server/endpoints";
 import Image from "next/image";
 import styles from "@/css/floating-card.module.css";
 import { cn } from "@/lib/utils";
+import { EquipmentConfig } from "@/bindings/EquipmentConfig";
 
 type Props = {
-  data: LightCone;
+  data: EquipmentConfig;
 };
 export function Portrait({ data }: Props) {
-  const { metadata } = data;
   const { flowRef, glowRef, removeListener, rotateToMouse } = useCardEffect();
 
   return (
     <div
       ref={flowRef}
-      className={cn("relative h-fit w-full", styles.card)}
+      className={cn("relative h-fit w-full", styles["card"])}
       onMouseLeave={removeListener}
       onMouseMove={rotateToMouse}
     >
       <Image
-        src={url(metadata.equipment_id)}
+        src={url(data.equipment_id)}
         width={902}
         height={1260}
         className="place-self-start object-contain"
-        alt={metadata.equipment_name}
+        alt={data.equipment_name}
       />
-      <div ref={glowRef} className={styles.glow} />
+      <div ref={glowRef} className={styles["glow"]} />
     </div>
   );
 }

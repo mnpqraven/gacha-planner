@@ -3,7 +3,8 @@
 import { LightConeCard } from "@/app/lightcone-db/LightConeCard";
 import { Content } from "@/app/lightcone-db/[slug]/Content";
 import { Portrait } from "@/app/lightcone-db/[slug]/Portrait";
-import { LightCone } from "@/bindings/LightConeFull";
+import { EquipmentConfig } from "@/bindings/EquipmentConfig";
+import { EquipmentSkillConfig } from "@/bindings/EquipmentSkillConfig";
 import { IMAGE_URL } from "@/server/endpoints";
 import API from "@/server/typedEndpoints";
 import { useQuery } from "@tanstack/react-query";
@@ -16,45 +17,57 @@ interface Props {
 const SignatureLightCone = ({ characterId }: Props) => {
   const { data: atlas } = useQuery({
     queryKey: ["signature_atlas"],
-    queryFn: async () => await API.signatureAtlas.fetch(),
+    queryFn: async () => await API.signatureAtlas.get(),
   });
 
   const lc_ids = atlas?.list.find((e) => e.char_id === characterId)?.lc_id;
 
-  const { data: lcs } = useQuery({
-    queryKey: ["lightcones", lc_ids],
+  const { data: lcMetadata } = useQuery({
+    queryKey: ["lightconeMetadata", lc_ids],
     queryFn: async () =>
-      await API.lightCones.fetch({ payload: { ids: lc_ids ?? [] } }),
+      await API.lightConeMetadataMany.post({ payload: { list: lc_ids ?? [] } }),
     enabled: !!lc_ids,
-    initialData: { list: [] },
+  });
+  const { data: lcSkill } = useQuery({
+    queryKey: ["lightconeSkill", lc_ids],
+    queryFn: async () =>
+      await API.lightConeSkillMany.post({ payload: { list: lc_ids ?? [] } }),
+    enabled: !!lc_ids,
   });
 
-  const [selectedLc, setSelectedLc] = useState<LightCone | undefined>(
-    undefined
-  );
+  const [selectedLc, setSelectedLc] = useState<
+    { metadata: EquipmentConfig; skill: EquipmentSkillConfig } | undefined
+  >(undefined);
 
   useEffect(() => {
-    if (lcs.list) {
-      setSelectedLc(lcs.list[0]);
+    if (lcMetadata?.list && lcSkill?.list) {
+      let id = lcMetadata.list[0].skill_id;
+      let correspondingSkill = lcSkill.list.find((e) => e.skill_id == id)!;
+      setSelectedLc({
+        metadata: lcMetadata.list[0],
+        skill: correspondingSkill,
+      });
     }
-  }, [lcs.list]);
+  }, [lcMetadata, lcSkill]);
 
-  if (!lcs) return null;
+  function updateSelectedLc(metadata: EquipmentConfig) {
+    if (lcSkill) {
+      let skill = lcSkill.list.find((e) => e.skill_id == metadata.skill_id);
+      if (skill) setSelectedLc({ metadata, skill });
+    }
+  }
 
-  const sortedLcs = lcs.list.sort(
-    (a, b) => b.metadata.rarity - a.metadata.rarity
-  );
+  if (!lcMetadata) return null;
+
+  const sortedLcs = lcMetadata.list.sort((a, b) => b.rarity - a.rarity);
 
   return (
     <div className="block">
-      <div
-        id="flexcontainer"
-        className="flex flex-col gap-4 sm:grid sm:grid-cols-3"
-      >
+      <div className="flex flex-col gap-4 sm:grid sm:grid-cols-3">
         <div className="col-span-1 flex flex-col">
           {selectedLc && (
             <div className="p-6">
-              <Portrait data={selectedLc} />
+              <Portrait data={selectedLc.metadata} />
             </div>
           )}
         </div>
@@ -65,18 +78,18 @@ const SignatureLightCone = ({ characterId }: Props) => {
               {sortedLcs.map((lc, index) => (
                 <div
                   key={index}
-                  onClick={() => setSelectedLc(lc)}
+                  onClick={() => updateSelectedLc(lc)}
                   className="relative p-2"
                 >
                   <LightConeCard
-                    name={lc.metadata.equipment_name}
-                    imgUrl={url(lc.metadata.equipment_id)}
+                    name={lc.equipment_name}
+                    imgUrl={url(lc.equipment_id)}
                   />
                 </div>
               ))}
             </div>
 
-            <Content data={selectedLc} />
+            <Content data={selectedLc.metadata} skill={selectedLc.skill} />
           </div>
         )}
       </div>

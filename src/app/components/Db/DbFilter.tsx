@@ -5,7 +5,7 @@ import { Toggle } from "../ui/Toggle";
 import Image from "next/image";
 import { PathIcon } from "@/app/character-db/PathIcon";
 import { ElementIcon } from "@/app/character-db/ElementIcon";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 type Props = {
   onEnterKey?: (searchText: string) => void;
@@ -84,10 +84,10 @@ const DbFilter = ({
           {rarityList.map((rarity) => (
             <Toggle
               key={rarity}
-              className="flex"
+              className="flex text-muted-foreground hover:text-primary"
               onPressedChange={() => updateRarity(rarity)}
             >
-              <div className="text-xl font-bold">{rarity}</div>
+              <span className="text-xl font-bold">{rarity}</span>
               <div className="aspect-square h-7">
                 <Image
                   src="/Star.png"
@@ -104,7 +104,11 @@ const DbFilter = ({
       {updatePath && (
         <div className="flex rounded-md border p-1">
           {pathList.map((path) => (
-            <Toggle key={path} onPressedChange={() => updatePath(path)}>
+            <Toggle
+              key={path}
+              onPressedChange={() => updatePath(path)}
+              className="text-muted-foreground hover:text-primary"
+            >
               <PathIcon path={path} size="28px" />
             </Toggle>
           ))}

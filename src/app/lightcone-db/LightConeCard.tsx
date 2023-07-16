@@ -6,9 +6,9 @@ import { PathIcon } from "../character-db/PathIcon";
 import { HTMLAttributes, forwardRef } from "react";
 import { cn, range } from "@/lib/utils";
 import styles from "@/css/floating-card.module.css";
-import { Path } from "@/bindings/LightConeFull";
 import { Element } from "@/bindings/PatchBanner";
 import useCardEffect from "@/hooks/animation/useCardEffect";
+import { Path } from "@/bindings/AvatarConfig";
 
 type Props = {
   rarity?: number;
@@ -32,10 +32,10 @@ const LightConeCard = ({ rarity, element, path, name, imgUrl }: Props) => {
         <div
           className={cn(
             "absolute left-[18%] top-[14%] h-[76%] w-[65%] rotate-[13deg]",
-            styles.card
+            styles["card"]
           )}
         >
-          <div ref={glowRef} className={styles.glow} />
+          <div ref={glowRef} className={styles["glow"]} />
         </div>
         <Image
           src={imgUrl}

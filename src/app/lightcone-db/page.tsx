@@ -7,11 +7,10 @@ export const metadata = {
 };
 
 export default async function LightConeDb() {
-  let { list } = await API.lightConeList.fetch();
+  let { list } = await API.lightConeMetadataMany.get();
   let sortedDb = list.sort((a, b) => {
     return (
-      b.metadata.rarity - a.metadata.rarity ||
-      a.metadata.equipment_name.localeCompare(b.metadata!.equipment_name)
+      b.rarity - a.rarity || a.equipment_name.localeCompare(b.equipment_name)
     );
   });
 

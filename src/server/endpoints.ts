@@ -43,6 +43,7 @@ const ENDPOINT = {
           required_error: "Required field",
         })
       ),
+      mocCurrentWeekDone: z.boolean(),
       currentRolls: z.preprocess(
         (args) => (args === "" ? undefined : args),
         z.coerce
@@ -183,7 +184,7 @@ const ENDPOINT = {
   mhyBigTrace: {
     path: "/honkai/mhy/big_trace",
     payload: undefined,
-    response: z.any()
+    response: z.any(),
   },
   mhyEidolon: {
     path: "/honkai/mhy/eidolon", // :id
@@ -199,7 +200,7 @@ const ENDPOINT = {
     path: "/honkai/mhy/attribute_property_list", // :id
     payload: undefined,
     response: z.any(),
-  }
+  },
 } as const;
 export type EndpointUrl = (typeof ENDPOINT)[keyof typeof ENDPOINT]["path"];
 

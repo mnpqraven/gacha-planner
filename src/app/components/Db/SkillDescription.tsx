@@ -1,37 +1,29 @@
-interface SkillDescriptionProps {
-  description: string[];
-  /**
-   * list of params
-   * NOTE: this has a depth of 2 aka. listing params of all skill/superimpose
-   * levels
-   * */
-  params: string[][];
-  /**
-   * Skill level for Skill or Superimpose level for LCs
-   * */
+import { ParameterizedDescription } from "@/bindings/SkillTreeConfig";
+import { Fragment } from "react";
+
+type SkillDescriptionProps = {
+  skillDesc: ParameterizedDescription;
+  paramList: string[][] | string[];
   slv: number;
-}
+};
 
 export const SkillDescription = ({
-  description,
-  params,
+  skillDesc,
+  paramList,
   slv,
 }: SkillDescriptionProps) => {
+  // for depth of 2, flatten once
+  const currentParam = Array.isArray(paramList[0]) ? paramList[slv] : paramList;
+
   return (
     <p className="text-justify">
-      {description.map((descPart, index) => (
-        <>
-          <span key={index}>{descPart}</span>
-          {!params[slv] ? (
-            <span className="font-semibold text-accent-foreground">
-              {params[0] && params[0][index]}
-            </span>
-          ) : (
-            <span className="font-semibold text-accent-foreground">
-              {params[slv][index]}
-            </span>
-          )}
-        </>
+      {skillDesc.map((descPart, index) => (
+        <Fragment key={index}>
+          <span>{descPart}</span>
+          <span className="font-semibold text-accent-foreground">
+            {currentParam[index]}
+          </span>
+        </Fragment>
       ))}
     </p>
   );

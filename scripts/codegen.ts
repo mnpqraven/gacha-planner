@@ -25,7 +25,10 @@ async function main() {
 
     let filePath = path.join(schemasPath, filename);
     let schema = JSON.parse(await fs.readFile(filePath, { encoding: "utf-8" }));
-    let compiled = await compile(schema, schema.title, { bannerComment: "" });
+    let compiled = await compile(schema, schema.title, {
+      additionalProperties: false,
+      bannerComment: "",
+    });
     let eachType = compiled.split("export");
     for (let type of eachType) {
       if (!type) {

@@ -11,7 +11,6 @@ export interface PatchBanner {
   dateEnd: string;
   dateStart: string;
   version: PatchVersion;
-  [k: string]: unknown;
 }
 
 export interface Character {
@@ -21,7 +20,6 @@ export interface Character {
   icon?: AssetPath | null;
   maxEnergy: number;
   skills: SimpleSkill[];
-  [k: string]: unknown;
 }
 
 export interface CharacterElement {
@@ -29,7 +27,6 @@ export interface CharacterElement {
   icon: AssetPath;
   id: string;
   name: Element;
-  [k: string]: unknown;
 }
 
 export interface SimpleSkill {
@@ -38,5 +35,4 @@ export interface SimpleSkill {
   name: string;
   params: string[][];
   ttype: SkillType;
-  [k: string]: unknown;
 }

@@ -1,5 +1,6 @@
 import API from "@/server/typedEndpoints";
 import CharacterCatalogue from "./CharacterCatalogue";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "Character Database",
@@ -7,12 +8,12 @@ export const metadata = {
 };
 
 export default async function CharacterDb() {
-  let { list } = await API.mhyCharacterList.fetch();
+  let { list } = await API.characters.get();
   let sortedDb = list.sort((a, b) => {
     return (
       b.rarity - a.rarity ||
-      a.name.localeCompare(b.name) ||
-      a.tag.localeCompare(b.tag)
+      a.avatar_name.localeCompare(b.avatar_name) ||
+      a.avatar_votag.localeCompare(b.avatar_votag)
     );
   });
 

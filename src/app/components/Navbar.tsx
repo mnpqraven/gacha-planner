@@ -58,7 +58,7 @@ const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {
     cn(defaultLinkClass, pathname !== path ? "text-muted-foreground" : "");
 
   return (
-    <div className="flex h-12 items-center border-b px-4">
+    <div className="flex h-12 items-center border-b px-4 sticky top-0 bg-background z-50">
       <nav
         className={cn(
           "mr-auto flex flex-1 items-center space-x-4 lg:space-x-6",
@@ -73,7 +73,7 @@ const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {
                 <TooltipTrigger className={pathnameClass(path)}>
                   {icon} <span className="hidden xl:inline-block">{label}</span>
                 </TooltipTrigger>
-                <TooltipContent>{label}</TooltipContent>
+                <TooltipContent className="xl:hidden">{label}</TooltipContent>
               </Tooltip>
             </Link>
           ))}

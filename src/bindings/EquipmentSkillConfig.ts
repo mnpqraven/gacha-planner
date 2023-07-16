@@ -1,5 +1,3 @@
-export type Path = "Destruction" | "Hunt" | "Erudition" | "Harmony" | "Nihility" | "Preservation" | "Abundance";
-
 export type Property =
   | "MaxHP"
   | "Attack"
@@ -62,28 +60,9 @@ export type Property =
 
 export type ParameterizedDescription = string[];
 
-export interface LightCone {
-  metadata: EquipmentConfig;
-  skill: EquipmentSkillConfig;
-  [k: string]: unknown;
-}
-
-export interface EquipmentConfig {
-  avatar_base_type: Path;
-  coin_cost: number;
-  equipment_desc: string;
-  equipment_id: number;
-  equipment_name: string;
-  exp_provide: number;
-  exp_type: number;
-  max_promotion: number;
-  max_rank: number;
-  rank_up_cost_list: number[];
-  rarity: number;
-  release: boolean;
-  skill_id: number;
-  [k: string]: unknown;
-}
+/**
+ * skill info for light cones
+ */
 
 export interface EquipmentSkillConfig {
   ability_name: string;
@@ -101,16 +80,13 @@ export interface EquipmentSkillConfig {
    * merge
    */
   skill_name: string;
-  [k: string]: unknown;
 }
 
 export interface AbilityProperty {
   property_type: Property;
   value: Param;
-  [k: string]: unknown;
 }
 
 export interface Param {
   value: number;
-  [k: string]: unknown;
 }

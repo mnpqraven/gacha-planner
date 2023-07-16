@@ -5,7 +5,7 @@ export const useLightConeList = () => {
   const { data: lightConeList } = useQuery({
     queryKey: ["lightconeList"],
     queryFn: async () => {
-      const { list } = await API.lightConeList.fetch();
+      const { list } = await API.lightConeMetadataMany.get();
       return list;
     },
     initialData: [],

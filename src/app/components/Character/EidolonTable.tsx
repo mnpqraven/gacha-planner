@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useState } from "react";
 import { Toggle } from "../ui/Toggle";
-import { sanitizeNewline } from "@/lib/utils";
+import { cn, sanitizeNewline } from "@/lib/utils";
 import { Badge } from "../ui/Badge";
 
 type Props = {
@@ -87,7 +87,7 @@ const EidolonRow = ({
               onClick={() => setSelectedEidolon(eidolon.rank)}
               width={64}
               height={64}
-              className="min-w-[64px] aspect-square"
+              className="aspect-square min-w-[64px] invert dark:invert-0"
             />
             <Badge className="w-fit sm:inline">E{eidolon.rank}</Badge>
           </div>

@@ -8,7 +8,11 @@ interface Props {
 
 export default async function LightConePage({ params }: Props) {
   const { slug: lightConeId } = params;
-  const lc = await API.lightCone.fetch({ params: lightConeId });
+  const callLc = API.lightConeMetadata.get(lightConeId);
+  const callLcSkill = API.lightConeSkill.get(lightConeId);
+
+  console.log(API.lightConeSkill.path);
+  const [lc, lcSkill] = await Promise.all([callLc, callLcSkill]);
 
   return (
     <>
@@ -16,7 +20,7 @@ export default async function LightConePage({ params }: Props) {
         <Portrait data={lc} />
       </div>
       <div className="md:max-w-[50%]">
-        <Content data={lc} />
+        <Content data={lc} skill={lcSkill} />
       </div>
     </>
   );

@@ -19,6 +19,11 @@ export type Anchor =
   | "Point18";
 
 export type AssetPath = string;
+/**
+ * Usually served to the front end and connect string slices there
+ */
+
+export type ParameterizedDescription = string[];
 
 export type Property =
   | "MaxHP"
@@ -77,33 +82,37 @@ export type Property =
   | "SpeedAddedRatio"
   | "AllDamageTypeAddedRatio";
 
-export interface DbCharacterSkillTree {
+export interface SkillTreeConfig {
+  ability_name: string;
   anchor: Anchor;
-  icon: AssetPath;
-  id: number;
-  level_up_skills: SkillKV[];
-  levels: SkillLevel[];
+  avatar_id: number;
+  avatar_promotion_limit: (number | null)[];
+  default_unlock: boolean[];
+  icon_path: AssetPath;
+  level: number[];
+  level_up_skill_id: number[];
+  material_list: Item[][];
   max_level: number;
-  pre_points: string[];
+  param_list: string[];
+  point_desc: ParameterizedDescription;
+  point_id: number;
+  point_name: string;
+  point_trigger_key: string;
+  point_type: number;
+  pre_point: number[];
+  status_add_list: AbilityProperty[];
 }
 
-export interface SkillKV {
-  id: number;
-  num: number;
+export interface Item {
+  item_id: number;
+  item_num: number;
 }
 
-export interface SkillLevel {
-  materials: MaterialKV[];
-  promotion: number;
-  properties: PropertyKV[];
+export interface AbilityProperty {
+  property_type: Property;
+  value: Param;
 }
 
-export interface MaterialKV {
-  id: number;
-  num: number;
-}
-
-export interface PropertyKV {
-  ttype: Property;
+export interface Param {
   value: number;
 }

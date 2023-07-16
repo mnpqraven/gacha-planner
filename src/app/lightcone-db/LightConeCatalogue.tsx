@@ -5,13 +5,13 @@ import { IMAGE_URL } from "@/server/endpoints";
 import { DbFilter } from "../components/Db/DbFilter";
 import Fuse from "fuse.js";
 import { useState } from "react";
-import { LightCone } from "@/bindings/LightConeFull";
 import { LightConeCard } from "./LightConeCard";
 import useLightConeFilter from "../components/Db/useLightConeFilter";
 import { useRouter } from "next/navigation";
+import { EquipmentConfig } from "@/bindings/EquipmentConfig";
 
 type Props = {
-  data: LightCone[];
+  data: EquipmentConfig[];
 };
 
 const LightConeCatalogue = ({ data }: Props) => {
@@ -38,7 +38,7 @@ const LightConeCatalogue = ({ data }: Props) => {
 
   function onEnter(_query: string) {
     if (processedData.length > 0)
-      router.push(`/lightcone-db/${processedData[0].id}`);
+      router.push(`/lightcone-db/${processedData[0].equipment_id}`);
   }
 
   return (
@@ -53,24 +53,22 @@ const LightConeCatalogue = ({ data }: Props) => {
         {processedData.map((lc) => (
           <div
             id="lc-card"
-            key={lc.metadata.equipment_id}
+            key={lc.equipment_id}
             className="flex flex-col items-center gap-3 self-start"
           >
             <Link
-              href={`/lightcone-db/${lc.metadata.equipment_id}`}
+              href={`/lightcone-db/${lc.equipment_id}`}
               className="relative"
             >
               <LightConeCard
-                rarity={lc.metadata.rarity}
-                path={lc.metadata.avatar_base_type}
-                name={lc.metadata.equipment_name}
-                imgUrl={url(lc.metadata.equipment_id)}
+                rarity={lc.rarity}
+                path={lc.avatar_base_type}
+                name={lc.equipment_name}
+                imgUrl={url(lc.equipment_id)}
               />
             </Link>
 
-            <p className="text-center font-semibold">
-              {lc.metadata.equipment_name}
-            </p>
+            <p className="text-center font-semibold">{lc.equipment_name}</p>
           </div>
         ))}
       </div>

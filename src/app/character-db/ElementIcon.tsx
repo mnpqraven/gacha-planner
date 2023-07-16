@@ -10,6 +10,7 @@ import Wind from "@public/element/Wind.svg";
 import Lightning from "@public/element/Lightning.svg";
 import { HTMLAttributes, forwardRef, useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { cva } from "class-variance-authority";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   element: Element;
@@ -17,10 +18,11 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
    * this is getting passed into `style` props of the wrapping div
    */
   size: string;
+  ignoreTheme?: boolean;
 }
 
 const ElementIcon = forwardRef<HTMLDivElement, Props>(
-  ({ element, size, ...props }, ref) => {
+  ({ element, size, ignoreTheme = false, ...props }, ref) => {
     const { theme } = useTheme();
     const filterDark = { filter: "drop-shadow(1px 1px 1px rgb(0 0 0 / 1))" };
     const filterLight = {
@@ -28,35 +30,50 @@ const ElementIcon = forwardRef<HTMLDivElement, Props>(
     };
     const [filter, setFilter] = useState(filterLight);
     useEffect(() => {
-      if (theme === "light") setFilter(filterDark);
-      else setFilter(filterLight);
+      if (!ignoreTheme) {
+        if (theme === "light") setFilter(filterDark);
+        else setFilter(filterLight);
+      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [theme]);
+    const cl = cva("", {
+      variants: {
+        element: {
+          Fire: "text-fire",
+          Physical: "text-physical",
+          Quantum: "text-quantum",
+          Lightning: "text-lightning",
+          Ice: "text-ice",
+          Wind: "text-wind",
+          Imaginary: "text-imaginary",
+        },
+      },
+    });
 
     // original width in svg files ???????
     const sizes = { width: "100%", height: "100%", viewBox: "0 0 14 14" };
     return (
       <div style={{ width: size, height: size }} ref={ref} {...props}>
         {element === "Fire" && (
-          <Fire className="text-fire" style={filter} {...sizes} />
+          <Fire className={cl({ element })} style={filter} {...sizes} />
         )}
         {element === "Physical" && (
-          <Physical className="text-physical" style={filter} {...sizes} />
+          <Physical className={cl({ element })} style={filter} {...sizes} />
         )}
         {element === "Quantum" && (
-          <Quantum className="text-quantum" style={filter} {...sizes} />
+          <Quantum className={cl({ element })} style={filter} {...sizes} />
         )}
         {element === "Lightning" && (
-          <Lightning className="text-lightning" style={filter} {...sizes} />
+          <Lightning className={cl({ element })} style={filter} {...sizes} />
         )}
         {element === "Ice" && (
-          <Ice className="text-ice" style={filter} {...sizes} />
+          <Ice className={cl({ element })} style={filter} {...sizes} />
         )}
         {element === "Wind" && (
-          <Wind className="text-wind" style={filter} {...sizes} />
+          <Wind className={cl({ element })} style={filter} {...sizes} />
         )}
         {element === "Imaginary" && (
-          <Imaginary className="text-imaginary" style={filter} {...sizes} />
+          <Imaginary className={cl({ element })} style={filter} {...sizes} />
         )}
       </div>
     );

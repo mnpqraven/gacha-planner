@@ -8,17 +8,14 @@ export interface DbCharacterEidolon {
   materials: MaterialKV[];
   name: string;
   rank: number;
-  [k: string]: unknown;
 }
 
 export interface SkillKV {
   id: number;
   num: number;
-  [k: string]: unknown;
 }
 
 export interface MaterialKV {
   id: number;
   num: number;
-  [k: string]: unknown;
 }
