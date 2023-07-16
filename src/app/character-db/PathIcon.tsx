@@ -18,10 +18,11 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
    */
   size: string;
   iconClass?: string;
+  ignoreTheme?: boolean;
 }
 
 const PathIcon = forwardRef<HTMLDivElement, Props>(
-  ({ path, size, iconClass, ...props }, ref) => {
+  ({ path, size, iconClass, ignoreTheme = false, ...props }, ref) => {
     const { theme } = useTheme();
     const filterDark = { filter: "drop-shadow(1px 1px 1px rgb(0 0 0 / 1))" };
     const filterLight = {
@@ -29,8 +30,10 @@ const PathIcon = forwardRef<HTMLDivElement, Props>(
     };
     const [filter, setFilter] = useState(filterLight);
     useEffect(() => {
-      if (theme === "light") setFilter(filterDark);
-      else setFilter(filterLight);
+      if (!ignoreTheme) {
+        if (theme === "light") setFilter(filterDark);
+        else setFilter(filterLight);
+      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [theme]);
 

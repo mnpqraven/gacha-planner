@@ -13,21 +13,39 @@ export function* range(start: number, end: number, step: number) {
   }
 }
 
-export function parseSkillType(ttype: SkillType) {
-  switch (ttype) {
-    case "Normal":
-      return "Attack";
-    case "BPSkill":
-      return "Skill";
-    case "Ultra":
-      return "Ultimate";
-    case "Talent":
-      return "Talent";
-    case "MazeNormal":
-      return "Attack";
-    case "Maze":
-      return "Technique";
-  }
+export function parseSkillType(
+  skillType: SkillType | undefined | null,
+  fallbackSkillDesc: string
+) {
+  if (skillType)
+    switch (skillType) {
+      case "Normal":
+        return "Attack";
+      case "BPSkill":
+        return "Skill";
+      case "Ultra":
+        return "Ultimate";
+      case "Talent":
+        return "Talent";
+      case "MazeNormal":
+        return "Attack";
+      case "Maze":
+        return "Technique";
+    }
+  else
+    switch (fallbackSkillDesc) {
+      case "Basic ATK":
+        return "Attack";
+      case "Skill":
+        return "BPSkill";
+      case "Ultra":
+        return "Ultimate";
+      case "Talent":
+        return "Talent";
+      case "Technique":
+        return "Technique";
+    }
+  return "";
 }
 
 export function sanitizeNewline(data?: string) {

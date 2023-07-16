@@ -6,9 +6,9 @@ import { PathIcon } from "../character-db/PathIcon";
 import { HTMLAttributes, forwardRef } from "react";
 import { cn, range } from "@/lib/utils";
 import styles from "@/css/floating-card.module.css";
-import { Path } from "@/bindings/LightConeFull";
 import { Element } from "@/bindings/PatchBanner";
 import useCardEffect from "@/hooks/animation/useCardEffect";
+import { Path } from "@/bindings/AvatarConfig";
 
 type Props = {
   rarity?: number;

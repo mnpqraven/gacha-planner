@@ -22,8 +22,14 @@ const CharacterCatalogue = ({ data }: Props) => {
     .filter(filter.byRarity)
     .filter(filter.byPath)
     .filter(filter.byElement);
+
+  const keys: (keyof AvatarConfig)[] = [
+    "avatar_name",
+    "avatar_id",
+    "avatar_votag",
+  ];
   const fz = new Fuse(data, {
-    keys: ["name", "id", "max_sp"],
+    keys,
     threshold: 0.4,
   });
 
@@ -42,8 +48,6 @@ const CharacterCatalogue = ({ data }: Props) => {
       router.push(`/character-db/${processedData[0].avatar_id}`);
   }
 
-  console.log(processedData);
-
   return (
     <div className="flex flex-col gap-4">
       <DbFilter
@@ -53,11 +57,11 @@ const CharacterCatalogue = ({ data }: Props) => {
         {...filter}
       />
       <div className="grid scroll-m-4 grid-cols-2 items-center justify-center gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
-        {processedData.map((chara, index) => (
+        {processedData.map((chara) => (
           <div
             id="character-card"
             key={chara.avatar_id}
-            className="flex flex-col items-center justify-center gap-3"
+            className="flex flex-col items-center justify-center gap-4"
           >
             <Link
               href={`/character-db/${chara.avatar_id}`}
@@ -66,7 +70,12 @@ const CharacterCatalogue = ({ data }: Props) => {
               <CharacterCard imgUrl={url(chara.avatar_id)} {...chara} />
             </Link>
 
-            <p className="font-semibold">{chara.avatar_name}</p>
+            <Link
+              href={`/character-db/${chara.avatar_id}`}
+              className="font-semibold"
+            >
+              {chara.avatar_name}
+            </Link>
           </div>
         ))}
       </div>

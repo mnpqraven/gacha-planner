@@ -48,7 +48,7 @@ const CalendarFooter = ({ date }: Props) => {
           </DialogTrigger>
           <DialogContent className="min-h-[16rem] sm:max-w-4xl">
             {banner.characterData.characterId && (
-              <CharacterTabWrapper data={banner.characterData} characterId={banner.characterData.characterId} />
+              <CharacterTabWrapper characterId={banner.characterData.characterId} />
             )}
           </DialogContent>
         </Dialog>

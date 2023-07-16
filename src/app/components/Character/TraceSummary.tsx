@@ -6,14 +6,15 @@ import { IMAGE_URL } from "@/server/endpoints";
 import { HTMLAttributes, forwardRef } from "react";
 import Image from "next/image";
 import { asPercentage } from "@/lib/utils";
+import { SkillTreeConfig } from "@/bindings/SkillTreeConfig";
 
 type Haystack = {
-  [Key in Property]?: { value: number; icon: string };
+  [Key in Property]?: { value: number; icon: string; label: string };
 };
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   characterId: number;
-  skills: DbCharacterSkillTree[];
+  skills: SkillTreeConfig[];
   properties: DbAttributeProperty[];
 }
 
@@ -21,15 +22,27 @@ const TraceSummary = forwardRef<HTMLDivElement, Props>(
   ({ characterId, skills, properties, ...props }, ref) => {
     let hay: Haystack = {};
     skills.forEach((traceNode) => {
-      let property = traceNode.levels[0].properties[0];
+      let property = traceNode.status_add_list[0];
 
-      if (property && property.ttype) {
-        const { ttype: key, value } = property;
+      if (property && property.property_type) {
+        const {
+          property_type: key,
+          value: { value },
+        } = property;
 
         // upserting
-        if (!hay[key]) hay[key] = { value, icon: traceNode.icon };
+        if (!hay[key])
+          hay[key] = {
+            value,
+            icon: traceNode.icon_path,
+            label: traceNode.point_name,
+          };
         else
-          hay[key] = { value: hay[key]!.value + value, icon: traceNode.icon };
+          hay[key] = {
+            value: hay[key]!.value + value,
+            icon: traceNode.icon_path,
+            label: traceNode.point_name,
+          };
       }
     });
 
@@ -59,8 +72,9 @@ const TraceSummary = forwardRef<HTMLDivElement, Props>(
 );
 TraceSummary.displayName = "TraceSummary";
 
-function propertyUrl(path: string | undefined) {
-  return IMAGE_URL + path;
+function propertyUrl(icon: string | undefined) {
+  const lastSlash = icon?.lastIndexOf('/')
+  return `${IMAGE_URL}icon/property${icon?.slice(lastSlash)}`;
 }
 
 export { TraceSummary };

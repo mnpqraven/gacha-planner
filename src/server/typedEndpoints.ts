@@ -1,12 +1,13 @@
 import { SimpleSkill } from "@/bindings/PatchBanner";
 import { serverFetch } from "./serverFetch";
 import { DbCharacter } from "@/bindings/DbCharacter";
-import { LightCone } from "@/bindings/LightConeFull";
 import { SignatureAtlas } from "@/bindings/SignatureAtlas";
 import { List } from "@/lib/generics";
 import { AvatarConfig } from "@/bindings/AvatarConfig";
 import { SkillTreeConfig } from "@/bindings/SkillTreeConfig";
 import { AvatarSkillConfig } from "@/bindings/AvatarSkillConfig";
+import { EquipmentConfig } from "@/bindings/EquipmentConfig";
+import { EquipmentSkillConfig } from "@/bindings/EquipmentSkillConfig";
 
 const API = {
   mhyCharacterList: route<{ list: DbCharacter[] }>(
@@ -14,16 +15,33 @@ const API = {
     "GET"
   ),
   mhyCharacter: route<DbCharacter>("/honkai/mhy/character", "GET"),
-  mhySkill: route<List<SimpleSkill>>("/honkai/mhy/skill", "GET"),
   mhyBigTrace: route<List<SimpleSkill>>("/honkai/mhy/big_trace", "GET"),
-  lightConeList: route<List<LightCone>>("/honkai/light_cone", "GET"),
+  lightConeMetadata: route<EquipmentConfig>(
+    "/honkai/light_cone/:id/metadata",
+    "GET"
+  ),
+  lightConeMetadataMany: route<List<number>, List<EquipmentConfig>>(
+    "/honkai/light_cone/metadata"
+  ),
+  lightConeSkill: route<EquipmentSkillConfig>(
+    "/honkai/light_cone/:id/skill",
+    "GET"
+  ),
+  lightConeSkillMany: route<List<number>, List<EquipmentSkillConfig>>(
+    "/honkai/light_cone/skill"
+  ),
   character: route<AvatarConfig>("/honkai/avatar", "GET"),
   characters: route<List<number>, List<AvatarConfig>>("/honkai/avatar"),
-  lightCone: route<List<number>, List<LightCone>>("/honkai/light_cone"),
   signatureAtlas: route<List<SignatureAtlas>>("/honkai/signature_atlas", "GET"),
-  trace: route<List<SkillTreeConfig>>("/honkai/trace", "GET"),
-  skillsByCharId: route<List<AvatarSkillConfig>>("/honkai/skill", "GET"),
-  skills: route<List<number>, List<AvatarSkillConfig>>("/honkai/skills", "POST"),
+  trace: route<List<SkillTreeConfig>>("/honkai/trace/:id", "GET"),
+  skillsByCharId: route<List<AvatarSkillConfig>>(
+    "/honkai/avatar/:id/skill",
+    "GET"
+  ),
+  skills: route<List<number>, List<AvatarSkillConfig>>(
+    "/honkai/skills",
+    "POST"
+  ),
 };
 
 type ApiRoute = {

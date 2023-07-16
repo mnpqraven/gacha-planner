@@ -6,9 +6,9 @@ import { PathIcon } from "./PathIcon";
 import { HTMLAttributes, forwardRef } from "react";
 import { cn, range } from "@/lib/utils";
 import styles from "@/css/floating-card.module.css";
-import { Path } from "@/bindings/LightConeFull";
 import { Element } from "@/bindings/PatchBanner";
 import useCardEffect from "@/hooks/animation/useCardEffect";
+import { Path } from "@/bindings/AvatarConfig";
 
 type Props = {
   rarity: number;
@@ -41,7 +41,7 @@ const CharacterCard = ({
         <Image
           className={cn(
             "rounded-tr-3xl bg-gradient-to-b",
-            rarity === 5 ? "bg-[#d0aa6e]/[0.7]" : "bg-[#9c65d7]/[0.7]"
+            rarity === 5 ? "bg-[#d0aa6e]" : "bg-[#9c65d7]"
           )}
           src={imgUrl}
           alt={avatar_name}
@@ -54,6 +54,7 @@ const CharacterCard = ({
             element={damage_type}
             size="15%"
             className="absolute left-1 top-0"
+            ignoreTheme
           />
         )}
         <PathIcon
@@ -63,6 +64,7 @@ const CharacterCard = ({
             "absolute left-1 text-white",
             damage_type ? "top-[15%]" : "top-0"
           )}
+          ignoreTheme
         />
         <RarityIcon rarity={rarity} className="top-[85%] h-6 w-full" />
         <div ref={glowRef} className={cn("rounded-tr-3xl", styles["glow"])} />

@@ -8,7 +8,6 @@ import {
   TabsTrigger,
 } from "@/app/components/ui/Tabs";
 import API from "@/server/typedEndpoints";
-import Image from "next/image";
 import { TraceSummaryWrapper } from "./TraceSummaryWrapper";
 import { SignatureLightCone } from "./SignatureLightCone";
 
@@ -20,64 +19,48 @@ export default async function Character({ params }: Props) {
   const { slug } = params;
   const characterId = parseInt(slug);
   const character = await API.mhyCharacter.get(characterId);
-  const { list: skills } = await API.mhySkill.get(characterId);
+  const { list: skills } = await API.skillsByCharId.get(characterId);
 
   return (
-    <>
-      <div className="aspect-square">
-        <Image
-          src={portraitUrl(characterId)}
-          width={2048}
-          height={2048}
-          className="place-self-start object-contain"
-          alt={character.name}
+    <Tabs defaultValue="skill">
+      <TabsList className="h-fit [&>*]:whitespace-pre-wrap">
+        <TabsTrigger value="skill">Skills</TabsTrigger>
+        <TabsTrigger value="eidolon">Eidolons</TabsTrigger>
+        <TabsTrigger value="sig-lc">Signature Light Cone</TabsTrigger>
+        <TabsTrigger value="trace">Traces</TabsTrigger>
+      </TabsList>
+      <TabsContent value="skill">
+        <SkillOverview
+          skills={skills}
+          characterId={characterId}
+          maxEnergy={character.max_sp}
         />
-      </div>
+      </TabsContent>
 
-      <Tabs defaultValue="skill">
-        <TabsList className="h-fit [&>*]:whitespace-pre-wrap">
-          <TabsTrigger value="skill">Skills</TabsTrigger>
-          <TabsTrigger value="eidolon">Eidolons</TabsTrigger>
-          <TabsTrigger value="sig-lc">Signature Light Cone</TabsTrigger>
-          <TabsTrigger value="trace">Traces</TabsTrigger>
-        </TabsList>
-        <TabsContent value="skill">
-          <SkillOverview
-            skills={skills}
-            characterId={characterId}
-            maxEnergy={character.max_sp}
-          />
-        </TabsContent>
+      <TabsContent value="eidolon">
+        <EidolonTable characterId={characterId} />
+      </TabsContent>
 
-        <TabsContent value="eidolon">
-          <EidolonTable characterId={characterId} />
-        </TabsContent>
+      <TabsContent value="sig-lc">
+        <SignatureLightCone characterId={characterId} />
+      </TabsContent>
 
-        <TabsContent value="sig-lc">
-          <SignatureLightCone characterId={characterId} />
-        </TabsContent>
-
-        <TabsContent value="trace">
-          <div className="mt-2 flex flex-col items-center gap-4 xl:flex-row xl:items-start">
-            <div className="flex w-[30rem] grow justify-center">
-              <TraceTable
-                characterId={characterId}
-                wrapperSize={480}
-                path={character.path}
-                maxEnergy={character.max_sp}
-              />
-            </div>
-
-            <div className="w-full">
-              <TraceSummaryWrapper characterId={characterId} />
-            </div>
+      <TabsContent value="trace">
+        <div className="mt-2 flex flex-col items-center gap-4 xl:flex-row xl:items-start">
+          <div className="flex w-[30rem] grow justify-center">
+            <TraceTable
+              characterId={characterId}
+              wrapperSize={480}
+              path={character.path}
+              maxEnergy={character.max_sp}
+            />
           </div>
-        </TabsContent>
-      </Tabs>
-    </>
-  );
-}
 
-function portraitUrl(charId: number | string): string {
-  return `https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/image/character_portrait/${charId}.png`;
+          <div className="w-full">
+            <TraceSummaryWrapper characterId={characterId} />
+          </div>
+        </div>
+      </TabsContent>
+    </Tabs>
+  );
 }

@@ -46,6 +46,7 @@ import { CalendarFooter } from "./CalendarFooter";
 import { CurrentRollTab } from "./CurrentRollTab";
 import { RailPassField } from "./RailPassField";
 import { BattlePassField } from "./BattlePassField";
+import { Switch } from "../ui/Switch";
 
 type Props = {
   submitButton?: boolean;
@@ -64,6 +65,7 @@ export const defaultFormValues: FormSchema = {
   },
   eq: "Zero",
   moc: 0,
+  mocCurrentWeekDone: true,
   currentRolls: 0,
 };
 
@@ -105,7 +107,7 @@ export default function JadeEstimateForm({
 
   useEffect(() => {
     debounceOnChange(null);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [untilDateSubscription]);
 
   useEffect(() => {
@@ -116,7 +118,7 @@ export default function JadeEstimateForm({
       setMonthController(updatedDate);
       setUncontrolledQueryPayload(savedFormData);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [savedFormData]);
 
   useEffect(() => {
@@ -199,7 +201,7 @@ export default function JadeEstimateForm({
                   <FormDescription>The date that you'll pull</FormDescription>
                   <FormMessage />
                 </div>
-                <div className="flex flex-col lg:flex-row gap-4">
+                <div className="flex flex-col gap-4 lg:flex-row">
                   <FormField
                     control={form.control}
                     name="server"
@@ -360,41 +362,64 @@ export default function JadeEstimateForm({
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="moc"
-          render={({ field }) => (
-            <FormItem>
-              <div className="flex items-center space-x-4 rounded-md border p-4">
-                <div className="flex-1 space-y-1">
-                  <FormLabel>Memory of Chaos</FormLabel>
-                  <FormDescription>
-                    Amount of stars you can clear in a MoC cycle
-                  </FormDescription>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="moc"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-center space-x-4 rounded-md border p-4">
+                  <div className="flex-1 space-y-1">
+                    <FormLabel>Memory of Chaos</FormLabel>
+                    <FormDescription>
+                      Amount of stars you can clear in a MoC cycle
+                    </FormDescription>
+                  </div>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={String(form.watch("moc"))}
+                    defaultValue={String(field.value)}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-fit">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {mocStars().map((value) => (
+                        <SelectItem value={String(value)} key={value}>
+                          {value} ✦
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
                 </div>
-                <Select
-                  onValueChange={field.onChange}
-                  value={String(form.watch("moc"))}
-                  defaultValue={String(field.value)}
-                >
-                  <FormControl>
-                    <SelectTrigger className="w-fit">
-                      <SelectValue />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {mocStars().map((value) => (
-                      <SelectItem value={String(value)} key={value}>
-                        {value} ✦
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </div>
-            </FormItem>
-          )}
-        />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="mocCurrentWeekDone"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-center space-x-4 rounded-md border p-4">
+                  <div className="flex-1 space-y-1">
+                    <FormLabel>Current Cycle Completed</FormLabel>
+                    <FormDescription>
+                      Whether you have completed the current MoC cycle
+                    </FormDescription>
+                  </div>
+                  <Switch
+                    onCheckedChange={field.onChange}
+                    checked={field.value}
+                  />
+                </div>
+              </FormItem>
+            )}
+          />
+        </div>
         <CurrentRollTab form={form} />
         {submitButton && <Button type="submit">Calculate</Button>}
       </form>

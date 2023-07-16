@@ -9,14 +9,16 @@ import {
   CardTitle,
 } from "@/app/components/ui/Card";
 import { Slider } from "@/app/components/ui/Slider";
-import { LightCone } from "@/bindings/LightConeFull";
+import { EquipmentConfig } from "@/bindings/EquipmentConfig";
+import { EquipmentSkillConfig } from "@/bindings/EquipmentSkillConfig";
 import { useState } from "react";
 
 type Props = {
-  data: LightCone;
+  data: EquipmentConfig;
+  skill: EquipmentSkillConfig;
   ranking?: boolean;
 };
-function Content({ data: lc, ranking = false }: Props) {
+function Content({ data, skill, ranking = false }: Props) {
   const [promotion, setPromotion] = useState(0);
 
   return (
@@ -24,8 +26,8 @@ function Content({ data: lc, ranking = false }: Props) {
       <Card className="flex-1">
         <div className="flex items-center justify-between">
           <CardHeader>
-            <CardTitle>{lc.metadata.equipment_name}</CardTitle>
-            <CardDescription>{lc.skill.skill_name}</CardDescription>
+            <CardTitle>{data.equipment_name}</CardTitle>
+            <CardDescription>{skill.skill_name}</CardDescription>
           </CardHeader>
 
           {/* <div className="mr-6 flex w-48 flex-col"> */}
@@ -44,8 +46,8 @@ function Content({ data: lc, ranking = false }: Props) {
         </div>
         <CardContent>
           <SkillDescription
-            description={lc.skill.skill_desc}
-            params={lc.skill.param_list}
+            skillDesc={skill.skill_desc}
+            paramList={skill.param_list}
             slv={promotion}
           />
         </CardContent>

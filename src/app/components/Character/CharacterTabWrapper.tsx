@@ -10,16 +10,17 @@ import { DbAttributeProperty } from "@/bindings/DbAttributeProperty";
 import API from "@/server/typedEndpoints";
 
 type Props = {
-  data: Character;
   characterId: number;
 };
-const CharacterTabWrapper = ({
-  data: { skills, maxEnergy },
-  characterId,
-}: Props) => {
+const CharacterTabWrapper = ({ characterId }: Props) => {
   const { data } = useQuery({
     queryKey: ["character", characterId],
     queryFn: async () => await API.character.get(characterId),
+  });
+
+  const { data: skills } = useQuery({
+    queryKey: ["skillsByCharId", characterId],
+    queryFn: async () => await API.skillsByCharId.get(characterId),
   });
 
   const client = useQueryClient();
@@ -31,11 +32,9 @@ const CharacterTabWrapper = ({
       ),
   });
 
-  if (!data) return null;
+  if (!data || !skills) return null;
 
-  const {
-    list: [{ avatar_base_type }],
-  } = data;
+  const { avatar_base_type, spneed: maxEnergy } = data;
 
   return (
     <>
@@ -48,7 +47,7 @@ const CharacterTabWrapper = ({
 
         <TabsContent value="skills">
           <SkillOverview
-            skills={skills}
+            skills={skills.list}
             characterId={characterId}
             maxEnergy={maxEnergy}
           />
