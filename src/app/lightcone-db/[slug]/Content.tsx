@@ -18,10 +18,9 @@ import { useState } from "react";
 type Props = {
   data: EquipmentConfig;
   skill: EquipmentSkillConfig;
-  ranking?: boolean;
   link?: boolean;
 };
-function Content({ data, skill, ranking = false, link = false }: Props) {
+function Content({ data, skill, link = false }: Props) {
   const [promotion, setPromotion] = useState(0);
 
   return (
@@ -67,15 +66,6 @@ function Content({ data, skill, ranking = false, link = false }: Props) {
           />
         </CardContent>
       </Card>
-
-      {ranking && (
-        <Card className="flex-1">
-          <CardHeader>
-            <CardTitle>Stat Ranking</CardTitle>
-          </CardHeader>
-          <CardContent>Coming soon!</CardContent>
-        </Card>
-      )}
     </div>
   );
 }

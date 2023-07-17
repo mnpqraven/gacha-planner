@@ -15,7 +15,7 @@ import { ParentSize } from "@visx/responsive";
 import { ParentSizeProvidedProps } from "@visx/responsive/lib/components/ParentSize";
 import { scaleBand, scaleLinear } from "@visx/scale";
 import { Bar } from "@visx/shape";
-import { withTooltip } from "@visx/tooltip";
+import { useTooltip, withTooltip } from "@visx/tooltip";
 import { useMemo } from "react";
 
 const DEFAULT_INDEX = 6;
@@ -31,13 +31,13 @@ type TooltipData = {
   y: number;
   color: string;
 };
-const LightConeRanking = withTooltip<Props, TooltipData>(({ id }: Props) => {
+const LightConeRanking = ({ id }: Props) => {
   const { data } = useQuery({
     queryKey: ["lightConeRanking"],
     queryFn: async () => await API.lightConeRanking.get(),
   });
 
-  if (!data) return "loading";
+  if (!data) return <>loading</>;
 
   // by atk for now
   const sortedList = data.list.sort(
@@ -53,36 +53,42 @@ const LightConeRanking = withTooltip<Props, TooltipData>(({ id }: Props) => {
       <CardContent>
         <ParentSize debounceTime={10}>
           {(parent) => (
-            <RankingChart data={sortedList} {...parent} height={400} />
+            <RankingChart data={sortedList} {...parent} height={1200} />
           )}
         </ParentSize>
       </CardContent>
     </Card>
   );
-});
+};
 
 interface ChartProps extends ParentSizeProvidedProps {
   data: EquipmentRanking[];
 }
 const RankingChart = ({ data, height, width }: ChartProps) => {
-  console.log(width, height);
+  const xMax = width;
+  const yMax = height;
+  const tooltip = useTooltip();
+
+  // x axis: value
   const xScale = useMemo(
     () =>
-      scaleBand({
-        range: [0, width],
-        round: true,
-        domain: data.map((e) => e.equipment_id),
-        padding: 0.4,
-      }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [width]
-  );
-  const yScale = useMemo(
-    () =>
-      scaleLinear({
-        range: [height, 0],
+      scaleLinear<number>({
+        range: [xMax, 0],
         round: true,
         domain: [0, Math.max(...data.map((e) => e.atk[DEFAULT_INDEX]))],
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [xMax]
+  );
+
+  // yaxis: ID
+  const yScale = useMemo(
+    () =>
+      scaleBand<string>({
+        range: [0, yMax],
+        round: true,
+        domain: data.map((e) => e.equipment_name),
+        padding: 0.4,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [height]
@@ -92,18 +98,20 @@ const RankingChart = ({ data, height, width }: ChartProps) => {
     <svg width={width} height={height}>
       <Group>
         {data.map((dataPoint, index) => {
-          const barWidth = xScale.bandwidth();
-          const barHeight = height - yScale(dataPoint.atk[DEFAULT_INDEX]);
-          const barX = xScale(dataPoint.equipment_id);
-          const barY = height - barHeight;
+          const barHeight = yScale.bandwidth();
+          const barWidth = width - (xScale(dataPoint.atk[DEFAULT_INDEX]) ?? 0);
+
+          const barY = yScale(dataPoint.equipment_name);
+          const barX = xMax - barWidth
 
           return (
             <Bar
-              key={index}
               x={barX}
               y={barY}
               width={barWidth}
               height={barHeight}
+              fill="rgba(23, 233, 217, .5)"
+              key={`bar-${index}`}
             />
           );
         })}
