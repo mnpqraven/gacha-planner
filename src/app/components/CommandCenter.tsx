@@ -107,10 +107,6 @@ const CommandCenter = ({ routes }: Props) => {
   }
 
   useEffect(() => {
-    console.log(filteredChar, filteredLc);
-  }, [filteredChar, filteredLc]);
-
-  useEffect(() => {
     if (!open) {
       setFilteredChar([]);
       setFilteredLc([]);
@@ -141,37 +137,35 @@ const CommandCenter = ({ routes }: Props) => {
           <CommandEmpty>No results found.</CommandEmpty>
           {filteredChar.length > 0 && (
             <CommandGroup heading="Character">
-              {filteredChar.map(
-                (chara) => (
-                  <CommandItem
-                    key={chara.avatar_id}
-                    value={keysChar.map(key => chara[key]).join('-')}
-                    className="w-full justify-between"
-                    onSelect={() => {
-                      router.push(`/character-db/${chara.avatar_id}`);
-                      setOpen(false);
-                    }}
-                  >
-                    <div className="flex gap-2">
-                      <PathIcon path={chara.avatar_base_type} size="auto" />
-                      <ElementIcon element={chara.damage_type} size="auto" />
-                      <span>{chara.avatar_name}</span>
-                    </div>
+              {filteredChar.map((chara) => (
+                <CommandItem
+                  key={chara.avatar_id}
+                  value={keysChar.map((key) => chara[key]).join("-")}
+                  className="w-full justify-between"
+                  onSelect={() => {
+                    router.push(`/character-db/${chara.avatar_id}`);
+                    setOpen(false);
+                  }}
+                >
+                  <div className="flex gap-2">
+                    <PathIcon path={chara.avatar_base_type} size="auto" />
+                    <ElementIcon element={chara.damage_type} size="auto" />
+                    <span>{chara.avatar_name}</span>
+                  </div>
 
-                    <div className="flex">
-                      {Array.from(range(1, chara.rarity, 1)).map((rarity) => (
-                        <Image
-                          key={rarity}
-                          width={20}
-                          height={20}
-                          src="/Star.png"
-                          alt={`${rarity} *`}
-                        />
-                      ))}
-                    </div>
-                  </CommandItem>
-                )
-              )}
+                  <div className="flex">
+                    {Array.from(range(1, chara.rarity, 1)).map((rarity) => (
+                      <Image
+                        key={rarity}
+                        width={20}
+                        height={20}
+                        src="/Star.png"
+                        alt={`${rarity} *`}
+                      />
+                    ))}
+                  </div>
+                </CommandItem>
+              ))}
             </CommandGroup>
           )}
           {filteredLc.length > 0 && (
@@ -179,7 +173,7 @@ const CommandCenter = ({ routes }: Props) => {
               {filteredLc.map((lc) => (
                 <CommandItem
                   key={lc.equipment_id}
-                  value={keysLc.map(key => lc[key]).join('-')}
+                  value={keysLc.map((key) => lc[key]).join("-")}
                   className="w-full justify-between"
                   onSelect={() => {
                     router.push(`/lightcone-db/${lc.equipment_id}`);
