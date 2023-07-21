@@ -11,11 +11,6 @@ import { EquipmentSkillConfig } from "@/bindings/EquipmentSkillConfig";
 import { EquipmentRanking } from "@/bindings/EquipmentRanking";
 
 const API = {
-  mhyCharacterList: route<{ list: DbCharacter[] }>(
-    "/honkai/mhy/character",
-    "GET"
-  ),
-  mhyCharacter: route<DbCharacter>("/honkai/mhy/character", "GET"),
   mhyBigTrace: route<List<SimpleSkill>>("/honkai/mhy/big_trace", "GET"),
   lightConeMetadata: route<EquipmentConfig>(
     "/honkai/light_cone/:id/metadata",

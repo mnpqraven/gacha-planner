@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useState } from "react";
 import { Toggle } from "../ui/Toggle";
-import { cn, sanitizeNewline } from "@/lib/utils";
+import { sanitizeNewline } from "@/lib/utils";
 import { Badge } from "../ui/Badge";
 
 type Props = {

@@ -30,6 +30,21 @@ import { useCallback, useMemo, useState } from "react";
 type Props = {
   id: number;
 };
+
+// hp atk def
+const hpColor = "#10b981";
+const atkColor = "#f43f5e";
+const defColor = "#0ea5e9";
+const activeColors = [hpColor, atkColor, defColor];
+
+const inactiveHpColor = "#022c22";
+const inactiveAtkColor = "#4c0519";
+const inactiveDefColor = "#082f49";
+const inactiveColors = [inactiveHpColor, inactiveAtkColor, inactiveDefColor];
+
+const textActive = "#212529";
+const textInactive = "#ADB5BD";
+
 const LightConeRanking = ({ id }: Props) => {
   const { data } = useQuery({
     queryKey: ["lightConeRanking"],
@@ -71,7 +86,7 @@ const LightConeRanking = ({ id }: Props) => {
           onValueChange={(e) => setDatakey(e as typeof dataKey)}
           defaultValue={dataKey}
         >
-          <SelectTrigger className="mb-4">
+          <SelectTrigger className="sticky top-0 bg-background">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -81,20 +96,22 @@ const LightConeRanking = ({ id }: Props) => {
             <SelectItem value="all">All</SelectItem>
           </SelectContent>
         </Select>
-        <ParentSize debounceTime={10}>
-          {(parent) =>
-            accessor ? (
-              <RankingChart
-                data={sortedList}
-                currentLcId={id}
-                dataAccessor={accessor()}
-                {...parent}
-                height={sortedList.length * 40}
-                promotion={DEFAULT_INDEX}
-              />
-            ) : null
-          }
-        </ParentSize>
+        <div className="mt-4 h-[450px] overflow-auto rounded-md">
+          <ParentSize debounceTime={10}>
+            {(parent) =>
+              accessor ? (
+                <RankingChart
+                  data={sortedList}
+                  currentLcId={id}
+                  dataAccessor={accessor()}
+                  {...parent}
+                  height={sortedList.length * 40}
+                  promotion={DEFAULT_INDEX}
+                />
+              ) : null
+            }
+          </ParentSize>
+        </div>
       </CardContent>
     </Card>
   );
@@ -137,6 +154,8 @@ const RankingChart = ({
   const { containerRef, TooltipInPortal } = useTooltipInPortal({
     scroll: true,
   });
+  const currentLcIndex = data.findIndex((e) => e.equipment_id === currentLcId);
+
 
   // x axis: value
   const xScale = useMemo(
@@ -210,7 +229,7 @@ const RankingChart = ({
                     showTooltip({
                       tooltipData: toTooltipData(dataPoint, DEFAULT_INDEX),
                       tooltipTop: eventSvgCoords?.y,
-                      tooltipLeft: left,
+                      tooltipLeft: eventSvgCoords?.x,
                     });
                   }}
                 />
@@ -219,8 +238,15 @@ const RankingChart = ({
             <AxisRight
               scale={yScale}
               numTicks={99}
-              tickLabelProps={{ fontSize: 14, fontWeight: 600 }}
+              tickLabelProps={(_name, index) => ({
+                fontSize: 14,
+                fontWeight: 600,
+                fontFamily: "Arial",
+                verticalAnchor: "middle",
+                fill: index === currentLcIndex ? textActive : textInactive,
+              })}
               hideAxisLine
+              tickFormat={(name, index) => `#${index + 1} ${name}`}
               hideTicks
             />
           </Group>
@@ -237,15 +263,12 @@ const RankingChart = ({
     );
 
   // sum graph
-  const purple1 = "#6c5efb";
-  const purple2 = "#c998ff";
-  const purple3 = "#a44afe";
 
   type MultiKeys = "atk" | "def" | "hp";
   const keys: MultiKeys[] = ["hp", "atk", "def"];
   const colorScale = scaleOrdinal<MultiKeys, string>({
     domain: keys,
-    range: [purple1, purple2, purple3],
+    range: activeColors,
   });
 
   const omittedIndexData = data.map((e) => {
@@ -278,7 +301,10 @@ const RankingChart = ({
           >
             {(barStacks) =>
               barStacks.map((barStack) =>
-                barStack.bars.map((bar, index) => {
+                barStack.bars.map((bar) => {
+                  const isActive = bar.index == currentLcIndex;
+                  const colors = isActive ? activeColors : inactiveColors;
+
                   return (
                     <rect
                       key={`barstack-horizontal-${barStack.index}-${bar.index}`}
@@ -287,7 +313,27 @@ const RankingChart = ({
                       rx={6}
                       width={bar.width}
                       height={bar.height}
-                      fill={bar.color}
+                      fill={colors[barStack.index]}
+                      onMouseLeave={() => {
+                        tooltipTimeout = window.setTimeout(() => {
+                          hideTooltip();
+                        }, 300);
+                      }}
+                      onMouseMove={(event) => {
+                        if (tooltipTimeout) clearTimeout(tooltipTimeout);
+                        // TooltipInPortal expects coordinates to be relative to containerRef
+                        // localPoint returns coordinates relative to the nearest SVG, which
+                        // is what containerRef is set to in this example.
+                        const eventSvgCoords = localPoint(event);
+                        showTooltip({
+                          tooltipData: toTooltipData(
+                            data[bar.index],
+                            DEFAULT_INDEX
+                          ),
+                          tooltipTop: eventSvgCoords?.y,
+                          tooltipLeft: eventSvgCoords?.x,
+                        });
+                      }}
                     />
                   );
                 })
@@ -296,8 +342,15 @@ const RankingChart = ({
           </BarStackHorizontal>
           <AxisRight
             scale={yScale}
-            numTicks={99}
-            tickLabelProps={{ fontSize: 14, fontWeight: 600 }}
+            numTicks={999}
+            tickLabelProps={(_name, index) => ({
+              fontSize: 14,
+              fontWeight: 600,
+              fontFamily: "Arial",
+              verticalAnchor: "middle",
+              fill: index === currentLcIndex ? textActive : textInactive,
+            })}
+            tickFormat={(name, index) => `#${index + 1} ${name}`}
             hideAxisLine
             hideTicks
           />
