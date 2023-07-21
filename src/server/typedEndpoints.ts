@@ -8,13 +8,9 @@ import { SkillTreeConfig } from "@/bindings/SkillTreeConfig";
 import { AvatarSkillConfig } from "@/bindings/AvatarSkillConfig";
 import { EquipmentConfig } from "@/bindings/EquipmentConfig";
 import { EquipmentSkillConfig } from "@/bindings/EquipmentSkillConfig";
+import { EquipmentRanking } from "@/bindings/EquipmentRanking";
 
 const API = {
-  mhyCharacterList: route<{ list: DbCharacter[] }>(
-    "/honkai/mhy/character",
-    "GET"
-  ),
-  mhyCharacter: route<DbCharacter>("/honkai/mhy/character", "GET"),
   mhyBigTrace: route<List<SimpleSkill>>("/honkai/mhy/big_trace", "GET"),
   lightConeMetadata: route<EquipmentConfig>(
     "/honkai/light_cone/:id/metadata",
@@ -30,6 +26,7 @@ const API = {
   lightConeSkillMany: route<List<number>, List<EquipmentSkillConfig>>(
     "/honkai/light_cone/skill"
   ),
+  lightConeRanking: route<List<EquipmentRanking>>('/honkai/light_cone/ranking', 'GET'),
   character: route<AvatarConfig>("/honkai/avatar", "GET"),
   characters: route<List<number>, List<AvatarConfig>>("/honkai/avatar"),
   signatureAtlas: route<List<SignatureAtlas>>("/honkai/signature_atlas", "GET"),

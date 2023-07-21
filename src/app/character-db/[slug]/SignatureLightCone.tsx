@@ -89,7 +89,7 @@ const SignatureLightCone = ({ characterId }: Props) => {
               ))}
             </div>
 
-            <Content data={selectedLc.metadata} skill={selectedLc.skill} />
+            <Content data={selectedLc.metadata} skill={selectedLc.skill} link />
           </div>
         )}
       </div>

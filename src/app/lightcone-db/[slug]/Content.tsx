@@ -11,14 +11,16 @@ import {
 import { Slider } from "@/app/components/ui/Slider";
 import { EquipmentConfig } from "@/bindings/EquipmentConfig";
 import { EquipmentSkillConfig } from "@/bindings/EquipmentSkillConfig";
+import { ExternalLink } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 type Props = {
   data: EquipmentConfig;
   skill: EquipmentSkillConfig;
-  ranking?: boolean;
+  link?: boolean;
 };
-function Content({ data, skill, ranking = false }: Props) {
+function Content({ data, skill, link = false }: Props) {
   const [promotion, setPromotion] = useState(0);
 
   return (
@@ -26,7 +28,19 @@ function Content({ data, skill, ranking = false }: Props) {
       <Card className="flex-1">
         <div className="flex items-center justify-between">
           <CardHeader>
-            <CardTitle>{data.equipment_name}</CardTitle>
+            <CardTitle>
+              {link ? (
+                <Link
+                  href={`/lightcone-db/${data.equipment_id}`}
+                  className="hover:underline flex items-center"
+                >
+                  {data.equipment_name}
+                  <ExternalLink className="ml-1 h-4 w-4" />
+                </Link>
+              ) : (
+                <span>{data.equipment_name}</span>
+              )}
+            </CardTitle>
             <CardDescription>{skill.skill_name}</CardDescription>
           </CardHeader>
 
@@ -52,15 +66,6 @@ function Content({ data, skill, ranking = false }: Props) {
           />
         </CardContent>
       </Card>
-
-      {ranking && (
-        <Card className="flex-1">
-          <CardHeader>
-            <CardTitle>Stat Ranking</CardTitle>
-          </CardHeader>
-          <CardContent>Coming soon!</CardContent>
-        </Card>
-      )}
     </div>
   );
 }

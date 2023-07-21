@@ -1,7 +1,6 @@
 "use client";
 
 import { DbAttributeProperty, Property } from "@/bindings/DbAttributeProperty";
-import { DbCharacterSkillTree } from "@/bindings/DbCharacterSkillTree";
 import { IMAGE_URL } from "@/server/endpoints";
 import { HTMLAttributes, forwardRef } from "react";
 import Image from "next/image";
