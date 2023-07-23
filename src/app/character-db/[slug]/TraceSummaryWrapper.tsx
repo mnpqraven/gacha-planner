@@ -7,7 +7,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/app/components/ui/Accordion";
-import { DbAttributeProperty } from "@/bindings/DbAttributeProperty";
 import ENDPOINT from "@/server/endpoints";
 import { typedFetch } from "@/server/fetchHelper";
 import API from "@/server/typedEndpoints";
@@ -23,11 +22,8 @@ const TraceSummaryWrapper = ({ characterId }: Props) => {
   });
 
   const { data: properties } = useQuery({
-    queryKey: ["attribute_property"],
-    queryFn: async () =>
-      await typedFetch<undefined, { list: DbAttributeProperty[] }>(
-        ENDPOINT.mhyAttributeProperty
-      ),
+    queryKey: ["properties"],
+    queryFn: async () => await API.properties.get(),
   });
 
   if (!data || !properties) return null;

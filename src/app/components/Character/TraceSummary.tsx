@@ -1,20 +1,20 @@
 "use client";
 
-import { DbAttributeProperty, Property } from "@/bindings/DbAttributeProperty";
 import { IMAGE_URL } from "@/server/endpoints";
 import { HTMLAttributes, forwardRef } from "react";
 import Image from "next/image";
 import { asPercentage } from "@/lib/utils";
 import { SkillTreeConfig } from "@/bindings/SkillTreeConfig";
+import { AvatarPropertyConfig } from "@/bindings/AvatarPropertyConfig";
 
 type Haystack = {
-  [Key in Property]?: { value: number; icon: string; label: string };
+  [key in string]?: { value: number; icon: string; label: string };
 };
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   characterId: number;
   skills: SkillTreeConfig[];
-  properties: DbAttributeProperty[];
+  properties: AvatarPropertyConfig[];
 }
 
 const TraceSummary = forwardRef<HTMLDivElement, Props>(
@@ -59,7 +59,7 @@ const TraceSummary = forwardRef<HTMLDivElement, Props>(
                   height={128}
                   className="aspect-square h-8 w-8"
                 />
-                {properties.find((e) => e.type == (key as Property))?.name}
+                {properties.find((e) => e.property_type == key)?.property_name}
               </div>
 
               <div>{asPercentage(hay[key as keyof typeof hay]?.value)}</div>
@@ -72,7 +72,7 @@ const TraceSummary = forwardRef<HTMLDivElement, Props>(
 TraceSummary.displayName = "TraceSummary";
 
 function propertyUrl(icon: string | undefined) {
-  const lastSlash = icon?.lastIndexOf('/')
+  const lastSlash = icon?.lastIndexOf("/");
   return `${IMAGE_URL}icon/property${icon?.slice(lastSlash)}`;
 }
 

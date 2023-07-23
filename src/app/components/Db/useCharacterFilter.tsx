@@ -1,5 +1,4 @@
-import { AvatarConfig } from "@/bindings/AvatarConfig";
-import { Element, Path } from "@/bindings/DbCharacter";
+import { AvatarConfig, Element, Path } from "@/bindings/AvatarConfig";
 import { useState } from "react";
 
 export default function useCharacterFilter() {

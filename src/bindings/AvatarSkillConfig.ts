@@ -1,7 +1,4 @@
 export type SkillType = "Normal" | "BPSkill" | "Ultra" | "Talent" | "MazeNormal" | "Maze";
-/**
- * Usually served to the front end and connect string slices there
- */
 
 export type ParameterizedDescription = string[];
 

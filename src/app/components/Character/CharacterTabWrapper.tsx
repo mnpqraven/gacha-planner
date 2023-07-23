@@ -1,4 +1,3 @@
-import { Character } from "@/bindings/PatchBanner";
 import { SkillOverview } from "./SkillOverview";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
 import { TraceTable } from "./TraceTable";
@@ -6,7 +5,6 @@ import { EidolonTable } from "./EidolonTable";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { typedFetch } from "@/server/fetchHelper";
 import ENDPOINT from "@/server/endpoints";
-import { DbAttributeProperty } from "@/bindings/DbAttributeProperty";
 import API from "@/server/typedEndpoints";
 
 type Props = {
@@ -25,11 +23,8 @@ const CharacterTabWrapper = ({ characterId }: Props) => {
 
   const client = useQueryClient();
   client.prefetchQuery({
-    queryKey: ["attribute_property"],
-    queryFn: async () =>
-      await typedFetch<undefined, { list: DbAttributeProperty[] }>(
-        ENDPOINT.mhyAttributeProperty
-      ),
+    queryKey: ["properties"],
+    queryFn: async () => await API.properties.get(),
   });
 
   if (!data || !skills) return null;

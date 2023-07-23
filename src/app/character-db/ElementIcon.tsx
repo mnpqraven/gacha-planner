@@ -1,6 +1,5 @@
 "use client";
 
-import { Element } from "@/bindings/DbCharacter";
 import Fire from "@public/element/Fire.svg";
 import Physical from "@public/element/Physical.svg";
 import Ice from "@public/element/Ice.svg";
@@ -11,6 +10,7 @@ import Lightning from "@public/element/Lightning.svg";
 import { HTMLAttributes, forwardRef, useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { cva } from "class-variance-authority";
+import { Element } from "@/bindings/AvatarConfig";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   element: Element;

@@ -1,4 +1,4 @@
-import { SkillType } from "@/bindings/PatchBanner";
+import { SkillType } from "@/bindings/AvatarSkillConfig";
 import { ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 

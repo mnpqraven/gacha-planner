@@ -54,9 +54,6 @@ export type Property =
   | "SpeedDelta"
   | "SpeedAddedRatio"
   | "AllDamageTypeAddedRatio";
-/**
- * Usually served to the front end and connect string slices there
- */
 
 export type ParameterizedDescription = string[];
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { Path } from "@/bindings/DbCharacter";
+import { Path } from "@/bindings/AvatarConfig";
 import Abundance from "@public/path/Abundance.svg";
 import Destruction from "@public/path/Destruction.svg";
 import Erudition from "@public/path/Erudition.svg";

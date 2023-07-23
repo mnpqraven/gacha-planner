@@ -1,14 +1,15 @@
 "use client";
 
-import { DbCharacterEidolon } from "@/bindings/DbCharacterEidolon";
 import ENDPOINT from "@/server/endpoints";
 import { typedFetch } from "@/server/fetchHelper";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Toggle } from "../ui/Toggle";
 import { sanitizeNewline } from "@/lib/utils";
 import { Badge } from "../ui/Badge";
+import API from "@/server/typedEndpoints";
+import { AvatarRankConfig } from "@/bindings/AvatarRankConfig";
 
 type Props = {
   characterId: number;
@@ -18,17 +19,18 @@ const EidolonTable = ({ characterId }: Props) => {
   const [selectedEidolon, setSelectedEidolon] = useState(1);
   const { data } = useQuery({
     queryKey: ["eidolon", characterId],
-    queryFn: async () =>
-      await typedFetch<undefined, { list: DbCharacterEidolon[] }>(
-        ENDPOINT.mhyEidolon,
-        undefined,
-        characterId
-      ),
+    queryFn: async () => await API.eidolon.get(characterId),
   });
   if (!data) return null;
 
-  const bottom = data.list.sort((a, b) => a.rank - b.rank).slice(3);
-  const top = data.list.sort((a, b) => a.rank - b.rank).slice(0, 3);
+  const bottom = data.list
+    .filter((e) => e.rank <= 3)
+    .sort((a, b) => a.rank - b.rank);
+  const top = data.list
+    .filter((e) => e.rank > 3)
+    .sort((a, b) => a.rank - b.rank);
+
+  const currentEidolon = data.list.find((e) => e.rank === selectedEidolon);
 
   return (
     <>
@@ -42,9 +44,14 @@ const EidolonTable = ({ characterId }: Props) => {
       )}
 
       <div className="my-2 min-h-[8rem] whitespace-pre-wrap rounded-md border p-4">
-        {sanitizeNewline(
-          data?.list.find((e) => e.rank == selectedEidolon)?.desc
-        )}
+        {currentEidolon?.desc.map((descPart, index) => (
+          <Fragment key={index}>
+            <span className="whitespace-pre-wrap">{sanitizeNewline(descPart)}</span>
+            <span className="font-semibold text-accent-foreground">
+              {currentEidolon.param[index]}
+            </span>
+          </Fragment>
+        ))}
       </div>
 
       {bottom && (
@@ -60,7 +67,7 @@ const EidolonTable = ({ characterId }: Props) => {
 };
 
 type EidolonRowProps = {
-  data: DbCharacterEidolon[];
+  data: AvatarRankConfig[];
   selectedEidolon: number;
   setSelectedEidolon: (value: number) => void;
   characterId: number;
@@ -75,7 +82,7 @@ const EidolonRow = ({
     <div className="grid grid-cols-3 gap-2">
       {data.map((eidolon) => (
         <Toggle
-          key={eidolon.id}
+          key={eidolon.rank_id}
           className="flex h-full flex-1 flex-col justify-start gap-2 py-2 sm:flex-row"
           pressed={selectedEidolon === eidolon.rank}
           onPressedChange={() => setSelectedEidolon(eidolon.rank)}

@@ -19,9 +19,6 @@ export type Anchor =
   | "Point18";
 
 export type AssetPath = string;
-/**
- * Usually served to the front end and connect string slices there
- */
 
 export type ParameterizedDescription = string[];
 
