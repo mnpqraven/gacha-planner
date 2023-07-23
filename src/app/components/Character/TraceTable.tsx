@@ -9,8 +9,6 @@ import { cn, parseSkillType } from "@/lib/utils";
 import { VariantProps, cva } from "class-variance-authority";
 import Xarrow, { Xwrapper, useXarrow } from "react-xarrows";
 import { useEffect, useState } from "react";
-import { DbAttributeProperty } from "@/bindings/DbAttributeProperty";
-import { SimpleSkill } from "@/bindings/PatchBanner";
 import { Slider } from "../ui/Slider";
 import { SkillDescription } from "../Db/SkillDescription";
 import { useTheme } from "next-themes";
@@ -170,26 +168,6 @@ const TraceTableInner = ({
           ))}
       </Xwrapper>
     </div>
-  );
-};
-
-interface BigTraceDescriptionProps {
-  data: SimpleSkill | undefined;
-}
-const BigTraceDescription = ({ data: bigTrace }: BigTraceDescriptionProps) => {
-  if (!bigTrace) return null;
-
-  return (
-    <p className="text-justify">
-      {bigTrace.description.map((descPart, index) => (
-        <>
-          <span key={index}>{descPart}</span>
-          <span className="font-semibold text-accent-foreground">
-            {bigTrace.params[0][index]}
-          </span>
-        </>
-      ))}
-    </p>
   );
 };
 

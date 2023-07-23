@@ -29,39 +29,47 @@ const CalendarFooter = ({ date }: Props) => {
   const banner = futurePatchBannerList.list.find(hasDate);
 
   if (!start && !banner) return null;
-  const color = banner?.characterData.element
-    ? `border-${banner.characterData.element?.name.toLowerCase()}`
+  const color = banner?.characterData?.damage_type
+    ? `border-${banner.characterData.damage_type?.toLowerCase()}`
     : "";
 
   return (
-    <div className="flex items-center justify-evenly">
-      {banner && banner.characterData.icon && (
-        <Dialog>
-          <DialogTrigger>
-            <Image
-              src={`https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/${banner.characterData.icon}`}
-              alt={banner.characterData.characterName ?? ""}
-              className={cn("h-20 w-20 rounded-full border-2", color)}
-              width={128}
-              height={128}
-            />
-          </DialogTrigger>
-          <DialogContent className="min-h-[16rem] sm:max-w-4xl">
-            {banner.characterData.characterId && (
-              <CharacterTabWrapper characterId={banner.characterData.characterId} />
-            )}
-          </DialogContent>
-        </Dialog>
+    <div className="flex w-full flex-col justify-center">
+      {start && (
+        <span className="text-center">Start of patch {start.version}</span>
       )}
-      <ul>
-        {start && <li>Start of patch {start.version}</li>}
-        {banner && (
-          <>
-            <li>{banner.characterData.characterName} Banner</li>
-            <li>Click to view</li>
-          </>
-        )}
-      </ul>
+      {banner && banner.characterData && (
+        <div className="flex flex-col gap-2.5">
+          <p className="whitespace-pre-wrap text-center">
+            {banner.characterData.avatar_name}
+          </p>
+          <div className="flex gap-2.5">
+            <Dialog>
+              <DialogTrigger>
+                <Image
+                  src={`https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/icon/character/${banner.characterData.avatar_id}.png`}
+                  alt=""
+                  className={cn("h-20 w-20 rounded-full border-2", color)}
+                  width={128}
+                  height={128}
+                />
+              </DialogTrigger>
+              <DialogContent className="min-h-[16rem] sm:max-w-4xl">
+                {banner.characterData.avatar_id && (
+                  <CharacterTabWrapper
+                    characterId={banner.characterData.avatar_id}
+                  />
+                )}
+              </DialogContent>
+            </Dialog>
+
+            <div className="flex flex-col">
+              {banner.characterData.rarity} ✦{" "}
+              {banner.characterData.avatar_base_type}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

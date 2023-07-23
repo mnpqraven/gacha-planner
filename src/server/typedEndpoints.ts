@@ -1,6 +1,4 @@
-import { SimpleSkill } from "@/bindings/PatchBanner";
 import { serverFetch } from "./serverFetch";
-import { DbCharacter } from "@/bindings/DbCharacter";
 import { SignatureAtlas } from "@/bindings/SignatureAtlas";
 import { List } from "@/lib/generics";
 import { AvatarConfig } from "@/bindings/AvatarConfig";
@@ -8,14 +6,15 @@ import { SkillTreeConfig } from "@/bindings/SkillTreeConfig";
 import { AvatarSkillConfig } from "@/bindings/AvatarSkillConfig";
 import { EquipmentConfig } from "@/bindings/EquipmentConfig";
 import { EquipmentSkillConfig } from "@/bindings/EquipmentSkillConfig";
+import { EquipmentRanking } from "@/bindings/EquipmentRanking";
+import { AvatarPropertyConfig } from "@/bindings/AvatarPropertyConfig";
+import { AvatarRankConfig } from "@/bindings/AvatarRankConfig";
+import { Patch } from "@/bindings/Patch";
+import { PatchBanner } from "@/bindings/PatchBanner";
 
 const API = {
-  mhyCharacterList: route<{ list: DbCharacter[] }>(
-    "/honkai/mhy/character",
-    "GET"
-  ),
-  mhyCharacter: route<DbCharacter>("/honkai/mhy/character", "GET"),
-  mhyBigTrace: route<List<SimpleSkill>>("/honkai/mhy/big_trace", "GET"),
+  patchDates: route<List<Patch>>("/honkai/patch_dates", "GET"),
+  patchBanners: route<List<PatchBanner>>("/honkai/patch_banners", "GET"),
   lightConeMetadata: route<EquipmentConfig>(
     "/honkai/light_cone/:id/metadata",
     "GET"
@@ -30,18 +29,20 @@ const API = {
   lightConeSkillMany: route<List<number>, List<EquipmentSkillConfig>>(
     "/honkai/light_cone/skill"
   ),
+  lightConeRanking: route<List<EquipmentRanking>>(
+    "/honkai/light_cone/ranking",
+    "GET"
+  ),
   character: route<AvatarConfig>("/honkai/avatar", "GET"),
   characters: route<List<number>, List<AvatarConfig>>("/honkai/avatar"),
   signatureAtlas: route<List<SignatureAtlas>>("/honkai/signature_atlas", "GET"),
-  trace: route<List<SkillTreeConfig>>("/honkai/trace/:id", "GET"),
   skillsByCharId: route<List<AvatarSkillConfig>>(
     "/honkai/avatar/:id/skill",
     "GET"
   ),
-  skills: route<List<number>, List<AvatarSkillConfig>>(
-    "/honkai/skills",
-    "POST"
-  ),
+  trace: route<List<SkillTreeConfig>>("/honkai/avatar/:id/trace", "GET"),
+  properties: route<List<AvatarPropertyConfig>>("/honkai/properties", "GET"),
+  eidolon: route<List<AvatarRankConfig>>("/honkai/avatar/:id/eidolon", "GET"),
 };
 
 type ApiRoute = {

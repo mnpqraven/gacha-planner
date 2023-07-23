@@ -18,7 +18,7 @@ interface Props {
 export default async function Character({ params }: Props) {
   const { slug } = params;
   const characterId = parseInt(slug);
-  const character = await API.mhyCharacter.get(characterId);
+  const character = await API.character.get(characterId);
   const { list: skills } = await API.skillsByCharId.get(characterId);
 
   return (
@@ -29,11 +29,12 @@ export default async function Character({ params }: Props) {
         <TabsTrigger value="sig-lc">Signature Light Cone</TabsTrigger>
         <TabsTrigger value="trace">Traces</TabsTrigger>
       </TabsList>
+
       <TabsContent value="skill">
         <SkillOverview
           skills={skills}
           characterId={characterId}
-          maxEnergy={character.max_sp}
+          maxEnergy={character.spneed}
         />
       </TabsContent>
 
@@ -51,8 +52,8 @@ export default async function Character({ params }: Props) {
             <TraceTable
               characterId={characterId}
               wrapperSize={480}
-              path={character.path}
-              maxEnergy={character.max_sp}
+              path={character.avatar_base_type}
+              maxEnergy={character.spneed}
             />
           </div>
 

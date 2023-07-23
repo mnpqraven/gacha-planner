@@ -1,6 +1,5 @@
 "use client";
 
-import { SimpleSkill, SkillType } from "@/bindings/PatchBanner";
 import Image from "next/image";
 import { useState } from "react";
 import { Slider } from "../ui/Slider";
@@ -8,7 +7,7 @@ import { cn, parseSkillType } from "@/lib/utils";
 import { Toggle } from "../ui/Toggle";
 import { Separator } from "../ui/Separator";
 import { SkillDescription } from "../Db/SkillDescription";
-import { AvatarSkillConfig } from "@/bindings/AvatarSkillConfig";
+import { AvatarSkillConfig, SkillType } from "@/bindings/AvatarSkillConfig";
 
 type Props = {
   skills: AvatarSkillConfig[];

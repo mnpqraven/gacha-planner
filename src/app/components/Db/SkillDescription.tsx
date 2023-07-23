@@ -1,4 +1,5 @@
 import { ParameterizedDescription } from "@/bindings/SkillTreeConfig";
+import { sanitizeNewline } from "@/lib/utils";
 import { Fragment } from "react";
 
 type SkillDescriptionProps = {
@@ -19,7 +20,7 @@ export const SkillDescription = ({
     <p className="text-justify">
       {skillDesc.map((descPart, index) => (
         <Fragment key={index}>
-          <span>{descPart}</span>
+          <span className="whitespace-pre-wrap">{sanitizeNewline(descPart)}</span>
           <span className="font-semibold text-accent-foreground">
             {currentParam[index]}
           </span>
