@@ -23,10 +23,10 @@ const EidolonTable = ({ characterId }: Props) => {
   });
   if (!data) return null;
 
-  const bottom = data.list
+  const top = data.list
     .filter((e) => e.rank <= 3)
     .sort((a, b) => a.rank - b.rank);
-  const top = data.list
+  const bottom = data.list
     .filter((e) => e.rank > 3)
     .sort((a, b) => a.rank - b.rank);
 
@@ -46,7 +46,9 @@ const EidolonTable = ({ characterId }: Props) => {
       <div className="my-2 min-h-[8rem] whitespace-pre-wrap rounded-md border p-4">
         {currentEidolon?.desc.map((descPart, index) => (
           <Fragment key={index}>
-            <span className="whitespace-pre-wrap">{sanitizeNewline(descPart)}</span>
+            <span className="whitespace-pre-wrap">
+              {sanitizeNewline(descPart)}
+            </span>
             <span className="font-semibold text-accent-foreground">
               {currentEidolon.param[index]}
             </span>
