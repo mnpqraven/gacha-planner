@@ -127,7 +127,7 @@ function getImagePath(
   } else {
     switch (skill.skill_type_desc) {
       case "Basic ATK":
-        ttype = "basic_attack";
+        ttype = "basic_atk";
         break;
       case "Skill":
         ttype = "skill";
