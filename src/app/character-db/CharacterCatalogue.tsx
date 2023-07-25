@@ -63,10 +63,7 @@ const CharacterCatalogue = ({ data }: Props) => {
             key={chara.avatar_id}
             className="flex flex-col items-center justify-center gap-4"
           >
-            <Link
-              href={`/character-db/${chara.avatar_id}`}
-              className={"relative flex flex-col items-center"}
-            >
+            <Link href={`/character-db/${chara.avatar_id}`}>
               <CharacterCard imgUrl={url(chara.avatar_id)} {...chara} />
             </Link>
 
