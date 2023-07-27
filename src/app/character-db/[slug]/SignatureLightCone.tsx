@@ -7,7 +7,7 @@ import { EquipmentConfig } from "@/bindings/EquipmentConfig";
 import { EquipmentSkillConfig } from "@/bindings/EquipmentSkillConfig";
 import { IMAGE_URL } from "@/server/endpoints";
 import API from "@/server/typedEndpoints";
-import { useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
 interface Props {
@@ -22,18 +22,40 @@ const SignatureLightCone = ({ characterId }: Props) => {
 
   const lc_ids = atlas?.list.find((e) => e.char_id === characterId)?.lc_id;
 
-  const { data: lcMetadata } = useQuery({
-    queryKey: ["lightconeMetadata", lc_ids],
-    queryFn: async () =>
-      await API.lightConeMetadataMany.post({ payload: { list: lc_ids ?? [] } }),
-    enabled: !!lc_ids,
+  // const { data: lcMetadata } = useQuery({
+  //   queryKey: ["lightconeMetadata", lc_ids],
+  //   queryFn: async () =>
+  //     await API.lightConeMetadataMany.post({ payload: { list: lc_ids ?? [] } }),
+  //   enabled: !!lc_ids,
+  // });
+  // const { data: lcSkill } = useQuery({
+  //   queryKey: ["lightconeSkill", lc_ids],
+  //   queryFn: async () =>
+  //     await API.lightConeSkillMany.post({ payload: { list: lc_ids ?? [] } }),
+  //   enabled: !!lc_ids,
+  // });
+  const [metadataQuery, skillQuery] = useQueries({
+    queries: [
+      {
+        queryKey: ["lightconeMetadata", lc_ids],
+        queryFn: async () =>
+          await API.lightConeMetadataMany.post({
+            payload: { list: lc_ids ?? [] },
+          }),
+        enabled: !!lc_ids,
+      },
+      {
+        queryKey: ["lightconeSkill", lc_ids],
+        queryFn: async () =>
+          await API.lightConeSkillMany.post({
+            payload: { list: lc_ids ?? [] },
+          }),
+        enabled: !!lc_ids,
+      },
+    ],
   });
-  const { data: lcSkill } = useQuery({
-    queryKey: ["lightconeSkill", lc_ids],
-    queryFn: async () =>
-      await API.lightConeSkillMany.post({ payload: { list: lc_ids ?? [] } }),
-    enabled: !!lc_ids,
-  });
+  const { data: lcMetadata } = metadataQuery;
+  const { data: lcSkill } = skillQuery;
 
   const [selectedLc, setSelectedLc] = useState<
     { metadata: EquipmentConfig; skill: EquipmentSkillConfig } | undefined
