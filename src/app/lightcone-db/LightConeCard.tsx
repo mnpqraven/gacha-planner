@@ -10,62 +10,66 @@ import { Element } from "@/bindings/PatchBanner";
 import useCardEffect from "@/hooks/animation/useCardEffect";
 import { Path } from "@/bindings/AvatarConfig";
 
-type Props = {
+interface Props extends HTMLAttributes<HTMLDivElement> {
   rarity?: number;
   element?: Element;
   path?: Path;
   name: string;
   imgUrl: string;
-};
+}
 
-const LightConeCard = ({ rarity, element, path, name, imgUrl }: Props) => {
-  const { flowRef, glowRef, removeListener, rotateToMouse } = useCardEffect();
-  return (
-    <div>
-      <div
-        ref={flowRef}
-        className="relative h-full w-full transition-all ease-out"
-        onMouseLeave={removeListener}
-        onMouseMove={rotateToMouse}
-        style={{ perspective: "1500px" }}
-      >
+const LightConeCard = forwardRef<HTMLDivElement, Props>(
+  ({ rarity, element, path, name, imgUrl, className, ...props }, ref) => {
+    const { flowRef, glowRef, removeListener, rotateToMouse } = useCardEffect();
+    return (
+      <div className={cn("relative", className)} ref={ref} {...props}>
         <div
-          className={cn(
-            "absolute left-[18%] top-[14%] h-[76%] w-[65%] rotate-[13deg]",
-            styles["card"]
-          )}
+          ref={flowRef}
+          className="relative h-full w-full transition-all ease-out"
+          onMouseLeave={removeListener}
+          onMouseMove={rotateToMouse}
+          style={{ perspective: "1500px" }}
         >
-          <div ref={glowRef} className={styles["glow"]} />
+          <div
+            className={cn(
+              "absolute left-[18%] top-[14%] h-[76%] w-[65%] rotate-[13deg]",
+              styles["card"]
+            )}
+          >
+            <div ref={glowRef} className={styles["glow"]} />
+          </div>
+          <Image
+            src={imgUrl}
+            alt={name}
+            width={374}
+            height={512}
+            priority={rarity === 5}
+          />
+          {element && (
+            <ElementIcon
+              element={element}
+              size="15%"
+              className="absolute left-1 top-0"
+            />
+          )}
         </div>
-        <Image
-          src={imgUrl}
-          alt={name}
-          width={374}
-          height={512}
-          priority={rarity === 5}
-        />
-        {element && (
-          <ElementIcon
-            element={element}
+        {path && (
+          <PathIcon
+            path={path}
             size="15%"
-            className="absolute left-1 top-0"
+            className={cn(
+              "absolute left-1 text-white",
+              element ? "top-[15%]" : "top-0"
+            )}
           />
         )}
+        {rarity && <RarityIcon rarity={rarity} className="-my-4 h-6 w-full" />}
       </div>
-      {path && (
-        <PathIcon
-          path={path}
-          size="15%"
-          className={cn(
-            "absolute left-1 text-white",
-            element ? "top-[15%]" : "top-0"
-          )}
-        />
-      )}
-      {rarity && <RarityIcon rarity={rarity} className="-my-4 h-6 w-full" />}
-    </div>
-  );
-};
+    );
+  }
+);
+LightConeCard.displayName = "LightConeCard";
+
 export { LightConeCard };
 
 interface RarityIconProps extends HTMLAttributes<HTMLDivElement> {

@@ -86,7 +86,7 @@ const LightConeRanking = ({ id }: Props) => {
           onValueChange={(e) => setDatakey(e as typeof dataKey)}
           defaultValue={dataKey}
         >
-          <SelectTrigger className="sticky top-0 bg-background">
+          <SelectTrigger className="top-0 sticky bg-background">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -155,7 +155,6 @@ const RankingChart = ({
     scroll: true,
   });
   const currentLcIndex = data.findIndex((e) => e.equipment_id === currentLcId);
-
 
   // x axis: value
   const xScale = useMemo(
