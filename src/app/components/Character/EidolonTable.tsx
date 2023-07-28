@@ -123,7 +123,7 @@ function url(charID: number, eidolon: number) {
 
 const LoadingEidolonTable = () => {
   const Row = ({ keys }: { keys: number[] }) => (
-    <>
+    <div className="grid grid-cols-3 gap-2">
       {keys.map((key) => (
         <Toggle
           key={key}
@@ -137,17 +137,13 @@ const LoadingEidolonTable = () => {
           <span className="md:text-lg"> </span>
         </Toggle>
       ))}
-    </>
+    </div>
   );
   return (
     <>
-      <div className="grid grid-cols-3 gap-2">
-        <Row keys={[1, 2, 3]} />
-      </div>
+      <Row keys={[1, 2, 3]} />
       <div className="my-2 min-h-[8rem] whitespace-pre-wrap rounded-md border p-4" />
-      <div className="grid grid-cols-3 gap-2">
-        <Row keys={[6, 5, 4]} />
-      </div>
+      <Row keys={[6, 5, 4]} />
     </>
   );
 };
