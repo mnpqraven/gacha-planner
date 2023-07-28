@@ -6,15 +6,13 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { typedFetch } from "@/server/fetchHelper";
 import ENDPOINT from "@/server/endpoints";
 import API from "@/server/typedEndpoints";
+import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
 
 type Props = {
   characterId: number;
 };
 const CharacterTabWrapper = ({ characterId }: Props) => {
-  const { data } = useQuery({
-    queryKey: ["character", characterId],
-    queryFn: async () => await API.character.get(characterId),
-  });
+  const { character } = useCharacterMetadata(characterId);
 
   const { data: skills } = useQuery({
     queryKey: ["skillsByCharId", characterId],
@@ -27,9 +25,9 @@ const CharacterTabWrapper = ({ characterId }: Props) => {
     queryFn: async () => await API.properties.get(),
   });
 
-  if (!data || !skills) return null;
+  if (!character || !skills) return null;
 
-  const { avatar_base_type, spneed: maxEnergy } = data;
+  const { avatar_base_type, spneed: maxEnergy } = character;
 
   return (
     <>
@@ -42,9 +40,9 @@ const CharacterTabWrapper = ({ characterId }: Props) => {
 
         <TabsContent value="skills">
           <SkillOverview
-            skills={skills.list}
+            // skills={skills.list}
             characterId={characterId}
-            maxEnergy={maxEnergy}
+            // maxEnergy={maxEnergy}
           />
         </TabsContent>
 

@@ -27,7 +27,6 @@ export default async function Character({ params }: Props) {
   const { slug } = params;
   const characterId = parseInt(slug);
   const character = await API.character.get(characterId);
-  const { list: skills } = await API.skillsByCharId.get(characterId);
 
   return (
     <Tabs defaultValue="skill">
@@ -40,11 +39,7 @@ export default async function Character({ params }: Props) {
 
       <TabsContent value="skill">
         <Suspense fallback={<SkillOverviewLoading />}>
-          <SkillOverview
-            skills={skills}
-            characterId={characterId}
-            maxEnergy={character.spneed}
-          />
+          <SkillOverview characterId={characterId} />
         </Suspense>
       </TabsContent>
 

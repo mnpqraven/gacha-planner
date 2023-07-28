@@ -15,7 +15,7 @@ type RootProps = {
 };
 export default function RootLayout({ children }: RootProps) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>
           <Navbar />

@@ -52,7 +52,7 @@ import { Switch } from "../ui/Switch";
 
 type Props = {
   submitButton?: boolean;
-  // updateTable: (to: z.infer<typeof ENDPOINT.jadeEstimate.response>) => void;
+  updateTable: (to: z.infer<typeof ENDPOINT.jadeEstimate.response>) => void;
 };
 
 type FormSchema = z.infer<(typeof ENDPOINT)["jadeEstimate"]["payload"]>;
@@ -72,7 +72,7 @@ export const defaultFormValues: FormSchema = {
 };
 
 export default function JadeEstimateForm({
-  // updateTable,
+  updateTable,
   submitButton = false,
 }: Props) {
   const [uncontrolledDate, setUncontrolledDate] = useState<Date | undefined>(
@@ -124,9 +124,9 @@ export default function JadeEstimateForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [savedFormData]);
 
-  // useEffect(() => {
-  //   if (data) updateTable(data);
-  // }, [data, updateTable]);
+  useEffect(() => {
+    if (data) updateTable(data);
+  }, [data, updateTable]);
 
   function onSubmit(values: FormSchema) {
     if (!equal(values, defaultFormValues)) {
@@ -414,10 +414,12 @@ export default function JadeEstimateForm({
                       Whether you have completed the current MoC cycle
                     </FormDescription>
                   </div>
-                  <Switch
-                    onCheckedChange={field.onChange}
-                    checked={field.value}
-                  />
+                  <FormControl>
+                    <Switch
+                      onCheckedChange={field.onChange}
+                      checked={field.value}
+                    />
+                  </FormControl>
                 </div>
               </FormItem>
             )}
