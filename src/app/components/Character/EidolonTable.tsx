@@ -1,7 +1,5 @@
 "use client";
 
-import ENDPOINT from "@/server/endpoints";
-import { typedFetch } from "@/server/fetchHelper";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { Fragment, Suspense, useState } from "react";
@@ -21,7 +19,7 @@ const EidolonTable = ({ characterId }: Props) => {
   const { data } = useQuery({
     queryKey: ["eidolon", characterId],
     queryFn: async () => await API.eidolon.get(characterId),
-    suspense: true
+    suspense: true,
   });
 
   const top = data?.list
@@ -124,21 +122,23 @@ function url(charID: number, eidolon: number) {
 }
 
 const LoadingEidolonTable = () => {
-  const Row = ({ keys }: { keys: number[] }) =>
-    keys.map((key) => (
-      <Toggle
-        key={key}
-        pressed={key === 1}
-        className="flex h-full flex-1 flex-col justify-start gap-2 py-2 sm:flex-row"
-      >
-        <div className="flex flex-col items-center gap-1">
-          <Skeleton className="h-16 w-16 rounded-full" />
-          <Badge className="w-fit sm:inline">E{key}</Badge>
-        </div>
-        <span className="md:text-lg"> </span>
-      </Toggle>
-    ));
-
+  const Row = ({ keys }: { keys: number[] }) => (
+    <>
+      {keys.map((key) => (
+        <Toggle
+          key={key}
+          pressed={key === 1}
+          className="flex h-full flex-1 flex-col justify-start gap-2 py-2 sm:flex-row"
+        >
+          <div className="flex flex-col items-center gap-1">
+            <Skeleton className="h-16 w-16 rounded-full" />
+            <Badge className="w-fit sm:inline">E{key}</Badge>
+          </div>
+          <span className="md:text-lg"> </span>
+        </Toggle>
+      ))}
+    </>
+  );
   return (
     <>
       <div className="grid grid-cols-3 gap-2">
