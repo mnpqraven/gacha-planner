@@ -18,6 +18,7 @@ const SignatureLightCone = ({ characterId }: Props) => {
   const { data: atlas } = useQuery({
     queryKey: ["signature_atlas"],
     queryFn: async () => await API.signatureAtlas.get(),
+    suspense: true
   });
 
   const lc_ids = atlas?.list.find((e) => e.char_id === characterId)?.lc_id;

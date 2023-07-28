@@ -1,16 +1,12 @@
+import { Loader2 } from "lucide-react";
+
 export default function Loading() {
   return (
-    <main className="grid grid-cols-1 overflow-hidden px-2 pt-4 lg:grid-cols-2">
-      <div className="aspect-square">
-        {/* <Image
-          src={portraitUrl(characterId)}
-          width={2048}
-          height={2048}
-          className="place-self-start object-contain"
-          alt={params.slug}
-        /> */}
+    <div className="grid h-full w-full grid-cols-1 grid-rows-3">
+      <div className="flex items-center justify-center">
+        <Loader2 className="mr-1 animate-spin" />
+        Loading...
       </div>
-      Loading
-    </main>
+    </div>
   );
 }

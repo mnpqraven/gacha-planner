@@ -1,5 +1,11 @@
-import { EidolonTable } from "@/app/components/Character/EidolonTable";
-import { SkillOverview } from "@/app/components/Character/SkillOverview";
+import {
+  EidolonTable,
+  LoadingEidolonTable,
+} from "@/app/components/Character/EidolonTable";
+import {
+  SkillOverview,
+  SkillOverviewLoading,
+} from "@/app/components/Character/SkillOverview";
 import { TraceTable } from "@/app/components/Character/TraceTable";
 import {
   Tabs,
@@ -10,6 +16,8 @@ import {
 import API from "@/server/typedEndpoints";
 import { TraceSummaryWrapper } from "./TraceSummaryWrapper";
 import { SignatureLightCone } from "./SignatureLightCone";
+import { Suspense } from "react";
+import Loading from "./loading";
 
 interface Props {
   params: { slug: string };
@@ -31,19 +39,25 @@ export default async function Character({ params }: Props) {
       </TabsList>
 
       <TabsContent value="skill">
-        <SkillOverview
-          skills={skills}
-          characterId={characterId}
-          maxEnergy={character.spneed}
-        />
+        <Suspense fallback={<SkillOverviewLoading />}>
+          <SkillOverview
+            skills={skills}
+            characterId={characterId}
+            maxEnergy={character.spneed}
+          />
+        </Suspense>
       </TabsContent>
 
       <TabsContent value="eidolon">
-        <EidolonTable characterId={characterId} />
+        <Suspense fallback={<LoadingEidolonTable />}>
+          <EidolonTable characterId={characterId} />
+        </Suspense>
       </TabsContent>
 
       <TabsContent value="sig-lc">
-        <SignatureLightCone characterId={characterId} />
+        <Suspense fallback={<Loading />}>
+          <SignatureLightCone characterId={characterId} />
+        </Suspense>
       </TabsContent>
 
       <TabsContent value="trace">
