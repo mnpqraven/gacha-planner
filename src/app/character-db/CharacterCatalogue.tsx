@@ -64,7 +64,12 @@ const CharacterCatalogue = ({ data }: Props) => {
             className="flex flex-col items-center justify-center gap-4"
           >
             <Link href={`/character-db/${chara.avatar_id}`}>
-              <CharacterCard imgUrl={url(chara.avatar_id)} {...chara} />
+              <CharacterCard
+                imgUrl={url(chara.avatar_id)}
+                avatar_base_type={chara.avatar_base_type}
+                avatar_name={chara.avatar_name}
+                rarity={chara.rarity}
+              />
             </Link>
 
             <Link

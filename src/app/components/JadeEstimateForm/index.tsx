@@ -1,3 +1,5 @@
+"use client";
+
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -103,6 +105,7 @@ export default function JadeEstimateForm({
         payload: uncontrolledQueryPayload,
         method: "POST",
       }),
+    suspense: false,
   });
 
   useEffect(() => {
@@ -362,7 +365,7 @@ export default function JadeEstimateForm({
             </FormItem>
           )}
         />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField
             control={form.control}
             name="moc"
@@ -411,10 +414,12 @@ export default function JadeEstimateForm({
                       Whether you have completed the current MoC cycle
                     </FormDescription>
                   </div>
-                  <Switch
-                    onCheckedChange={field.onChange}
-                    checked={field.value}
-                  />
+                  <FormControl>
+                    <Switch
+                      onCheckedChange={field.onChange}
+                      checked={field.value}
+                    />
+                  </FormControl>
                 </div>
               </FormItem>
             )}

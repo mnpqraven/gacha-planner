@@ -1,6 +1,5 @@
 import API from "@/server/typedEndpoints";
 import CharacterCatalogue from "./CharacterCatalogue";
-import { Suspense } from "react";
 
 export const metadata = {
   title: "Character Database",
@@ -18,7 +17,7 @@ export default async function CharacterDb() {
   });
 
   return (
-    <main className="container py-4">
+    <main className="px-2 py-4 md:container md:px-0">
       <CharacterCatalogue data={sortedDb} />
     </main>
   );

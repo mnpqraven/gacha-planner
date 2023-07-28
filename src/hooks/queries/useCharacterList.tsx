@@ -2,7 +2,7 @@ import API from "@/server/typedEndpoints";
 import { useQuery } from "@tanstack/react-query";
 
 export const useCharacterList = () => {
-  const { data: characterList } = useQuery({
+  const query = useQuery({
     queryKey: ["characterList"],
     queryFn: async () => {
       const { list } = await API.characters.get();
@@ -10,5 +10,5 @@ export const useCharacterList = () => {
     },
     initialData: [],
   });
-  return { characterList };
+  return { characterList: query.data };
 };

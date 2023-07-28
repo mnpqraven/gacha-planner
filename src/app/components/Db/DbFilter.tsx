@@ -66,39 +66,41 @@ const DbFilter = ({
   return (
     <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
       {text && updateText && (
-        <div className="relative h-full">
-          <Input
-            ref={searchInput}
-            placeholder="Search"
-            className="h-12 text-lg"
-            onChange={(e) => updateText(e.currentTarget.value)}
-          />
+        <div className="flex gap-2">
+          <div className="relative h-full">
+            <Input
+              ref={searchInput}
+              placeholder="Search"
+              className="h-12 text-lg"
+              onChange={(e) => updateText(e.currentTarget.value)}
+            />
 
-          <kbd className="pointer-events-none absolute right-2 top-[calc(50%-10px)] inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-            <span className="text-xs">⌘/Ctrl + F</span>
-          </kbd>
-        </div>
-      )}
-      {minRarity && updateRarity && (
-        <div className="flex rounded-md border p-1">
-          {rarityList.map((rarity) => (
-            <Toggle
-              key={rarity}
-              className="flex text-muted-foreground hover:text-primary"
-              onPressedChange={() => updateRarity(rarity)}
-            >
-              <span className="text-xl font-bold">{rarity}</span>
-              <div className="aspect-square h-7">
-                <Image
-                  src="/Star.png"
-                  height={128}
-                  width={128}
-                  alt={rarity + " ✦"}
-                  className="pointer-events-none"
-                />
-              </div>
-            </Toggle>
-          ))}
+            <kbd className="pointer-events-none absolute right-2 top-[calc(50%-10px)] inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+              <span className="text-xs">⌘/Ctrl + F</span>
+            </kbd>
+          </div>
+          {minRarity && updateRarity && (
+            <div className="flex rounded-md border p-1">
+              {rarityList.map((rarity) => (
+                <Toggle
+                  key={rarity}
+                  className="flex text-muted-foreground hover:text-primary"
+                  onPressedChange={() => updateRarity(rarity)}
+                >
+                  <span className="text-xl font-bold">{rarity}</span>
+                  <div className="aspect-square h-7">
+                    <Image
+                      src="/Star.png"
+                      height={128}
+                      width={128}
+                      alt={rarity + " ✦"}
+                      className="pointer-events-none"
+                    />
+                  </div>
+                </Toggle>
+              ))}
+            </div>
+          )}
         </div>
       )}
       {updatePath && (
@@ -109,7 +111,7 @@ const DbFilter = ({
               onPressedChange={() => updatePath(path)}
               className="text-muted-foreground hover:text-primary"
             >
-              <PathIcon path={path} size="28px" />
+              <PathIcon path={path} size="26px" />
             </Toggle>
           ))}
         </div>
@@ -121,7 +123,7 @@ const DbFilter = ({
               key={element}
               onPressedChange={() => updateElement(element)}
             >
-              <ElementIcon element={element} size="28px" />
+              <ElementIcon element={element} size="26px" />
             </Toggle>
           ))}
         </div>
