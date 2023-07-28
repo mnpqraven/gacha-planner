@@ -15,7 +15,7 @@ export default async function LightConeDb() {
   });
 
   return (
-    <main className="container py-4">
+    <main className="px-2 py-4 md:container md:px-0">
       <LightConeCatalogue data={sortedDb} />
     </main>
   );

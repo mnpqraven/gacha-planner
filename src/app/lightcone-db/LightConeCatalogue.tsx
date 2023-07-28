@@ -56,10 +56,7 @@ const LightConeCatalogue = ({ data }: Props) => {
             key={lc.equipment_id}
             className="flex flex-col items-center gap-3 self-start"
           >
-            <Link
-              href={`/lightcone-db/${lc.equipment_id}`}
-              className="relative"
-            >
+            <Link href={`/lightcone-db/${lc.equipment_id}`}>
               <LightConeCard
                 rarity={lc.rarity}
                 path={lc.avatar_base_type}

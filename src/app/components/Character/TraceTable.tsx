@@ -1,16 +1,11 @@
 "use client";
 
-import ENDPOINT, { IMAGE_URL } from "@/server/endpoints";
-import { typedFetch } from "@/server/fetchHelper";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
-import { cn, parseSkillType } from "@/lib/utils";
-import { VariantProps, cva } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+import { cva } from "class-variance-authority";
 import Xarrow, { Xwrapper, useXarrow } from "react-xarrows";
-import { useEffect, useState } from "react";
-import { Slider } from "../ui/Slider";
-import { SkillDescription } from "../Db/SkillDescription";
 import { useTheme } from "next-themes";
 import API from "@/server/typedEndpoints";
 import { SkillTreeConfig } from "@/bindings/SkillTreeConfig";
