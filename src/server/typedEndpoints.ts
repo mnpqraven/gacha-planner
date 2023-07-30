@@ -11,6 +11,9 @@ import { AvatarPropertyConfig } from "@/bindings/AvatarPropertyConfig";
 import { AvatarRankConfig } from "@/bindings/AvatarRankConfig";
 import { Patch } from "@/bindings/Patch";
 import { PatchBanner } from "@/bindings/PatchBanner";
+import { createPromiseClient } from "@bufbuild/connect";
+import { createGrpcWebTransport } from "@bufbuild/connect-web";
+import { ServiceType } from "@bufbuild/protobuf";
 
 const API = {
   patchDates: route<List<Patch>>("/honkai/patch_dates", "GET"),
@@ -98,6 +101,16 @@ function route<TReq, TRes>(
           ),
       };
   }
+}
+
+export function rpc<T extends ServiceType>(service: T) {
+  const client = createPromiseClient(
+    service,
+    createGrpcWebTransport({
+      baseUrl: process.env["NEXT_PUBLIC_WORKER_API"] + "/rpc",
+    })
+  );
+  return client;
 }
 
 export default API;

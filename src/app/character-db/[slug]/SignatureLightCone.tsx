@@ -6,7 +6,8 @@ import { Portrait } from "@/app/lightcone-db/[slug]/Portrait";
 import { EquipmentConfig } from "@/bindings/EquipmentConfig";
 import { EquipmentSkillConfig } from "@/bindings/EquipmentSkillConfig";
 import { IMAGE_URL } from "@/server/endpoints";
-import API from "@/server/typedEndpoints";
+import API, { rpc } from "@/server/typedEndpoints";
+import { SignatureAtlasService } from "@grpc/atlas_connect";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
@@ -17,24 +18,12 @@ interface Props {
 const SignatureLightCone = ({ characterId }: Props) => {
   const { data: atlas } = useQuery({
     queryKey: ["signature_atlas"],
-    queryFn: async () => await API.signatureAtlas.get(),
+    queryFn: async () => await rpc(SignatureAtlasService).list({}),
     suspense: true
   });
 
-  const lc_ids = atlas?.list.find((e) => e.char_id === characterId)?.lc_id;
+  const lc_ids = atlas?.list.find((e) => e.charId === characterId)?.lcId;
 
-  // const { data: lcMetadata } = useQuery({
-  //   queryKey: ["lightconeMetadata", lc_ids],
-  //   queryFn: async () =>
-  //     await API.lightConeMetadataMany.post({ payload: { list: lc_ids ?? [] } }),
-  //   enabled: !!lc_ids,
-  // });
-  // const { data: lcSkill } = useQuery({
-  //   queryKey: ["lightconeSkill", lc_ids],
-  //   queryFn: async () =>
-  //     await API.lightConeSkillMany.post({ payload: { list: lc_ids ?? [] } }),
-  //   enabled: !!lc_ids,
-  // });
   const [metadataQuery, skillQuery] = useQueries({
     queries: [
       {
