@@ -22,7 +22,8 @@
     ],
     "paths": {
       "@/*": [ "./src/*" ],
-      "@public/*": [ "./public/*" ]
+      "@public/*": [ "./public/*" ],
+      "@grpc/*": [ "./proto/*" ],
     }
   },
   "include": [ "next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts" ],
