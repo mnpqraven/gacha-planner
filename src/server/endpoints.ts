@@ -1,3 +1,4 @@
+import { BattlePassType, EqTier } from "@grpc/jadeestimate_pb";
 import * as z from "zod";
 
 const ENDPOINT = {
@@ -13,65 +14,20 @@ const ENDPOINT = {
         { required_error: "Required field" }
       ),
       battlePass: z.object({
-        battlePassType: z.enum(["None", "Basic", "Premium"]),
-        currentLevel: z.preprocess(
-          (args) => (args === "" ? undefined : args),
-          z.coerce
-            .number({
-              invalid_type_error: "Must be a number",
-              required_error: "Required field",
-            })
-            .nonnegative({ message: "BP level must be positive" })
-        ),
+        battlePassType: z.nativeEnum(BattlePassType),
+        currentLevel: z.number().nonnegative(),
       }),
       railPass: z.object({
         useRailPass: z.boolean(),
-        daysLeft: z.preprocess(
-          (args) => (args === "" ? undefined : args),
-          z.coerce.number({
-            invalid_type_error: "Must be a number",
-            required_error: "Required field",
-          })
-        ),
+        daysLeft: z.number().nonnegative(),
       }),
       server: z.enum(["America", "Asia", "Europe"]),
-      eq: z.enum(["Zero", "One", "Two", "Three", "Four", "Five", "Six"]),
-      moc: z.preprocess(
-        (args) => (args === "" ? undefined : args),
-        z.coerce.number({
-          invalid_type_error: "Must be a number",
-          required_error: "Required field",
-        })
-      ),
+      eq: z.nativeEnum(EqTier),
+      moc: z.number().nonnegative(),
       mocCurrentWeekDone: z.boolean(),
-      currentRolls: z.preprocess(
-        (args) => (args === "" ? undefined : args),
-        z.coerce
-          .number({
-            invalid_type_error: "Must be a number",
-          })
-          .nonnegative()
-          .optional()
-      ),
-      currentJades: z.preprocess(
-        (args) => (args === "" ? undefined : args),
-        z.coerce
-          .number({
-            invalid_type_error: "Must be a number",
-          })
-          .nonnegative()
-          .optional()
-      ),
-      dailyRefills: z.preprocess(
-        (args) => (args === "" ? undefined : args),
-        z.coerce
-          .number({
-            invalid_type_error: "Must be a number",
-            required_error: "Required field",
-          })
-          .nonnegative()
-          .optional()
-      ),
+      currentRolls: z.number().nonnegative(),
+      currentJades: z.number().nonnegative(),
+      dailyRefills: z.number().nonnegative(),
     }),
     response: z.object({
       sources: z

@@ -3,7 +3,8 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { SignatureReturns, What } from "./atlas_pb";
+import { Empty } from "./shared_pb";
+import { SignatureReturns } from "./atlas_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -17,7 +18,7 @@ export const SignatureAtlasService = {
      */
     list: {
       name: "List",
-      I: What,
+      I: Empty,
       O: SignatureReturns,
       kind: MethodKind.Unary,
     },

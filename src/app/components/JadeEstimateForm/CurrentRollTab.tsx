@@ -2,11 +2,10 @@ import { UseFormReturn } from "react-hook-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
 import * as F from "../ui/Form";
 import { Input } from "../ui/Input";
-import ENDPOINT from "@/server/endpoints";
-import { z } from "zod";
+import { JadeEstimateCfg } from "@grpc/jadeestimate_pb";
 
 type Props = {
-  form: UseFormReturn<z.infer<(typeof ENDPOINT)["jadeEstimate"]["payload"]>>;
+  form: UseFormReturn<JadeEstimateCfg>;
 };
 const CurrentRollTab = ({ form }: Props) => {
   return (
@@ -37,7 +36,17 @@ const CurrentRollTab = ({ form }: Props) => {
                     </F.FormDescription>
                   </div>
                   <F.FormControl>
-                    <Input className="w-20" type="number" min={0} {...field} />
+                    <Input
+                      className="w-20"
+                      type="number"
+                      min={0}
+                      {...field}
+                      onChange={(e) => {
+                        if (!Number.isNaN(e.currentTarget.value)) {
+                          field.onChange(Number(e.currentTarget.value));
+                        } else e.preventDefault();
+                      }}
+                    />
                   </F.FormControl>
                 </div>
                 <F.FormMessage />
@@ -59,7 +68,17 @@ const CurrentRollTab = ({ form }: Props) => {
                     </F.FormDescription>
                   </div>
                   <F.FormControl>
-                    <Input className="w-20" type="number" min={0} {...field} />
+                    <Input
+                      className="w-20"
+                      type="number"
+                      min={0}
+                      {...field}
+                      onChange={(e) => {
+                        if (!Number.isNaN(e.currentTarget.value)) {
+                          field.onChange(Number(e.currentTarget.value));
+                        } else e.preventDefault();
+                      }}
+                    />
                   </F.FormControl>
                 </div>
                 <F.FormMessage />
@@ -87,6 +106,11 @@ const CurrentRollTab = ({ form }: Props) => {
                       min={0}
                       max={8}
                       {...field}
+                      onChange={(e) => {
+                        if (!Number.isNaN(e.currentTarget.value)) {
+                          field.onChange(Number(e.currentTarget.value));
+                        } else e.preventDefault();
+                      }}
                     />
                   </F.FormControl>
                 </div>

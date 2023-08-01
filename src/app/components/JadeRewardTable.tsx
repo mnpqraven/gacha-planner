@@ -1,5 +1,5 @@
-import ENDPOINT from "@/server/endpoints";
-import * as z from "zod";
+"use client";
+
 import {
   Table,
   TableBody,
@@ -11,15 +11,14 @@ import {
 } from "./ui/Table";
 import { AlertCircle } from "lucide-react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/HoverCard";
+import { useContext } from "react";
+import { JadeEstimateFormContext } from "../JadeEstimateProvider";
+import { JadeEstimateResponse } from "@grpc/jadeestimate_pb";
 
-type Props = {
-  data: z.infer<typeof ENDPOINT.jadeEstimate.response>;
-};
-const JadeRewardTable = ({ data }: Props) => {
-  function parseDayCount() {
-    if (data.days <= 1) return `(${data.days} day)`;
-    else return `(${data.days} days)`;
-  }
+const JadeRewardTable = () => {
+  const { rewardTable: data, isLoading } = useContext(JadeEstimateFormContext);
+
+  if (!data || isLoading) return null;
 
   return (
     <Table>
@@ -28,21 +27,19 @@ const JadeRewardTable = ({ data }: Props) => {
       </TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead>
-            <div className="inline-flex">
-              Source
-              <HoverCard openDelay={0}>
-                <HoverCardTrigger>
-                  <AlertCircle className="scale-75 mx-1 align-text-bottom rounded-full hover:bg-accent hover:text-accent-foreground" />
-                </HoverCardTrigger>
-                <HoverCardContent side="top">
-                  These are repeatable rewards that are guaranteed to you and
-                  does not include one-off rewards like events or redemption
-                  codes/promotions. You{"'"}re bound to receive more than the
-                  table shows as you play the game
-                </HoverCardContent>
-              </HoverCard>
-            </div>
+          <TableHead className="flex items-center">
+            Source
+            <HoverCard openDelay={0}>
+              <HoverCardTrigger>
+                <AlertCircle className="mx-1 scale-75 rounded-full align-text-bottom hover:bg-accent hover:text-accent-foreground" />
+              </HoverCardTrigger>
+              <HoverCardContent side="top" className="w-96 text-justify">
+                These are repeatable rewards that are guaranteed to you and does
+                not include one-off rewards like events or redemption
+                codes/promotions. You{"'"}re bound to receive more than the
+                table shows as you play the game.
+              </HoverCardContent>
+            </HoverCard>
           </TableHead>
           <TableHead>Recurring</TableHead>
           <TableHead>Jades</TableHead>
@@ -60,7 +57,7 @@ const JadeRewardTable = ({ data }: Props) => {
                   {source.source}
                   <HoverCard openDelay={0}>
                     <HoverCardTrigger className="inline-flex">
-                      <AlertCircle className="scale-75 mx-1 align-text-bottom rounded-full hover:bg-accent hover:text-accent-foreground" />
+                      <AlertCircle className="mx-1 scale-75 rounded-full align-text-bottom hover:bg-accent hover:text-accent-foreground" />
                     </HoverCardTrigger>
                     <HoverCardContent side="top">
                       {source.description}
@@ -69,19 +66,28 @@ const JadeRewardTable = ({ data }: Props) => {
                 </div>
               )}
             </TableCell>
-            <TableCell>{source.source_type}</TableCell>
-            <TableCell>{source.jades_amount}</TableCell>
-            <TableCell>{source.rolls_amount}</TableCell>
+            <TableCell>{source.sourceType}</TableCell>
+            <TableCell>{source.jadesAmount}</TableCell>
+            <TableCell>{source.rollsAmount}</TableCell>
           </TableRow>
         ))}
         <TableRow>
-          <TableCell className="font-bold">Total {parseDayCount()}</TableCell>
+          <TableCell className="font-bold">Total {parseDayCount(data)}</TableCell>
           <TableCell />
-          <TableCell className="font-bold">{data.total_jades}</TableCell>
+          <TableCell className="font-bold">{data.totalJades}</TableCell>
           <TableCell className="font-bold">{data.rolls}</TableCell>
         </TableRow>
       </TableBody>
     </Table>
   );
 };
+
+function parseDayCount(data: JadeEstimateResponse | undefined) {
+  if (data) {
+    if (data.days <= 1) return `(${data.days} day)`;
+    else return `(${data.days} days)`;
+  }
+  return `(0 day)`;
+}
+
 export default JadeRewardTable;

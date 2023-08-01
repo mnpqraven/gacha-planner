@@ -1,15 +1,14 @@
-import ENDPOINT from "@/server/endpoints";
 import { UseFormReturn } from "react-hook-form";
-import { z } from "zod";
 import * as F from "../ui/Form";
 import { Switch } from "../ui/Switch";
 import { useState } from "react";
 import { Separator } from "../ui/Separator";
 import { Input } from "../ui/Input";
 import { useEffect } from "react";
+import { JadeEstimateCfg } from "@grpc/jadeestimate_pb";
 
 type Props = {
-  form: UseFormReturn<z.infer<(typeof ENDPOINT)["jadeEstimate"]["payload"]>>;
+  form: UseFormReturn<JadeEstimateCfg>;
 };
 const RailPassField = ({ form }: Props) => {
   const [usingRailPass, setUsingRailPass] = useState(false);
@@ -56,11 +55,21 @@ const RailPassField = ({ form }: Props) => {
                   <div className="flex-1">
                     <F.FormLabel>Days Left</F.FormLabel>
                     <F.FormDescription>
-                      You{'\''}ll receive 300 jades for renewing the subscription
+                      You{"'"}ll receive 300 jades for renewing the subscription
                     </F.FormDescription>
                   </div>
                   <F.FormControl>
-                    <Input type="number" {...field} className="w-20" />
+                    <Input
+                      type="number"
+                      min={0}
+                      {...field}
+                      onChange={(e) => {
+                        if (!Number.isNaN(e.currentTarget.value)) {
+                          field.onChange(Number(e.currentTarget.value));
+                        } else e.preventDefault();
+                      }}
+                      className="w-20"
+                    />
                   </F.FormControl>
                 </div>
               </F.FormItem>

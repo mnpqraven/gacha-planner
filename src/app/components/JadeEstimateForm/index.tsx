@@ -1,15 +1,10 @@
 "use client";
 
-import * as z from "zod";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useQuery } from "@tanstack/react-query";
-import { workerFetch } from "@/server/fetchHelper";
-import ENDPOINT from "@/server/endpoints";
 import {
   Form,
   FormControl,
@@ -29,7 +24,7 @@ import {
   SelectValue,
 } from "../ui/Select";
 import { Calendar } from "../ui/Calendar";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { dateToISO, objToDate } from "../schemas";
 import { useFuturePatchDateList } from "@/hooks/queries/useFuturePatchDate";
 import {
@@ -49,32 +44,38 @@ import { CurrentRollTab } from "./CurrentRollTab";
 import { RailPassField } from "./RailPassField";
 import { BattlePassField } from "./BattlePassField";
 import { Switch } from "../ui/Switch";
+import { PartialMessage } from "@bufbuild/protobuf";
+import {
+  BattlePassType,
+  EqTier,
+  JadeEstimateCfg,
+  Server,
+} from "@grpc/jadeestimate_pb";
+import { JadeEstimateFormContext } from "@/app/JadeEstimateProvider";
+import { zodResolver } from "@hookform/resolvers/zod";
+import ENDPOINT from "@/server/endpoints";
 
 type Props = {
   submitButton?: boolean;
-  updateTable: (to: z.infer<typeof ENDPOINT.jadeEstimate.response>) => void;
 };
 
-type FormSchema = z.infer<(typeof ENDPOINT)["jadeEstimate"]["payload"]>;
+type FormSchema = PartialMessage<JadeEstimateCfg>;
 
-export const defaultFormValues: FormSchema = {
-  server: "America",
+export const defaultFormValues: PartialMessage<JadeEstimateCfg> = {
+  server: Server.America,
   untilDate: dateToISO.parse(new Date()),
-  battlePass: { battlePassType: "None", currentLevel: 0 },
+  battlePass: { battlePassType: BattlePassType.None, currentLevel: 0 },
   railPass: {
     useRailPass: false,
     daysLeft: 30,
   },
-  eq: "Zero",
+  eq: EqTier.Zero,
   moc: 0,
   mocCurrentWeekDone: true,
   currentRolls: 0,
 };
 
-export default function JadeEstimateForm({
-  updateTable,
-  submitButton = false,
-}: Props) {
+export default function JadeEstimateForm({ submitButton = false }: Props) {
   const [uncontrolledDate, setUncontrolledDate] = useState<Date | undefined>(
     new Date()
   );
@@ -84,29 +85,21 @@ export default function JadeEstimateForm({
   const [savedFormData, setSavedFormData] = useLocalStorage<
     FormSchema | undefined
   >(STORAGE.jadeEstimateForm, undefined);
-  const [uncontrolledQueryPayload, setUncontrolledQueryPayload] =
-    useState(defaultFormValues);
+
+  // keybinds for jumper
+  const [open, setOpen] = useState(false);
 
   const { futurePatchDateList } = useFuturePatchDateList();
   const { futurePatchBannerList } = useFuturePatchBannerList();
+  const { updateForm } = useContext(JadeEstimateFormContext);
 
   // FORM SETUP
-  const form = useForm<FormSchema>({
+  const form = useForm<JadeEstimateCfg>({
     resolver: zodResolver(ENDPOINT.jadeEstimate.payload),
     defaultValues: defaultFormValues,
   });
   const debounceOnChange = useDebounce(form.handleSubmit(onSubmit), 300);
   const untilDateSubscription = form.watch("untilDate");
-
-  const { data } = useQuery({
-    queryKey: ["jadeEstimate", uncontrolledQueryPayload],
-    queryFn: async () =>
-      await workerFetch(ENDPOINT.jadeEstimate, {
-        payload: uncontrolledQueryPayload,
-        method: "POST",
-      }),
-    suspense: false,
-  });
 
   useEffect(() => {
     debounceOnChange(null);
@@ -116,17 +109,18 @@ export default function JadeEstimateForm({
   useEffect(() => {
     if (savedFormData) {
       form.reset(savedFormData);
-      const updatedDate = objToDate.parse(savedFormData.untilDate);
-      setUncontrolledDate(updatedDate);
-      setMonthController(updatedDate);
-      setUncontrolledQueryPayload(savedFormData);
+
+      {
+        // update date states for calendar footer
+        const updatedDate = objToDate.parse(savedFormData.untilDate);
+        setUncontrolledDate(updatedDate);
+        setMonthController(updatedDate);
+      }
+
+      updateForm(savedFormData);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [savedFormData]);
-
-  useEffect(() => {
-    if (data) updateTable(data);
-  }, [data, updateTable]);
 
   function onSubmit(values: FormSchema) {
     if (!equal(values, defaultFormValues)) {
@@ -149,12 +143,6 @@ export default function JadeEstimateForm({
     setOpen(false);
   }
 
-  function preventMinus(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.code === "Minus") e.preventDefault();
-  }
-
-  // keybinds for jumper
-  const [open, setOpen] = useState(false);
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "c" && (e.altKey || e.metaKey)) {
@@ -165,25 +153,6 @@ export default function JadeEstimateForm({
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
   }, []);
-
-  const eqField = {
-    label: "Equilibrum Level",
-    description: "You get more rewards the higher your Equilibrum level is",
-    options: [
-      { value: "Zero", label: "0 (TL 20-)" },
-      { value: "One", label: "1 (TL 20+)" },
-      { value: "Two", label: "2 (TL 30+)" },
-      { value: "Three", label: "3 (TL 40+)" },
-      { value: "Four", label: "4 (TL 50+)" },
-      { value: "Five", label: "5 (TL 60+)" },
-      { value: "Six", label: "6 (TL 65+)" },
-    ],
-  };
-  const mocField = {
-    label: "Memory of Chaos",
-    description: "Amount of stars you can clear in a MoC cycle",
-    options: mocStars(),
-  };
 
   return (
     <Form {...form}>
@@ -211,9 +180,11 @@ export default function JadeEstimateForm({
                     render={({ field: serverField }) => (
                       <FormItem>
                         <Select
-                          onValueChange={serverField.onChange}
-                          value={String(form.watch("server"))}
-                          defaultValue={serverField.value}
+                          onValueChange={(data) => {
+                            const asInt = parseInt(data);
+                            serverField.onChange(asInt);
+                          }}
+                          defaultValue="0"
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -221,8 +192,12 @@ export default function JadeEstimateForm({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="Asia">Asia</SelectItem>
-                            <SelectItem value="America">America</SelectItem>
+                            <SelectItem value={String(Server.Asia)}>
+                              {Server[Server.Asia]}
+                            </SelectItem>
+                            <SelectItem value={String(Server.America)}>
+                              {Server[Server.America]}
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </FormItem>
@@ -341,9 +316,12 @@ export default function JadeEstimateForm({
                   </FormDescription>
                 </div>
                 <Select
-                  onValueChange={field.onChange}
                   value={String(form.watch("eq"))}
-                  defaultValue={field.value}
+                  onValueChange={(data) => {
+                    const asInt = parseInt(data);
+                    field.onChange(asInt);
+                  }}
+                  defaultValue="0"
                 >
                   <FormControl>
                     <SelectTrigger className="w-fit">
@@ -351,13 +329,27 @@ export default function JadeEstimateForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="Zero">0 (TL 20-)</SelectItem>
-                    <SelectItem value="One">1 (TL 20+)</SelectItem>
-                    <SelectItem value="Two">2 (TL 30+)</SelectItem>
-                    <SelectItem value="Three">3 (TL 40+)</SelectItem>
-                    <SelectItem value="Four">4 (TL 50+)</SelectItem>
-                    <SelectItem value="Five">5 (TL 60+)</SelectItem>
-                    <SelectItem value="Six">6 (TL 65+)</SelectItem>
+                    <SelectItem value={String(EqTier.Zero)}>
+                      0 (TL 20-)
+                    </SelectItem>
+                    <SelectItem value={String(EqTier.One)}>
+                      1 (TL 20+)
+                    </SelectItem>
+                    <SelectItem value={String(EqTier.Two)}>
+                      2 (TL 30+)
+                    </SelectItem>
+                    <SelectItem value={String(EqTier.Three)}>
+                      3 (TL 40+)
+                    </SelectItem>
+                    <SelectItem value={String(EqTier.Four)}>
+                      4 (TL 50+)
+                    </SelectItem>
+                    <SelectItem value={String(EqTier.Five)}>
+                      5 (TL 60+)
+                    </SelectItem>
+                    <SelectItem value={String(EqTier.Six)}>
+                      6 (TL 65+)
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -379,7 +371,7 @@ export default function JadeEstimateForm({
                     </FormDescription>
                   </div>
                   <Select
-                    onValueChange={field.onChange}
+                    onValueChange={e => field.onChange(Number(e))}
                     value={String(form.watch("moc"))}
                     defaultValue={String(field.value)}
                   >

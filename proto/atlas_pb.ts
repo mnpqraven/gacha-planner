@@ -44,37 +44,6 @@ export class SignatureReturns extends Message<SignatureReturns> {
 }
 
 /**
- * @generated from message dm.atlas.What
- */
-export class What extends Message<What> {
-  constructor(data?: PartialMessage<What>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "dm.atlas.What";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): What {
-    return new What().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): What {
-    return new What().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): What {
-    return new What().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: What | PlainMessage<What> | undefined, b: What | PlainMessage<What> | undefined): boolean {
-    return proto3.util.equals(What, a, b);
-  }
-}
-
-/**
  * @generated from message dm.atlas.SignatureReturn
  */
 export class SignatureReturn extends Message<SignatureReturn> {
