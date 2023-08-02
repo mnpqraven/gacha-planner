@@ -53,7 +53,7 @@ import {
 } from "@grpc/jadeestimate_pb";
 import { JadeEstimateFormContext } from "@/app/JadeEstimateProvider";
 import { zodResolver } from "@hookform/resolvers/zod";
-import ENDPOINT from "@/server/endpoints";
+import { schema } from "./schema";
 
 type Props = {
   submitButton?: boolean;
@@ -95,7 +95,7 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
 
   // FORM SETUP
   const form = useForm<JadeEstimateCfg>({
-    resolver: zodResolver(ENDPOINT.jadeEstimate.payload),
+    resolver: zodResolver(schema),
     defaultValues: defaultFormValues,
   });
   const debounceOnChange = useDebounce(form.handleSubmit(onSubmit), 300);
@@ -123,10 +123,9 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
   }, [savedFormData]);
 
   function onSubmit(values: FormSchema) {
-    if (!equal(values, defaultFormValues)) {
-      // console.log("onSubmit", values);
-      // NOTE: this deep check is importnant
-      if (!equal(savedFormData, values)) setSavedFormData(values);
+    // NOTE: this deep check is importnant
+    if (!equal(values, defaultFormValues) && !equal(values, savedFormData)) {
+      setSavedFormData(values);
     }
   }
 
@@ -371,7 +370,7 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
                     </FormDescription>
                   </div>
                   <Select
-                    onValueChange={e => field.onChange(Number(e))}
+                    onValueChange={(e) => field.onChange(Number(e))}
                     value={String(form.watch("moc"))}
                     defaultValue={String(field.value)}
                   >

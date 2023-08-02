@@ -16,17 +16,17 @@ import {
   FormLabel,
   FormMessage,
 } from "../components/ui/Form";
-import * as z from "zod";
-import ENDPOINT from "@/server/endpoints";
 import { UseFormReturn } from "react-hook-form";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Switch } from "../components/ui/Switch";
+import { PlainMessage } from "@bufbuild/protobuf";
+import { BannerType, ProbabilityRatePayload } from "@grpc/probabilityrate_pb";
 
-type FormSchema = z.infer<typeof ENDPOINT.probabilityRate.payload>;
+type FormSchema = PlainMessage<ProbabilityRatePayload>;
 
 type Props = {
   updateQuery: (payload: FormSchema) => void;
-  bannerOnChange: (value: FormSchema["banner"]) => void;
+  bannerOnChange: (value: "SSR" | "SR" | "LC") => void;
   selectedBanner: Banner;
   form: UseFormReturn<FormSchema>;
 };
@@ -48,7 +48,7 @@ export function GachaForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(updateQuery)}
-        onInvalid={(e) => console.log(e)}
+        onInvalid={console.error}
         onChange={debounceOnChange}
       >
         <div className="flex flex-col flex-wrap justify-evenly gap-y-4 rounded-md border p-4 md:flex-row md:space-x-4">
@@ -59,12 +59,14 @@ export function GachaForm({
               <FormItem>
                 <FormLabel>Banner</FormLabel>
                 <Select
-                  defaultValue={field.value}
-                  onValueChange={(
-                    bannerType: (typeof bannerList)[number]["bannerType"]
-                  ) => {
-                    bannerOnChange(bannerType);
-                    field.onChange(bannerType);
+                  defaultValue={String(BannerType.SSR)}
+                  onValueChange={(bannerType) => {
+                    const parsed = BannerType[parseInt(bannerType)] as
+                      | "SSR"
+                      | "SR"
+                      | "LC";
+                    bannerOnChange(parsed);
+                    field.onChange(parseInt(bannerType));
                   }}
                 >
                   <FormControl>
@@ -74,7 +76,10 @@ export function GachaForm({
                   </FormControl>
                   <SelectContent position="popper">
                     {bannerList.map(({ bannerName, bannerType }, index) => (
-                      <SelectItem value={bannerType} key={index}>
+                      <SelectItem
+                        value={String(BannerType[bannerType])}
+                        key={index}
+                      >
                         {bannerName}
                       </SelectItem>
                     ))}

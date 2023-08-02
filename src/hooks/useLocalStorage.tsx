@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 /**
  * WARN: TESTS NEEDED
  */
-export function useLocalStorage<T>(key: string, fallbackValue: T) {
+export function useLocalStorage<T>(key: string, fallbackValue: T | undefined) {
   const [value, setValue] = useState(fallbackValue);
   useEffect(() => {
     const stored = localStorage.getItem(key);
