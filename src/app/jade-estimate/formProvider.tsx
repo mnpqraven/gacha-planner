@@ -7,7 +7,7 @@ import { JadeEstimateCfg, JadeEstimateResponse } from "@grpc/jadeestimate_pb";
 import { useQuery } from "@tanstack/react-query";
 import { rpc } from "@/server/typedEndpoints";
 import { JadeEstimateService } from "@grpc/jadeestimate_connect";
-import { placeholderTableData } from "./tableData";
+import { placeholderTableData } from "./defaultTableData";
 import equal from "fast-deep-equal/react";
 
 interface JadeEstimateFormContextPayload {

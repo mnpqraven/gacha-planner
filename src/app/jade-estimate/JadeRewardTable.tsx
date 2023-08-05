@@ -10,15 +10,20 @@ import {
   TableRow,
 } from "../components/ui/Table";
 import { AlertCircle } from "lucide-react";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "../components/ui/HoverCard";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "../components/ui/HoverCard";
 import { useContext } from "react";
 import { JadeEstimateFormContext } from "./formProvider";
 import { JadeEstimateResponse } from "@grpc/jadeestimate_pb";
+import { placeholderTableData } from "./defaultTableData";
+import { PlainMessage } from "@bufbuild/protobuf";
 
 const JadeRewardTable = () => {
-  const { rewardTable: data, isLoading } = useContext(JadeEstimateFormContext);
-
-  if (!data || isLoading) return null;
+  const { rewardTable } = useContext(JadeEstimateFormContext);
+  const data = rewardTable ?? placeholderTableData;
 
   return (
     <Table>
@@ -36,8 +41,8 @@ const JadeRewardTable = () => {
               <HoverCardContent side="top" className="w-96 text-justify">
                 These are repeatable rewards that are guaranteed to you and does
                 not include one-off rewards like events or redemption
-                codes/promotions. You are bound to receive more than the
-                table shows as you play the game.
+                codes/promotions. You are bound to receive more than the table
+                shows as you play the game.
               </HoverCardContent>
             </HoverCard>
           </TableHead>
@@ -72,7 +77,9 @@ const JadeRewardTable = () => {
           </TableRow>
         ))}
         <TableRow>
-          <TableCell className="font-bold">Total {parseDayCount(data)}</TableCell>
+          <TableCell className="font-bold">
+            Total {parseDayCount(data)}
+          </TableCell>
           <TableCell />
           <TableCell className="font-bold">{data.totalJades}</TableCell>
           <TableCell className="font-bold">{data.rolls}</TableCell>
@@ -82,7 +89,7 @@ const JadeRewardTable = () => {
   );
 };
 
-function parseDayCount(data: JadeEstimateResponse | undefined) {
+function parseDayCount(data: PlainMessage<JadeEstimateResponse> | undefined) {
   if (data) {
     if (data.days <= 1) return `(${data.days} day)`;
     else return `(${data.days} days)`;

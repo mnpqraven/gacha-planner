@@ -1,6 +1,10 @@
 import ENDPOINT from "@/server/endpoints";
-import { PartialMessage } from "@bufbuild/protobuf";
-import { JadeEstimateResponse, RewardFrequency } from "@grpc/jadeestimate_pb";
+import { PartialMessage, PlainMessage } from "@bufbuild/protobuf";
+import {
+  JadeEstimateResponse,
+  RewardFrequency,
+  RewardSource,
+} from "@grpc/jadeestimate_pb";
 import * as z from "zod";
 
 // export const placeholderTableData: z.infer<typeof ENDPOINT['jadeEstimate']['response']> = {
@@ -19,7 +23,7 @@ import * as z from "zod";
 //   ],
 // }
 
-export const placeholderTableData: PartialMessage<JadeEstimateResponse> = {
+export const placeholderTableData: PlainMessage<JadeEstimateResponse> = {
   days: 0,
   rolls: 0,
   totalJades: 0,
