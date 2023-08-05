@@ -1,27 +1,46 @@
 import { UseFormReturn } from "react-hook-form";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
-import * as F from "../ui/Form";
-import { Input } from "../ui/Input";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../components/ui/Tabs";
+import * as F from "../../components/ui/Form";
+import { Input } from "../../components/ui/Input";
 import { JadeEstimateCfg } from "@grpc/jadeestimate_pb";
+import { cva } from "class-variance-authority";
 
 type Props = {
   form: UseFormReturn<JadeEstimateCfg>;
 };
+
 const CurrentRollTab = ({ form }: Props) => {
+  const { errors } = form.formState;
+
   return (
     <div className="flex items-center space-x-4 rounded-md border p-4">
       <Tabs defaultValue="currentRolls" className="w-full">
         <TabsList className="w-full">
-          <TabsTrigger value="currentRolls" className="w-full">
+          <TabsTrigger
+            value="currentRolls"
+            className={triggerVariant("currentRolls", errors)}
+          >
             Sp. Passes
           </TabsTrigger>
-          <TabsTrigger value="currentJades" className="w-full">
+          <TabsTrigger
+            value="currentJades"
+            className={triggerVariant("currentJades", errors)}
+          >
             Jades
           </TabsTrigger>
-          <TabsTrigger value="dailyRefills" className="w-full">
+          <TabsTrigger
+            value="dailyRefills"
+            className={triggerVariant("dailyRefills", errors)}
+          >
             Daily Refills
           </TabsTrigger>
         </TabsList>
+
         <TabsContent value="currentRolls">
           <F.FormField
             control={form.control}
@@ -54,6 +73,7 @@ const CurrentRollTab = ({ form }: Props) => {
             )}
           />
         </TabsContent>
+
         <TabsContent value="currentJades">
           <F.FormField
             control={form.control}
@@ -86,6 +106,7 @@ const CurrentRollTab = ({ form }: Props) => {
             )}
           />
         </TabsContent>
+
         <TabsContent value="dailyRefills">
           <F.FormField
             control={form.control}
@@ -123,4 +144,20 @@ const CurrentRollTab = ({ form }: Props) => {
     </div>
   );
 };
+
 export { CurrentRollTab };
+
+function triggerVariant(key: string, errors: object) {
+  const variant = cva("w-full", {
+    variants: {
+      variant: {
+        default: "",
+        error: "text-destructive data-[state=active]:text-destructive",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  });
+  return variant({ variant: key in errors ? "error" : "default" });
+}

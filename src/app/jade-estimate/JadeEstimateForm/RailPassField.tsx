@@ -1,21 +1,15 @@
 import { UseFormReturn } from "react-hook-form";
-import * as F from "../ui/Form";
-import { Switch } from "../ui/Switch";
-import { useState } from "react";
-import { Separator } from "../ui/Separator";
-import { Input } from "../ui/Input";
-import { useEffect } from "react";
+import * as F from "../../components/ui/Form";
+import { Switch } from "../../components/ui/Switch";
+import { Separator } from "../../components/ui/Separator";
+import { Input } from "../../components/ui/Input";
 import { JadeEstimateCfg } from "@grpc/jadeestimate_pb";
 
 type Props = {
   form: UseFormReturn<JadeEstimateCfg>;
 };
 const RailPassField = ({ form }: Props) => {
-  const [usingRailPass, setUsingRailPass] = useState(false);
-  const subscriber = form.watch("railPass.useRailPass");
-  useEffect(() => {
-    setUsingRailPass(subscriber);
-  }, [subscriber]);
+  const useRailPass = form.watch("railPass.useRailPass");
 
   return (
     <div className="rounded-md border p-4">
@@ -32,10 +26,7 @@ const RailPassField = ({ form }: Props) => {
               <F.FormControl>
                 <Switch
                   checked={field.value}
-                  onCheckedChange={(e) => {
-                    setUsingRailPass(e);
-                    field.onChange(e);
-                  }}
+                  onCheckedChange={field.onChange}
                 />
               </F.FormControl>
             </div>
@@ -43,7 +34,7 @@ const RailPassField = ({ form }: Props) => {
           </F.FormItem>
         )}
       />
-      {usingRailPass && (
+      {useRailPass && (
         <>
           <Separator className="my-4" />
           <F.FormField

@@ -8,11 +8,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "./ui/Table";
+} from "../components/ui/Table";
 import { AlertCircle } from "lucide-react";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/HoverCard";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "../components/ui/HoverCard";
 import { useContext } from "react";
-import { JadeEstimateFormContext } from "../JadeEstimateProvider";
+import { JadeEstimateFormContext } from "./formProvider";
 import { JadeEstimateResponse } from "@grpc/jadeestimate_pb";
 
 const JadeRewardTable = () => {
@@ -23,7 +23,7 @@ const JadeRewardTable = () => {
   return (
     <Table>
       <TableCaption>
-        Breakdown of where you{"'"}re getting the jades
+        Breakdown of where you are getting Stellar Jades
       </TableCaption>
       <TableHeader>
         <TableRow>
@@ -36,7 +36,7 @@ const JadeRewardTable = () => {
               <HoverCardContent side="top" className="w-96 text-justify">
                 These are repeatable rewards that are guaranteed to you and does
                 not include one-off rewards like events or redemption
-                codes/promotions. You{"'"}re bound to receive more than the
+                codes/promotions. You are bound to receive more than the
                 table shows as you play the game.
               </HoverCardContent>
             </HoverCard>

@@ -2,8 +2,8 @@ import { useFuturePatchBannerList } from "@/hooks/queries/useFuturePatchBanner";
 import { useFuturePatchDateList } from "@/hooks/queries/useFuturePatchDate";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { Dialog, DialogContent, DialogTrigger } from "../ui/Dialog";
-import { CharacterTabWrapper } from "../Character/CharacterTabWrapper";
+import { Dialog, DialogContent, DialogTrigger } from "../../components/ui/Dialog";
+import { CharacterTabWrapper } from "../../components/Character/CharacterTabWrapper";
 
 type Props = {
   date: Date | undefined;

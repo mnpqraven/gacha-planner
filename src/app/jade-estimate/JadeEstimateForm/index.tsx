@@ -13,19 +13,23 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/Form";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
-import { Button } from "../ui/Button";
+} from "../../components/ui/Form";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "../../components/ui/Popover";
+import { Button } from "../../components/ui/Button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/Select";
-import { Calendar } from "../ui/Calendar";
+} from "../../components/ui/Select";
+import { Calendar } from "../../components/ui/Calendar";
 import { useContext, useEffect, useState } from "react";
-import { dateToISO, objToDate } from "../schemas";
+import { dateToISO, objToDate } from "../../components/schemas";
 import { useFuturePatchDateList } from "@/hooks/queries/useFuturePatchDate";
 import {
   CommandEmpty,
@@ -34,7 +38,7 @@ import {
   CommandItem,
   CommandList,
   CommandDialog,
-} from "../ui/Command";
+} from "../../components/ui/Command";
 import equal from "fast-deep-equal/react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import STORAGE from "@/server/storage";
@@ -43,7 +47,7 @@ import { CalendarFooter } from "./CalendarFooter";
 import { CurrentRollTab } from "./CurrentRollTab";
 import { RailPassField } from "./RailPassField";
 import { BattlePassField } from "./BattlePassField";
-import { Switch } from "../ui/Switch";
+import { Switch } from "../../components/ui/Switch";
 import { PartialMessage } from "@bufbuild/protobuf";
 import {
   BattlePassType,
@@ -51,9 +55,11 @@ import {
   JadeEstimateCfg,
   Server,
 } from "@grpc/jadeestimate_pb";
-import { JadeEstimateFormContext } from "@/app/JadeEstimateProvider";
+import { JadeEstimateFormContext } from "@/app/jade-estimate/formProvider";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { schema } from "./schema";
+import { useToast } from "@/app/components/ui/Toast/useToast";
+import { ToastAction } from "@/app/components/ui/Toast/Toast";
 
 type Props = {
   submitButton?: boolean;
@@ -61,7 +67,7 @@ type Props = {
 
 type FormSchema = PartialMessage<JadeEstimateCfg>;
 
-export const defaultFormValues: PartialMessage<JadeEstimateCfg> = {
+export const defaultValues: PartialMessage<JadeEstimateCfg> = {
   server: Server.America,
   untilDate: dateToISO.parse(new Date()),
   battlePass: { battlePassType: BattlePassType.None, currentLevel: 0 },
@@ -76,6 +82,8 @@ export const defaultFormValues: PartialMessage<JadeEstimateCfg> = {
 };
 
 export default function JadeEstimateForm({ submitButton = false }: Props) {
+  const { toast } = useToast();
+  const [mounted, setMounted] = useState(false);
   const [uncontrolledDate, setUncontrolledDate] = useState<Date | undefined>(
     new Date()
   );
@@ -96,10 +104,34 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
   // FORM SETUP
   const form = useForm<JadeEstimateCfg>({
     resolver: zodResolver(schema),
-    defaultValues: defaultFormValues,
+    defaultValues,
   });
   const debounceOnChange = useDebounce(form.handleSubmit(onSubmit), 300);
   const untilDateSubscription = form.watch("untilDate");
+
+  useEffect(() => {
+    const { success } = schema.safeParse(savedFormData);
+    if (!mounted && savedFormData && !success) {
+      toast({
+        title: "Outdated Local Cache",
+        description:
+          "The local cache seems to be outdated, this is usually due to an update to the website, if you are seeing this please either do a hard reload with Ctrl + Shift + R or click the 'Reload' button.",
+        action: (
+          <ToastAction
+            altText="Reload"
+            onClick={() => {
+              setSavedFormData(defaultValues);
+              form.reset(defaultValues);
+            }}
+          >
+            Reload
+          </ToastAction>
+        ),
+      });
+      setMounted(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted, savedFormData]);
 
   useEffect(() => {
     debounceOnChange(null);
@@ -116,7 +148,6 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
         setUncontrolledDate(updatedDate);
         setMonthController(updatedDate);
       }
-
       updateForm(savedFormData);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -124,7 +155,7 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
 
   function onSubmit(values: FormSchema) {
     // NOTE: this deep check is importnant
-    if (!equal(values, defaultFormValues) && !equal(values, savedFormData)) {
+    if (!equal(values, defaultValues) && !equal(values, savedFormData)) {
       setSavedFormData(values);
     }
   }

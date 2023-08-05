@@ -1,8 +1,8 @@
 import { UseFormReturn } from "react-hook-form";
-import * as F from "../ui/Form";
-import * as S from "../ui/Select";
-import { Separator } from "../ui/Separator";
-import { Input } from "../ui/Input";
+import * as F from "../../components/ui/Form";
+import * as S from "../../components/ui/Select";
+import { Separator } from "../../components/ui/Separator";
+import { Input } from "../../components/ui/Input";
 import { BattlePassType, JadeEstimateCfg } from "@grpc/jadeestimate_pb";
 
 type Props = {
@@ -10,7 +10,7 @@ type Props = {
 };
 
 const BattlePassField = ({ form }: Props) => {
-  const usingBP = form.watch("battlePass.battlePassType");
+  const battlePassType = form.watch("battlePass.battlePassType");
 
   return (
     <div className="rounded-md border p-4">
@@ -29,7 +29,7 @@ const BattlePassField = ({ form }: Props) => {
                 </F.FormDescription>
               </div>
               <S.Select
-                value={String(form.watch("battlePass.battlePassType"))}
+                value={String(field.value)}
                 onValueChange={(data) => {
                   const asInt = parseInt(data);
                   field.onChange(asInt);
@@ -58,8 +58,8 @@ const BattlePassField = ({ form }: Props) => {
           </F.FormItem>
         )}
       />
-      {usingBP !== BattlePassType.None && <Separator className="my-4" />}
-      {usingBP !== BattlePassType.None && (
+      {battlePassType !== BattlePassType.None && <Separator className="my-4" />}
+      {battlePassType !== BattlePassType.None && (
         <F.FormField
           control={form.control}
           name="battlePass.currentLevel"

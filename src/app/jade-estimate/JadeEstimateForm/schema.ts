@@ -22,7 +22,7 @@ export const schema = z.object({
   eq: z.nativeEnum(EqTier),
   moc: z.number().nonnegative(),
   mocCurrentWeekDone: z.boolean(),
-  currentRolls: z.number().nonnegative(),
-  currentJades: z.number().nonnegative(),
-  dailyRefills: z.number().nonnegative(),
+  currentRolls: z.number().nonnegative().optional(),
+  currentJades: z.number().nonnegative().optional(),
+  dailyRefills: z.number().nonnegative().optional(),
 });
