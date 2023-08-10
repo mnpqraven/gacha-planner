@@ -393,7 +393,7 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
             name="moc"
             render={({ field }) => (
               <FormItem>
-                <div className="flex items-center space-x-4 rounded-md border p-4">
+                <div className="flex h-full space-x-4 rounded-md border p-4">
                   <div className="flex-1 space-y-1">
                     <FormLabel>Memory of Chaos</FormLabel>
                     <FormDescription>
@@ -406,7 +406,7 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
                     defaultValue={String(field.value)}
                   >
                     <FormControl>
-                      <SelectTrigger className="w-fit">
+                      <SelectTrigger className="w-fit place-self-center">
                         <SelectValue />
                       </SelectTrigger>
                     </FormControl>
@@ -429,7 +429,7 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
             name="mocCurrentWeekDone"
             render={({ field }) => (
               <FormItem>
-                <div className="flex items-center space-x-4 rounded-md border p-4">
+                <div className="flex h-full space-x-4 rounded-md border p-4">
                   <div className="flex-1 space-y-1">
                     <FormLabel>Current Cycle Completed</FormLabel>
                     <FormDescription>
@@ -438,6 +438,7 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
                   </div>
                   <FormControl>
                     <Switch
+                      className="place-self-center"
                       onCheckedChange={field.onChange}
                       checked={field.value}
                     />
