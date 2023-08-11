@@ -64,3 +64,15 @@ export function asPercentage(data: number | undefined): string {
     return Number(`${(data * 100).toFixed(2)}`).toString() + " %";
   }
 }
+
+/**
+ * If 2 Javascript Date objects has the same date, ignoring its hours,
+ * minutes and seconds
+ */
+export function sameDate(a: Date, b: Date): boolean {
+  return (
+    a.getDate() === b.getDate() &&
+    a.getMonth() === b.getMonth() &&
+    a.getFullYear() === b.getFullYear()
+  );
+}
