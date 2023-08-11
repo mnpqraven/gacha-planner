@@ -84,9 +84,7 @@ export const defaultValues: PartialMessage<JadeEstimateCfg> = {
 export default function JadeEstimateForm({ submitButton = false }: Props) {
   const { toast } = useToast();
   const [mounted, setMounted] = useState(false);
-  const [uncontrolledDate, setUncontrolledDate] = useState<Date | undefined>(
-    new Date()
-  );
+  const [uncontrolledDate, setUncontrolledDate] = useState<Date>(new Date());
   const [monthController, setMonthController] = useState<Date | undefined>(
     uncontrolledDate
   );
