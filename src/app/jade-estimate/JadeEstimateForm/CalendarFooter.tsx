@@ -1,76 +1,82 @@
-import { useFuturePatchBannerList } from "@/hooks/queries/useFuturePatchBanner";
-import { useFuturePatchDateList } from "@/hooks/queries/useFuturePatchDate";
-import { cn } from "@/lib/utils";
-import Image from "next/image";
-import { Dialog, DialogContent, DialogTrigger } from "../../components/ui/Dialog";
-import { CharacterTabWrapper } from "../../components/Character/CharacterTabWrapper";
+import { cn, sameDate } from "@/lib/utils";
+import { useBannerList } from "@/hooks/queries/useBannerList";
+import { useMemo } from "react";
+import { useQueries } from "@tanstack/react-query";
+import API from "@/server/typedEndpoints";
+import { usePatchDateHelper } from "@/hooks/usePatchDateHelper";
+import { LightConeIcon } from "@/app/lightcone-db/LightConeIcon";
+import { CharacterIcon } from "@/app/character-db/CharacterIcon";
+import { Skeleton } from "@/app/components/ui/Skeleton";
 
 type Props = {
-  date: Date | undefined;
+  date: Date;
 };
+
 const CalendarFooter = ({ date }: Props) => {
-  const { futurePatchDateList } = useFuturePatchDateList();
-  const { futurePatchBannerList } = useFuturePatchBannerList();
+  const { bannerList } = useBannerList();
+  const { getVersion, currentPatch } = usePatchDateHelper();
 
-  function sameDate(a: Date, b: Date) {
-    return (
-      a.getDate() === b.getDate() &&
-      a.getMonth() === b.getMonth() &&
-      a.getFullYear() === b.getFullYear()
-    );
-  }
+  const banner = useMemo(
+    () => bannerList.find((e) => e.version == getVersion(date)),
+    [bannerList, getVersion, date]
+  );
+  const charas = banner?.chara ?? [];
+  const lcs = banner?.lc ?? [];
 
-  if (!date) return null;
+  const avatarQueries = useQueries({
+    queries: charas.map((id) => ({
+      queryKey: ["character", id],
+      queryFn: async () => API.character.get(id),
+      enabled: !!banner,
+    })),
+  });
 
-  const hasDate = (e: { dateStart: string }) =>
-    sameDate(new Date(e.dateStart), date);
+  const lcQueries = useQueries({
+    queries: lcs.map((id) => ({
+      queryKey: ["lightConeMetadata", id],
+      queryFn: async () => await API.lightConeMetadata.get(id),
+    })),
+  });
 
-  const start = futurePatchDateList.list.find(hasDate);
-  const banner = futurePatchBannerList.list.find(hasDate);
-
-  if (!start && !banner) return null;
-  const color = banner?.characterData?.damage_type
-    ? `border-${banner.characterData.damage_type?.toLowerCase()}`
-    : "";
+  const start = sameDate(date, currentPatch(date).startDate);
 
   return (
-    <div className="flex w-full flex-col justify-center">
-      {start && (
-        <span className="text-center">Start of patch {start.version}</span>
-      )}
-      {banner && banner.characterData && (
-        <div className="flex flex-col gap-2.5">
-          <p className="whitespace-pre-wrap text-center">
-            {banner.characterData.avatar_name}
-          </p>
-          <div className="flex gap-2.5">
-            <Dialog>
-              <DialogTrigger>
-                <Image
-                  src={`https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/icon/character/${banner.characterData.avatar_id}.png`}
-                  alt=""
-                  className={cn("h-20 w-20 rounded-full border-2", color)}
-                  width={128}
-                  height={128}
-                />
-              </DialogTrigger>
-              <DialogContent className="min-h-[16rem] sm:max-w-4xl">
-                {banner.characterData.avatar_id && (
-                  <CharacterTabWrapper
-                    characterId={banner.characterData.avatar_id}
-                  />
-                )}
-              </DialogContent>
-            </Dialog>
+    <div className="mt-2.5 flex w-full flex-col items-center justify-center gap-2.5">
+      <div id="patch-header" className="text-center">
+        {start ? "Start of patch" : "Patch"} {getVersion(date)}
+      </div>
 
-            <div className="flex flex-col">
-              {banner.characterData.rarity} ✦{" "}
-              {banner.characterData.avatar_base_type}
-            </div>
-          </div>
-        </div>
-      )}
+      <div>Character Banner</div>
+
+      <div className="flex gap-2.5">
+        {avatarQueries.map((query, index) =>
+          query.data ? (
+            <CharacterIcon key={index} data={query.data} />
+          ) : (
+            <LoadingIcon key={index} rounded />
+          )
+        )}
+      </div>
+
+      <div>Light Cone Banner</div>
+
+      <div className="flex gap-2.5">
+        {lcQueries.map((query, index) =>
+          query.data ? (
+            <LightConeIcon key={index} data={query.data} />
+          ) : (
+            <LoadingIcon key={index} />
+          )
+        )}
+      </div>
     </div>
   );
 };
+
+const LoadingIcon = ({ rounded = false }: { rounded?: boolean }) => (
+  <Skeleton
+    className={cn("h-12 w-12", rounded ? "rounded-full" : "rounded-md")}
+  />
+);
+
 export { CalendarFooter };
