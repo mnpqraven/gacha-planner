@@ -1,6 +1,7 @@
 import { SkillType } from "@/bindings/AvatarSkillConfig";
 import { ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import Svg from 'react-inlinesvg'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -55,13 +56,14 @@ export function sanitizeNewline(data?: string) {
 
 /**
  * This function removes trailing zeroes if it's a whole number (eg. 18.00)
- * Otherwise a float percent with 2 decimals is returned
+ * Otherwise a float percent with n decimals is returned
+ * @param fixed amount of decimals, defaults to 2
  * undefined number will return '0 %'
  */
-export function asPercentage(data: number | undefined): string {
+export function asPercentage(data: number | undefined, fixed?: number): string {
   if (!data) return "0 %";
   else {
-    return Number(`${(data * 100).toFixed(2)}`).toString() + " %";
+    return Number(`${(data * 100).toFixed(fixed ?? 2)}`).toString() + " %";
   }
 }
 
@@ -76,3 +78,5 @@ export function sameDate(a: Date, b: Date): boolean {
     a.getFullYear() === b.getFullYear()
   );
 }
+
+export const SVG = Svg

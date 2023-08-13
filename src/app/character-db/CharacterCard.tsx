@@ -91,7 +91,7 @@ export { CharacterCard };
 interface RarityIconProps extends HTMLAttributes<HTMLDivElement> {
   rarity: number;
 }
-const RarityIcon = forwardRef<HTMLDivElement, RarityIconProps>(
+export const RarityIcon = forwardRef<HTMLDivElement, RarityIconProps>(
   ({ rarity, className, ...props }, ref) => (
     <div
       className={cn("absolute flex justify-center", className)}
