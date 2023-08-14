@@ -1,4 +1,4 @@
-import { SVG, cn } from "@/lib/utils";
+import { cn, img } from "@/lib/utils";
 import { HTMLAttributes, forwardRef, useContext } from "react";
 import {
   MihomoPropertyConfig,
@@ -7,9 +7,9 @@ import {
   MihomoSubAffixInfo,
 } from "@/app/profile/types";
 import Image from "next/image";
-import { img } from "@/app/profile/page";
 import { Badge } from "@/app/components/ui/Badge";
 import { CardConfigContext } from "../../ConfigControllerContext";
+import SVG from "react-inlinesvg";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {}
 export const RelicInfo = forwardRef<HTMLDivElement, Props>(

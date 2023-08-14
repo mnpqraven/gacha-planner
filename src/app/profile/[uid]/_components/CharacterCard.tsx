@@ -1,7 +1,6 @@
 "use client";
 
 import { useContext, useEffect } from "react";
-import { img } from "../../page";
 import { MihomoResponse } from "../../types";
 import { CharacterInfo } from "./info_block/CharacterInfo";
 import { SkillInfo } from "./skill_block/SkillInfo";
@@ -10,6 +9,7 @@ import { RelicInfo } from "./relic_block/RelicInfo";
 import { StatTable } from "./stat_block/StatTable";
 import { SpiderChart } from "./SpiderChart";
 import { CardConfigContext } from "../ConfigControllerContext";
+import { img } from "@/lib/utils";
 
 interface Props {
   data: MihomoResponse;

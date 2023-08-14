@@ -1,10 +1,9 @@
 "use client";
 
 import { HTMLAttributes, forwardRef, useContext } from "react";
-import { img } from "../../page";
 import { MihomoCharacter } from "../../types";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
+import { cn, img } from "@/lib/utils";
 import { CardConfigContext } from "../ConfigControllerContext";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {

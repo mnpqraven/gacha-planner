@@ -1,7 +1,6 @@
-import { cn } from "@/lib/utils";
+import { cn, img } from "@/lib/utils";
 import { HTMLAttributes, forwardRef, useContext } from "react";
 import Image from "next/image";
-import { img } from "@/app/profile/page";
 import { ImpositionIcon } from "../ImpositionIcon";
 import { CardConfigContext } from "../../ConfigControllerContext";
 

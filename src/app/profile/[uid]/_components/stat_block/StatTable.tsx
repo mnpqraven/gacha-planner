@@ -3,8 +3,9 @@ import {
   MihomoPropertyConfig,
 } from "@/app/profile/types";
 import { Element } from "@/bindings/AvatarConfig";
-import { SVG, asPercentage, cn } from "@/lib/utils";
+import { asPercentage, cn } from "@/lib/utils";
 import { HTMLAttributes, forwardRef } from "react";
+import SVG from "react-inlinesvg";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   element: Element;

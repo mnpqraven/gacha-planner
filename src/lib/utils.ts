@@ -1,7 +1,6 @@
 import { SkillType } from "@/bindings/AvatarSkillConfig";
 import { ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import Svg from 'react-inlinesvg'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -79,4 +78,6 @@ export function sameDate(a: Date, b: Date): boolean {
   );
 }
 
-export const SVG = Svg
+const IMG_REPO = "https://raw.githubusercontent.com/Mar-7th/StarRailRes/master";
+export const img = (suffix: string) =>
+  suffix.startsWith("/") ? IMG_REPO + suffix : IMG_REPO + "/" + suffix;
