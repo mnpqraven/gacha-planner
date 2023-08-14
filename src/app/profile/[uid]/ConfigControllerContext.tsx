@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Dispatch,
   ReactNode,
   RefObject,
   createContext,
@@ -9,7 +10,12 @@ import {
   useState,
 } from "react";
 import { MihomoCharacter, MihomoPlayer } from "../types";
-import { configReducer, initialConfig } from "./configReducer";
+import {
+  CardConfig,
+  CardConfigAction,
+  configReducer,
+  initialConfig,
+} from "./configReducer";
 
 interface CardConfigContextPayload {
   currentCharacter?: MihomoCharacter;
@@ -17,6 +23,8 @@ interface CardConfigContextPayload {
   player?: MihomoPlayer;
   setPlayer: (to: MihomoPlayer) => void;
   enkaRef: RefObject<HTMLDivElement> | null;
+  config: CardConfig;
+  changeConfig: Dispatch<CardConfigAction>;
 }
 
 export const defaultCardConfig: CardConfigContextPayload = {
@@ -25,6 +33,8 @@ export const defaultCardConfig: CardConfigContextPayload = {
   player: undefined,
   setPlayer: () => {},
   enkaRef: null,
+  config: initialConfig,
+  changeConfig: () => {},
 };
 
 export const CardConfigContext =
@@ -49,7 +59,15 @@ function useCardConfigController(): CardConfigContextPayload {
   // for image exporting
   const enkaRef = useRef<HTMLDivElement>(null);
 
-  const [config, dispatch] = useReducer(configReducer, initialConfig);
+  const [config, changeConfig] = useReducer(configReducer, initialConfig);
 
-  return { currentCharacter, setCurrentCharacter, player, setPlayer, enkaRef };
+  return {
+    currentCharacter,
+    setCurrentCharacter,
+    player,
+    setPlayer,
+    enkaRef,
+    config,
+    changeConfig,
+  };
 }

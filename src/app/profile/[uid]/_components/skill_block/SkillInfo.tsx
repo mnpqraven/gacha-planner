@@ -4,6 +4,7 @@ import { cn, img } from "@/lib/utils";
 import Image from "next/image";
 import { Badge } from "@/app/components/ui/Badge";
 import { CardConfigContext } from "../../ConfigControllerContext";
+import { Separator } from "@/app/components/ui/Separator";
 
 const DISPLAY_SKILL_TYPES: SkillType[] = [
   "Talent",
@@ -30,23 +31,24 @@ export const SkillInfo = forwardRef<HTMLDivElement, Props>(
       <div
         className={cn(
           className,
-          "flex flex-col items-center justify-center pt-[72px]"
+          "flex flex-col items-center justify-center gap-2 pt-[72px]"
         )}
         ref={ref}
         {...props}
       >
-        {skills.map(({ icon, id, level: slv, type }) => (
+        {skills.map(({ icon, id, level: slv, type }, index) => (
           <div key={id} className="flex flex-col items-center">
-            <Badge className="w-fit">{type}</Badge>
+            <span className="mb-1">{getLabel(type)}</span>
             <Image src={img(icon)} alt="" height={48} width={48} />
             <span
               className={cn(
-                isImprovedByEidolon(type, eidolon) ? "text-blue-300" : "",
+                isImprovedByEidolon(type, eidolon) ? "text-[#6cfff7]" : "",
                 "font-bold"
               )}
             >
               {slv} / {getSkillMaxLevel(type, eidolon)}
             </span>
+            {index < skills.length - 1 && <Separator className="my-1" />}
           </div>
         ))}
       </div>
@@ -54,6 +56,21 @@ export const SkillInfo = forwardRef<HTMLDivElement, Props>(
   }
 );
 SkillInfo.displayName = "SkillInfo";
+
+function getLabel(skillType: SkillType): string {
+  switch (skillType) {
+    case "Normal":
+      return "Basic";
+    case "BPSkill":
+      return "Skill";
+    case "Ultra":
+      return "Ult";
+    case "Talent":
+      return "Talent";
+    default:
+      return "";
+  }
+}
 
 function getSkillMaxLevel(skillType: SkillType, eidolon: number): number {
   switch (skillType) {

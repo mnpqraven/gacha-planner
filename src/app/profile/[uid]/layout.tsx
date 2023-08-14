@@ -24,15 +24,15 @@ export default async function Layout({ params, children }: Props) {
   const mhyData = await getMihomoInfo(uid);
 
   return (
-    <main className="flex-col items-center justify-center">
-      <CardConfigController>
-        <div className="flex">
+    <CardConfigController>
+      <main className="flex flex-col items-center justify-center">
+        <div className="mt-2 flex items-center justify-center gap-2">
           <LineupSelector characters={mhyData.characters} />
           <Exporter />
           <ConfigController />
         </div>
         {children}
-      </CardConfigController>
-    </main>
+      </main>
+    </CardConfigController>
   );
 }

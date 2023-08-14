@@ -5,6 +5,7 @@ import { MihomoCharacter } from "../../types";
 import Image from "next/image";
 import { cn, img } from "@/lib/utils";
 import { CardConfigContext } from "../ConfigControllerContext";
+import { Toggle } from "@/app/components/ui/Toggle";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   characters: MihomoCharacter[];
@@ -12,15 +13,20 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 
 export const LineupSelector = forwardRef<HTMLDivElement, Props>(
   ({ characters, className }, ref) => {
-    const { setCurrentCharacter } = useContext(CardConfigContext);
+    const { setCurrentCharacter, currentCharacter } =
+      useContext(CardConfigContext);
 
     return (
       <div
-        className={cn(className, "flex gap-2 rounded-md border-2")}
+        className={cn(className, "flex gap-2 rounded-md border p-2")}
         ref={ref}
       >
         {characters.map((character, index) => (
-          <div key={index}>
+          <Toggle
+            key={index}
+            className="h-16 w-16 rounded-full p-0"
+            pressed={character.id == currentCharacter?.id}
+          >
             <Image
               src={img(character.icon)}
               width={64}
@@ -29,7 +35,7 @@ export const LineupSelector = forwardRef<HTMLDivElement, Props>(
               className="cursor-pointer rounded-full border"
               onClick={() => setCurrentCharacter(character)}
             />
-          </div>
+          </Toggle>
         ))}
       </div>
     );

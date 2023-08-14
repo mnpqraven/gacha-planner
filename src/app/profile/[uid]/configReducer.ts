@@ -2,6 +2,9 @@ export const initialConfig: CardConfig = {
   showStatName: true,
   showPlayerInfo: false,
   hoverVerbosity: "none",
+  statTableConfig: {
+    showEmptyStat: false,
+  },
 };
 
 export function configReducer(
@@ -16,6 +19,11 @@ export function configReducer(
       return { ...state, showStatName: payload };
     case "changeHoverVerbosity":
       return { ...state, hoverVerbosity: payload };
+    case "toggleEmptyStat":
+      return {
+        ...state,
+        statTableConfig: { ...state.statTableConfig, showEmptyStat: payload },
+      };
     default:
       return state;
   }
@@ -29,6 +37,9 @@ export interface CardConfig {
   showPlayerInfo: boolean;
   showStatName: boolean;
   hoverVerbosity: "none" | "simple" | "detailed";
+  statTableConfig: {
+    showEmptyStat: boolean;
+  };
 }
 
 /**
@@ -40,6 +51,7 @@ interface CardConfigActionSchema {
   togglePlayerInfo: boolean;
   toggleStatName: boolean;
   changeHoverVerbosity: "none" | "simple" | "detailed";
+  toggleEmptyStat: boolean;
 }
 
 type TypePayloadPair<K extends keyof CardConfigActionSchema> = {

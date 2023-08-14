@@ -48,22 +48,23 @@ function CharacterCardWrapper({ data }: Props) {
 
         <div id="block-2" className="flex gap-2">
           <LightConeInfo id="lightcone-2.1" />
-          <SkillInfo id="skill-2.2" />
+          <SkillInfo id="skill-2.2" className="w-14" />
         </div>
 
-        <div id="block-3" className="col-span-2 flex h-fit">
-          <div className="flex grow flex-col">
+        <div id="block-3" className="col-span-2 flex">
+          <div className="flex grow flex-col place-self-center gap-2">
             <SpiderChart />
 
             <StatTable
               id="stat-3"
+              className="grid grid-cols-2"
               element={currentCharacter.element.name}
               attributes={currentCharacter.attributes}
               properties={currentCharacter.properties}
               additions={currentCharacter.additions}
             />
           </div>
-          <RelicInfo id="relic-4" className="h-min" />
+          <RelicInfo id="relic-4" className="h-min place-self-center" />
         </div>
       </div>
     </div>

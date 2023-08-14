@@ -32,14 +32,7 @@ export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
               <span className="font-bold">Lv. {level}</span>/{maxLevel}
             </div>
             <div>
-              <Badge
-                className="rounded-none"
-                style={{
-                  clipPath: "polygon(10% 0, 100% 0, 90% 100%, 0 100%)",
-                }}
-              >
-                Eidolon {rank}
-              </Badge>
+              <Badge>Eidolon {rank}</Badge>
             </div>
           </div>
 

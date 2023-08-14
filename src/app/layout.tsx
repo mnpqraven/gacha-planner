@@ -1,10 +1,10 @@
 import Navbar from "./components/Navbar";
 import Providers from "./components/Providers";
 import "@/css/globals.css";
-import { Asap } from "next/font/google";
+import { Asap, Handjet, Merriweather_Sans } from "next/font/google";
 import { Toaster } from "./components/ui/Toast/Toaster";
 
-const inter = Asap({ subsets: ["latin"], display: "swap" });
+const inter = Merriweather_Sans({ subsets: ["latin"], display: "swap" });
 
 export const metadata = {
   title: "Honkai Star Rail Gacha Planner",

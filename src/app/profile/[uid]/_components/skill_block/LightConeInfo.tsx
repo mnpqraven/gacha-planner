@@ -24,14 +24,11 @@ export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
         ref={ref}
         {...props}
       >
-        <div className="flex h-[72px] gap-2">
-          <ImpositionIcon imposition={rank} className="place-self-center" />
-
-          <div className="flex flex-col">
-            <div className="font-bold">{name}</div>
-            <div>
-              <span className="font-bold">Lv. {level}</span> / {maxLevel}
-            </div>
+        <div className="flex h-[72px] flex-col ">
+          <div className="font-bold">{name}</div>
+          <div className="flex self-center">
+            <span className="font-bold">Lv. {level}</span> / {maxLevel}
+            <ImpositionIcon imposition={rank} className="ml-2.5" />
           </div>
         </div>
 
@@ -41,7 +38,7 @@ export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
             alt=""
             width={400 * ratio}
             height={400 / ratio}
-            className="justify-self-end"
+            className="justify-self-end shadow-xl shadow-border"
           />
         </div>
         {displayStat && (
