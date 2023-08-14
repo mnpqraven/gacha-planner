@@ -1,8 +1,9 @@
 import { ReactNode } from "react";
-import { CardConfigController } from "./ConfigController";
-import { CharacterCardWrapper } from "./_components/CharacterCard";
 import { LineupSelector } from "./_components/LineupSelector";
 import { getMihomoInfo } from "./_fetcher";
+import { Exporter } from "./_components/Exporter";
+import { CardConfigController } from "./ConfigControllerContext";
+import { ConfigController } from "./ConfigController";
 
 interface Props {
   params: { uid: string };
@@ -25,7 +26,11 @@ export default async function Layout({ params, children }: Props) {
   return (
     <main className="flex-col items-center justify-center">
       <CardConfigController>
-        <LineupSelector characters={mhyData.characters} />
+        <div className="flex">
+          <LineupSelector characters={mhyData.characters} />
+          <Exporter />
+          <ConfigController />
+        </div>
         {children}
       </CardConfigController>
     </main>

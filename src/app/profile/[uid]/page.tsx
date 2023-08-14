@@ -1,7 +1,4 @@
-import { Button } from "@/app/components/ui/Button";
-import { CardConfigController } from "./ConfigController";
 import { CharacterCardWrapper } from "./_components/CharacterCard";
-import { LineupSelector } from "./_components/LineupSelector";
 import { getMihomoInfo } from "./_fetcher";
 
 interface Props {

@@ -1,23 +1,26 @@
 import { HTMLAttributes, forwardRef, useContext } from "react";
-import { CardConfigContext } from "../../ConfigController";
 import { RarityIcon } from "@/app/character-db/CharacterCard";
 import { Badge } from "@/app/components/ui/Badge";
 import { cn } from "@/lib/utils";
+import { PathIcon } from "@/app/character-db/PathIcon";
+import { ElementIcon } from "@/app/character-db/ElementIcon";
+import { CardConfigContext } from "../../ConfigControllerContext";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {}
 export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
-  ({ className }: Props, ref) => {
+  ({ className, ...props }: Props, ref) => {
     const { currentCharacter, player } = useContext(CardConfigContext);
     if (!currentCharacter) return null;
-    const { name, level, rarity, rank } = currentCharacter;
+    const { name, level, rarity, rank, path, element } = currentCharacter;
     const maxLevel = currentCharacter.promotion * 10 + 20;
 
     return (
       <div
         className={cn("flex flex-col items-center justify-between", className)}
         ref={ref}
+        {...props}
       >
-        <div className="grid grid-cols-3 w-full">
+        <div className="grid w-full grid-cols-3">
           <div className="flex flex-col">
             <span className="font-bold">{player?.nickname}</span>
             <span>{player?.uid}</span>
@@ -40,7 +43,10 @@ export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
             </div>
           </div>
 
-          <div />
+          <div>
+            <PathIcon path={path.name} size={"20px"} />
+            <ElementIcon element={element.name} size={"20px"} />
+          </div>
         </div>
 
         <RarityIcon

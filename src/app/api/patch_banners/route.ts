@@ -2,10 +2,6 @@ import { NextResponse } from "next/server";
 import { get } from "@vercel/edge-config";
 import { List } from "@/lib/generics";
 
-export const config = {
-  runtime: "edge",
-};
-
 export async function GET() {
   const patch_banners = await get<PatchBanner[]>("patch_banners");
   if (patch_banners)
