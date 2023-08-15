@@ -17,4 +17,19 @@ export const LANG = {
   ru: "Русский",
   th: "ภาษาไทย",
   vi: "Tiếng Việt",
-} as const;
+};
+export const LANGS = [
+  "cn",
+  "cht",
+  "de",
+  "en",
+  "es",
+  "fr",
+  "id",
+  "jp",
+  "kr",
+  "pt",
+  "ru",
+  "th",
+  "vi",
+] as const;

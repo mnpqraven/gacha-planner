@@ -3,19 +3,24 @@ import { getMihomoInfo } from "./_fetcher";
 
 interface Props {
   params: { uid: string };
+  searchParams: { lang: string };
 }
 
-export async function generateMetadata({ params }: Props) {
+export async function generateMetadata({ params, searchParams }: Props) {
   const { uid } = params;
-  const blob = await getMihomoInfo(uid);
+  const { lang } = searchParams;
+  const { player } = await getMihomoInfo(uid, lang);
   return {
-    title: `${blob.player.nickname}'s Player Card`,
-    description: `${blob.player.nickname}'s Player Card`,
+    title: `${player.nickname}'s Player Card`,
+    description: `${player.nickname}'s Player Card`,
   };
 }
 
-export default async function ProfileCard({ params }: Props) {
-  const blob = await getMihomoInfo(params.uid);
+export default async function ProfileCard({ params, searchParams }: Props) {
+  const { uid } = params;
+  const { lang } = searchParams;
+  const blob = await getMihomoInfo(uid, lang);
+  console.log("uid and lang", uid, lang);
 
   return <CharacterCardWrapper data={blob} />;
 }

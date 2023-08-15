@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { MihomoCharacter, MihomoPlayer } from "../types";
+import { MihomoCharacter, MihomoPlayer, MihomoResponse } from "../types";
 import {
   CardConfig,
   CardConfigAction,
@@ -25,6 +25,8 @@ interface CardConfigContextPayload {
   enkaRef: RefObject<HTMLDivElement> | null;
   config: CardConfig;
   changeConfig: Dispatch<CardConfigAction>;
+  initResponse: (to: MihomoResponse) => void;
+  mihomoResponse?: MihomoResponse;
 }
 
 export const defaultCardConfig: CardConfigContextPayload = {
@@ -35,6 +37,8 @@ export const defaultCardConfig: CardConfigContextPayload = {
   enkaRef: null,
   config: initialConfig,
   changeConfig: () => {},
+  initResponse: () => {},
+  mihomoResponse: undefined,
 };
 
 export const CardConfigContext =
@@ -59,6 +63,10 @@ function useCardConfigController(): CardConfigContextPayload {
   // for image exporting
   const enkaRef = useRef<HTMLDivElement>(null);
 
+  const [mihomoResponse, setMihomoResponse] = useState<
+    MihomoResponse | undefined
+  >(undefined);
+
   const [config, changeConfig] = useReducer(configReducer, initialConfig);
 
   return {
@@ -69,5 +77,7 @@ function useCardConfigController(): CardConfigContextPayload {
     enkaRef,
     config,
     changeConfig,
+    initResponse: setMihomoResponse,
+    mihomoResponse,
   };
 }

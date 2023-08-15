@@ -15,8 +15,12 @@ interface Props {
   data: MihomoResponse;
 }
 function CharacterCardWrapper({ data }: Props) {
-  const { currentCharacter, setPlayer, enkaRef } =
+  const { currentCharacter, setPlayer, enkaRef, initResponse } =
     useContext(CardConfigContext);
+
+  useEffect(() => {
+    initResponse(data);
+  }, []);
 
   useEffect(() => {
     if (data.player) setPlayer(data.player);
@@ -52,7 +56,7 @@ function CharacterCardWrapper({ data }: Props) {
         </div>
 
         <div id="block-3" className="col-span-2 flex">
-          <div className="flex grow flex-col place-self-center gap-2">
+          <div className="flex grow flex-col gap-2 place-self-center">
             <SpiderChart />
 
             <StatTable

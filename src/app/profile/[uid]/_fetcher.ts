@@ -5,7 +5,8 @@ export async function getMihomoInfo(
   lang: string = "en"
 ): Promise<MihomoResponse> {
   const req = await fetch(
-    `https://api.mihomo.me/sr_info_parsed/${uid}?lang=${lang}`
+    `https://api.mihomo.me/sr_info_parsed/${uid}?lang=${lang}`,
+    { next: { revalidate: 15 } }
   );
   if (req.ok) {
     return req.json();
