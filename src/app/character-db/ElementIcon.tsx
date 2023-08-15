@@ -1,16 +1,10 @@
 "use client";
 
-import Fire from "@public/element/Fire.svg";
-import Physical from "@public/element/Physical.svg";
-import Ice from "@public/element/Ice.svg";
-import Quantum from "@public/element/Quantum.svg";
-import Imaginary from "@public/element/Imaginary.svg";
-import Wind from "@public/element/Wind.svg";
-import Lightning from "@public/element/Lightning.svg";
 import { HTMLAttributes, forwardRef, useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { cva } from "class-variance-authority";
 import { Element } from "@/bindings/AvatarConfig";
+import SVG from "react-inlinesvg";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   element: Element;
@@ -51,30 +45,16 @@ const ElementIcon = forwardRef<HTMLDivElement, Props>(
     });
 
     // original width in svg files ???????
-    const sizes = { width: "100%", height: "100%", viewBox: "0 0 14 14" };
     return (
       <div style={{ width: size, height: size }} ref={ref} {...props}>
-        {element === "Fire" && (
-          <Fire className={cl({ element })} style={filter} {...sizes} />
-        )}
-        {element === "Physical" && (
-          <Physical className={cl({ element })} style={filter} {...sizes} />
-        )}
-        {element === "Quantum" && (
-          <Quantum className={cl({ element })} style={filter} {...sizes} />
-        )}
-        {element === "Lightning" && (
-          <Lightning className={cl({ element })} style={filter} {...sizes} />
-        )}
-        {element === "Ice" && (
-          <Ice className={cl({ element })} style={filter} {...sizes} />
-        )}
-        {element === "Wind" && (
-          <Wind className={cl({ element })} style={filter} {...sizes} />
-        )}
-        {element === "Imaginary" && (
-          <Imaginary className={cl({ element })} style={filter} {...sizes} />
-        )}
+        <SVG
+          src={`/element/${element}.svg`}
+          className={cl({ element })}
+          style={filter}
+          width="100%"
+          height="100%"
+          viewBox="0 0 14 14"
+        />
       </div>
     );
   }

@@ -23,20 +23,17 @@ export const SkillInfo = forwardRef<HTMLDivElement, Props>(
 
     const { rank: eidolon } = currentCharacter;
 
-    const skills = currentCharacter.skills.filter((e) =>
-      DISPLAY_SKILL_TYPES.includes(e.type)
-    );
+    const skills = currentCharacter.skills
+      .filter((e) => DISPLAY_SKILL_TYPES.includes(e.type))
+      .slice(0, 4);
 
     return (
       <div
-        className={cn(
-          className,
-          "flex flex-col items-center justify-center gap-2 pt-[72px]"
-        )}
+        className={cn(className, "flex items-center justify-center gap-2")}
         ref={ref}
         {...props}
       >
-        {skills.map(({ icon, id, level: slv, type }, index) => (
+        {skills.map(({ icon, id, level: slv, type }) => (
           <div key={id} className="flex flex-col items-center">
             <span className="mb-1">{getLabel(type)}</span>
             <Image src={img(icon)} alt="" height={48} width={48} />
@@ -48,7 +45,6 @@ export const SkillInfo = forwardRef<HTMLDivElement, Props>(
             >
               {slv} / {getSkillMaxLevel(type, eidolon)}
             </span>
-            {index < skills.length - 1 && <Separator className="my-1" />}
           </div>
         ))}
       </div>

@@ -105,7 +105,7 @@ export const RarityIcon = forwardRef<HTMLDivElement, RarityIconProps>(
             height={128}
             width={128}
             alt={rarity + " ✦"}
-            className="pointer-events-none"
+            className="pointer-events-none h-full"
           />
         </div>
       ))}

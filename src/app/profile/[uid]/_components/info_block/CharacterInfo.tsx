@@ -36,9 +36,9 @@ export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
             </div>
           </div>
 
-          <div>
-            <PathIcon path={path.name} size={"20px"} />
-            <ElementIcon element={element.name} size={"20px"} />
+          <div className="flex justify-evenly gap-4">
+            <PathIcon path={path.name} size="36px" />
+            <ElementIcon element={element.name} size="36px" />
           </div>
         </div>
 

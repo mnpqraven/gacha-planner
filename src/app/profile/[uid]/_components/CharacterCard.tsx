@@ -10,6 +10,7 @@ import { StatTable } from "./stat_block/StatTable";
 import { SpiderChart } from "./SpiderChart";
 import { CardConfigContext } from "../ConfigControllerContext";
 import { img } from "@/lib/utils";
+import { EidolonInfo } from "./skill_block/EidolonInfo";
 
 interface Props {
   data: MihomoResponse;
@@ -20,6 +21,7 @@ function CharacterCardWrapper({ data }: Props) {
 
   useEffect(() => {
     initResponse(data);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -50,9 +52,16 @@ function CharacterCardWrapper({ data }: Props) {
 
         <CharacterInfo id="block-1" className="z-10" />
 
-        <div id="block-2" className="flex gap-2">
-          <LightConeInfo id="lightcone-2.1" />
-          <SkillInfo id="skill-2.2" className="w-14" />
+        <div id="block-2" className="flex flex-col gap-2">
+          <div className="flex justify-evenly">
+            <EidolonInfo className="w-14" />
+            <LightConeInfo id="lightcone-2.1" />
+          </div>
+
+          <div className="flex gap-2 justify-evenly">
+            <div className="w-14" />
+            <SkillInfo id="skill-2.2" />
+          </div>
         </div>
 
         <div id="block-3" className="col-span-2 flex">

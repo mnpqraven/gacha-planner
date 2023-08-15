@@ -19,26 +19,6 @@ export const StatTable = forwardRef<HTMLDivElement, Props>(
     { element, attributes, properties, additions, className, ...props },
     ref
   ) => {
-    function addStat(
-      attributeArray: MihomoAttributeConfig[],
-      additionArray: MihomoAttributeConfig[],
-      field: string,
-      isPercent: boolean = false
-    ): { label: string; isEmpty: boolean } {
-      const inAttribute = attributeArray.find((e) => e.field == field);
-      const inAddition = additionArray.find((e) => e.field == field);
-
-      let value = 0;
-      if (field == "sp_rate")
-        value = 1 + (inAttribute?.value ?? 0) + (inAddition?.value ?? 0);
-      else value = (inAttribute?.value ?? 0) + (inAddition?.value ?? 0);
-
-      return {
-        label: isPercent ? asPercentage(value, 1) : value.toFixed(0),
-        isEmpty: value === 0,
-      };
-    }
-
     return (
       <div className={cn(className)} ref={ref} {...props}>
         {mihomoPropertyList(element).map(({ value, icon, percent }, index) =>
@@ -55,7 +35,28 @@ export const StatTable = forwardRef<HTMLDivElement, Props>(
 );
 StatTable.displayName = "StatTable";
 
-function mihomoPropertyList(
+export function addStat(
+  attributeArray: MihomoAttributeConfig[],
+  additionArray: MihomoAttributeConfig[],
+  field: string,
+  isPercent: boolean = false
+): { label: string; isEmpty: boolean; value: number } {
+  const inAttribute = attributeArray.find((e) => e.field == field);
+  const inAddition = additionArray.find((e) => e.field == field);
+
+  let value = 0;
+  if (field == "sp_rate")
+    value = 1 + (inAttribute?.value ?? 0) + (inAddition?.value ?? 0);
+  else value = (inAttribute?.value ?? 0) + (inAddition?.value ?? 0);
+
+  return {
+    label: isPercent ? asPercentage(value, 1) : value.toFixed(0),
+    isEmpty: value === 0,
+    value,
+  };
+}
+
+export function mihomoPropertyList(
   element: Element
 ): { value: string; icon: string; percent: boolean }[] {
   const ele = {

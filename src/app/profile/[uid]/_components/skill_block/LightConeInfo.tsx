@@ -20,24 +20,26 @@ export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
 
     return (
       <div
-        className={cn("flex flex-col items-center", className)}
+        className={cn("flex flex-grow-0 flex-col items-center", className)}
+        // style={{ width: `${ratio * 350}px` }}
         ref={ref}
         {...props}
       >
-        <div className="flex h-[72px] flex-col ">
-          <div className="font-bold">{name}</div>
-          <div className="flex self-center">
+        <div className="flex h-[72px] flex-col items-center">
+          <span className="font-bold">{name}</span>
+
+          <span className="flex">
             <span className="font-bold">Lv. {level}</span> / {maxLevel}
             <ImpositionIcon imposition={rank} className="ml-2.5" />
-          </div>
+          </span>
         </div>
 
         <div className="flex grow items-center">
           <Image
             src={img(portrait)}
             alt=""
-            width={400 * ratio}
-            height={400 / ratio}
+            width={350 * ratio}
+            height={350}
             className="justify-self-end shadow-xl shadow-border"
           />
         </div>
