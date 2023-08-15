@@ -52,9 +52,12 @@ export default function Profile() {
   }
 
   return (
-    <main className="flex h-[50vh] items-start justify-center">
+    <main>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex gap-4">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col items-center justify-center gap-4 pt-12 md:flex-row md:items-start"
+        >
           <FormField
             name="uid"
             render={({ field }) => (
@@ -94,7 +97,11 @@ export default function Profile() {
             )}
           />
 
-          <Button type="submit" className="w-fit self-end">
+          <Button
+            type="submit"
+            className="mt-4 w-fit items-center md:mt-[34px] md:self-start"
+            size="sm"
+          >
             Search
           </Button>
         </form>
