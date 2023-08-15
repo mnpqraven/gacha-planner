@@ -193,8 +193,8 @@ function InnerSpiderChart({
             radius={((i + 1) * radius) / levels}
             fill="none"
             stroke={silver}
-            strokeWidth={2}
-            strokeOpacity={0.8}
+            strokeWidth={i == 2 ? 3 : 2}
+            strokeOpacity={i == 2 ? 1 : 0.8}
             strokeLinecap="round"
           />
         ))}
