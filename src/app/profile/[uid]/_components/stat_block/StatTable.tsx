@@ -40,7 +40,7 @@ export function addStat(
   additionArray: MihomoAttributeConfig[],
   field: string,
   isPercent: boolean = false
-): { label: string; isEmpty: boolean; value: number } {
+): { label: string; isEmpty: boolean; value: number; field: string, percent: boolean } {
   const inAttribute = attributeArray.find((e) => e.field == field);
   const inAddition = additionArray.find((e) => e.field == field);
 
@@ -53,6 +53,8 @@ export function addStat(
     label: isPercent ? asPercentage(value, 1) : value.toFixed(0),
     isEmpty: value === 0,
     value,
+    field,
+    percent: isPercent
   };
 }
 

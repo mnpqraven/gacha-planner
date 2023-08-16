@@ -1,5 +1,5 @@
 import { HTMLAttributes, forwardRef, useContext } from "react";
-import { RarityIcon } from "@/app/character-db/CharacterCard";
+import { RarityIcon } from "@/app/character-db/CharacterCardWrapper";
 import { Badge } from "@/app/components/ui/Badge";
 import { cn } from "@/lib/utils";
 import { PathIcon } from "@/app/character-db/PathIcon";

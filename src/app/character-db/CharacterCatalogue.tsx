@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CharacterCard } from "./CharacterCard";
+import { CharacterCard } from "./CharacterCardWrapper";
 import { IMAGE_URL } from "@/server/endpoints";
 import { DbFilter } from "../components/Db/DbFilter";
 import Fuse from "fuse.js";

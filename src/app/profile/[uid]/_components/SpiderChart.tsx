@@ -1,56 +1,21 @@
-import { cn } from "@/lib/utils";
-import { HTMLAttributes, forwardRef, useContext } from "react";
-import { CardConfigContext } from "../ConfigControllerContext";
-import { addStat, mihomoPropertyList } from "./stat_block/StatTable";
-import { ParentSize } from "@visx/responsive";
-
-interface Props extends HTMLAttributes<HTMLDivElement> {}
-export const SpiderChart = forwardRef<HTMLDivElement, Props>(
-  ({ className, ...props }, ref) => {
-    const { currentCharacter } = useContext(CardConfigContext);
-    if (!currentCharacter) return null;
-    const { attributes, additions, element } = currentCharacter;
-    const rawData = mihomoPropertyList(element.name).map(({ percent, value }) =>
-      addStat(attributes, additions, value, percent)
-    );
-    console.log("rawData", rawData);
-
-    return (
-      <div
-        className={cn(
-          "relative h-[300px] w-[300px]",
-          className
-        )}
-        ref={ref}
-        {...props}
-      >
-        <ParentSize debounceTime={10}>
-          {(parent) => (
-            <InnerSpiderChart width={parent.width} height={parent.height} />
-          )}
-        </ParentSize>
-      </div>
-    );
-  }
-);
-
-// existing fields:
-// ['hp', 'atk', 'def', 'spd', 'crit_rate']
-
-interface DataAnalyzeProps<T extends { field: string; value: number }> {
-  data: T;
-}
-function useDataAnalyze<T extends { field: string; value: number }>({
-  data,
-}: DataAnalyzeProps<T>) {}
-
-SpiderChart.displayName = "SpiderChart";
-
 import { Group } from "@visx/group";
 import { scaleLinear } from "@visx/scale";
 import { Point } from "@visx/point";
 import { Line, LineRadial } from "@visx/shape";
 import { Text } from "@visx/text";
+import { rotate } from "@/lib/utils";
+import SVG from "react-inlinesvg";
+import { Field, propertyPath } from "./SpiderChartWrapper";
+
+export type RadarProps = {
+  width: number;
+  height: number;
+  margin?: { top: number; right: number; bottom: number; left: number };
+  levels?: number;
+  data: { field: Field; value: number }[];
+};
+
+const DEGREES = 360;
 
 const orange = "#ff9933";
 const pumpkin = "#f5810c";
@@ -60,60 +25,28 @@ const background = "#00000000";
 
 const letterFrequency: LetterFrequency[] = [
   { letter: "a", frequency: 1 },
-  { letter: "s", frequency: 2 },
-  { letter: "d", frequency: 3 },
-  { letter: "f", frequency: 4 },
+  { letter: "b", frequency: 2 },
+  { letter: "c", frequency: 3 },
+  { letter: "d", frequency: 4 },
   { letter: "e", frequency: 5 },
-  { letter: "i", frequency: 6 },
-  { letter: "a", frequency: 7 },
-  { letter: "y", frequency: 8 },
-  { letter: "z", frequency: 9 },
+  { letter: "f", frequency: 6 },
+  { letter: "g", frequency: 7 },
+  { letter: "h", frequency: 8 },
+  { letter: "i", frequency: 9 },
 ];
 type LetterFrequency = {
   letter: string;
   frequency: number;
 };
-const degrees = 360;
 
-let temp = letterFrequency;
-if (temp.length > 0) {
-  // rotate 1
-  // temp.unshift(temp.pop()!);
-  // temp.unshift(temp.pop()!);
-  // temp.unshift(temp.pop()!);
-  // rotate -1
-  temp.push(temp.shift()!);
-  temp.push(temp.shift()!);
-  temp.push(temp.shift()!);
-  temp.push(temp.shift()!);
-  temp = temp.reverse();
-}
-function rotate<T>(by: number, data: T[]): T[] {
-  if (data.length == 0) return data;
-  if (by == 0) return data;
-  if (by < 0) {
-    let temp = data;
-    for (let index = 0; index < by * -1; index++) {
-      temp.push(temp.shift()!);
-    }
-    return temp;
-  } else {
-    let temp = data;
-    for (let index = 0; index < by; index++) {
-      temp.unshift(temp.pop()!);
-    }
-    return temp;
-  }
-}
-// const data = rotate(0, letterFrequency);
-const data = letterFrequency
+const data = rotate(-5, letterFrequency.reverse());
 
-const y = (d: LetterFrequency) => d.frequency;
+const y = (d: { field: string; value: number }) => d.value;
 
 const genAngles = (length: number) =>
   [...new Array(length + 1)].map((_, i) => ({
     angle:
-      i * (degrees / length) + (length % 2 === 0 ? 0 : degrees / length / 2),
+      i * (DEGREES / length) + (length % 2 === 0 ? 0 : DEGREES / length / 2),
   }));
 
 const genPoints = (length: number, radius: number) => {
@@ -147,21 +80,14 @@ function genPolygonPoints<Datum>(
 
   return { points, pointString };
 }
+const defaultMargin = { top: 0, left: 60, right: 60, bottom: 0 };
 
-const defaultMargin = { top: 0, left: 0, right: 0, bottom: 60 };
-
-export type RadarProps = {
-  width: number;
-  height: number;
-  margin?: { top: number; right: number; bottom: number; left: number };
-  levels?: number;
-};
-
-function InnerSpiderChart({
+export function SpiderChart({
   width,
   height,
   levels = 5,
   margin = defaultMargin,
+  data,
 }: RadarProps) {
   const xMax = width - margin.left - margin.right;
   const yMax = height - margin.top - margin.bottom;
@@ -169,7 +95,7 @@ function InnerSpiderChart({
 
   const radialScale = scaleLinear<number>({
     range: [0, Math.PI * 2],
-    domain: [degrees, 0],
+    domain: [DEGREES, 0],
   });
 
   const yScale = scaleLinear<number>({
@@ -179,6 +105,8 @@ function InnerSpiderChart({
 
   const webs = genAngles(data.length);
   const points = genPoints(data.length, radius);
+  const textAnchors = rotate(-1, genPoints(data.length, radius + 20));
+
   const polygonPoints = genPolygonPoints(data, (d) => yScale(d) ?? 0, y);
   const zeroPoint = new Point({ x: 0, y: 0 });
   return width < 10 ? null : (
@@ -206,17 +134,29 @@ function InnerSpiderChart({
             stroke={silver}
           />
         ))}
-        {[...new Array(data.length)].map((text, i) => (
+        {/* data.map((text, i) => (
           // TODO: dynamic x y coords according to index
           <Text
             key={`annotate-${i}`}
-            verticalAnchor="start"
+            verticalAnchor="middle"
             fill="white"
-            x={-40}
-            y={-40}
+            x={textAnchors[i].x - 5}
+            y={textAnchors[i].y}
           >
-            {i}
+            {text.field}
           </Text>
+        )) */}
+        {data.map((text, i) => (
+          // TODO: dynamic x y coords according to index
+          <SVG
+            key={`annotate-${i}`}
+            fill="white"
+            x={textAnchors[i].x - 10}
+            y={textAnchors[i].y - 10}
+            width={24}
+            height={24}
+            src={propertyPath(text.field)}
+          />
         ))}
         <polygon
           points={polygonPoints.pointString}
@@ -230,7 +170,7 @@ function InnerSpiderChart({
             key={`radar-point-${i}`}
             cx={point.x}
             cy={point.y}
-            r={4}
+            r={2}
             fill={pumpkin}
           />
         ))}

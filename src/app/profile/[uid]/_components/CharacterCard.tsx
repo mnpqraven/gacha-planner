@@ -7,7 +7,7 @@ import { SkillInfo } from "./skill_block/SkillInfo";
 import { LightConeInfo } from "./skill_block/LightConeInfo";
 import { RelicInfo } from "./relic_block/RelicInfo";
 import { StatTable } from "./stat_block/StatTable";
-import { SpiderChart } from "./SpiderChart";
+import { SpiderChartWrapper } from "./SpiderChartWrapper";
 import { CardConfigContext } from "../ConfigControllerContext";
 import { img } from "@/lib/utils";
 import { EidolonInfo } from "./skill_block/EidolonInfo";
@@ -66,7 +66,7 @@ function CharacterCardWrapper({ data }: Props) {
 
         <div id="block-3" className="col-span-2 flex">
           <div className="flex grow flex-col gap-2 place-self-center">
-            <SpiderChart />
+            <SpiderChartWrapper />
 
             <StatTable
               id="stat-3"

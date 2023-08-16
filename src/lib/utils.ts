@@ -81,3 +81,29 @@ export function sameDate(a: Date, b: Date): boolean {
 const IMG_REPO = "https://raw.githubusercontent.com/Mar-7th/StarRailRes/master";
 export const img = (suffix: string) =>
   suffix.startsWith("/") ? IMG_REPO + suffix : IMG_REPO + "/" + suffix;
+
+/**
+ * this function rotates your array and shift the elements around
+ * @param by number of rotations, positive number is clockwise (left shift),
+ * negative number is ccw (right shift)
+ * @param data any abitrary array, if the array is empty then it's directly
+ * returned
+ * @returns rotated array
+ */
+export function rotate<T>(by: number, data: T[]): T[] {
+  if (data.length == 0) return data;
+  if (by == 0) return data;
+  if (by < 0) {
+    let temp = data;
+    for (let index = 0; index < by * -1; index++) {
+      temp.push(temp.shift()!);
+    }
+    return temp;
+  } else {
+    let temp = data;
+    for (let index = 0; index < by; index++) {
+      temp.unshift(temp.pop()!);
+    }
+    return temp;
+  }
+}
