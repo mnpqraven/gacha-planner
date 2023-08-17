@@ -20,8 +20,6 @@ import {
 interface CardConfigContextPayload {
   currentCharacter?: MihomoCharacter;
   setCurrentCharacter: (to: MihomoCharacter) => void;
-  player?: MihomoPlayer;
-  setPlayer: (to: MihomoPlayer) => void;
   enkaRef: RefObject<HTMLDivElement> | null;
   config: CardConfig;
   changeConfig: Dispatch<CardConfigAction>;
@@ -32,8 +30,6 @@ interface CardConfigContextPayload {
 export const defaultCardConfig: CardConfigContextPayload = {
   currentCharacter: undefined,
   setCurrentCharacter: () => {},
-  player: undefined,
-  setPlayer: () => {},
   enkaRef: null,
   config: initialConfig,
   changeConfig: () => {},
@@ -58,8 +54,6 @@ function useCardConfigController(): CardConfigContextPayload {
   const [currentCharacter, setCurrentCharacter] = useState<
     MihomoCharacter | undefined
   >(undefined);
-  // for universal player info
-  const [player, setPlayer] = useState<MihomoPlayer | undefined>(undefined);
   // for image exporting
   const enkaRef = useRef<HTMLDivElement>(null);
 
@@ -72,8 +66,6 @@ function useCardConfigController(): CardConfigContextPayload {
   return {
     currentCharacter,
     setCurrentCharacter,
-    player,
-    setPlayer,
     enkaRef,
     config,
     changeConfig,

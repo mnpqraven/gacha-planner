@@ -9,7 +9,7 @@ import { CardConfigContext } from "../../ConfigControllerContext";
 interface Props extends HTMLAttributes<HTMLDivElement> {}
 export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
   ({ className, ...props }: Props, ref) => {
-    const { currentCharacter, player } = useContext(CardConfigContext);
+    const { currentCharacter, mihomoResponse } = useContext(CardConfigContext);
     if (!currentCharacter) return null;
     const { name, level, rarity, rank, path, element } = currentCharacter;
     const maxLevel = currentCharacter.promotion * 10 + 20;
@@ -22,8 +22,8 @@ export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
       >
         <div className="grid w-full grid-cols-3">
           <div className="flex flex-col">
-            <span className="font-bold">{player?.nickname}</span>
-            <span>{player?.uid}</span>
+            <span className="font-bold">{mihomoResponse?.player.nickname}</span>
+            <span>{mihomoResponse?.player.uid}</span>
           </div>
 
           <div className="flex flex-col place-self-center">

@@ -11,22 +11,26 @@ import { SpiderChartWrapper } from "./SpiderChartWrapper";
 import { CardConfigContext } from "../ConfigControllerContext";
 import { img } from "@/lib/utils";
 import { EidolonInfo } from "./skill_block/EidolonInfo";
+import { useParams, useSearchParams } from "next/navigation";
+import { useMihomoInfo } from "../_fetcher";
 
-interface Props {
-  data: MihomoResponse;
-}
-function CharacterCardWrapper({ data }: Props) {
-  const { currentCharacter, setPlayer, enkaRef, initResponse } =
+function CharacterCardWrapper() {
+  const searchParams = useSearchParams();
+  const lang = searchParams.get("lang") ?? "en";
+  const params = useParams();
+  const uid = params["uid"] as string;
+
+  const {
+    query: { data },
+  } = useMihomoInfo({ uid, lang });
+
+  const { currentCharacter, enkaRef, initResponse } =
     useContext(CardConfigContext);
 
   useEffect(() => {
-    initResponse(data);
+    if (!!data) initResponse(data);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (data.player) setPlayer(data.player);
-  }, [data.player, setPlayer]);
+  }, [data]);
 
   if (!currentCharacter) return null;
 
@@ -58,7 +62,7 @@ function CharacterCardWrapper({ data }: Props) {
             <LightConeInfo id="lightcone-2.1" />
           </div>
 
-          <div className="flex gap-2 justify-evenly">
+          <div className="flex justify-evenly gap-2">
             <div className="w-14" />
             <SkillInfo id="skill-2.2" />
           </div>

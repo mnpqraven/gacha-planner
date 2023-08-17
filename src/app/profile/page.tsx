@@ -21,13 +21,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/Select";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
-import { useMihomoInfo } from "./[uid]/_fetcherQuery";
-import { useToast } from "../components/ui/Toast/useToast";
-import Image from "next/image";
-import { img } from "@/lib/utils";
+import { useMihomoInfo } from "./[uid]/_fetcher";
+import { useEffect, useState } from "react";
+import { PlayerCard } from "./PlayerCard";
+import { useRouter } from "next/navigation";
 
 const schema = z.object({
   uid: z
@@ -36,50 +34,41 @@ const schema = z.object({
     .refine(
       (val) =>
         z.string().regex(/^\d+$/).transform(Number).safeParse(val).success,
-      {
-        message: "Invalid number",
-      }
+      { message: "Invalid number" }
     ),
   lang: z.enum(LANGS),
 });
 type FormSchema = z.infer<typeof schema>;
 
+const defaultValues: FormSchema = { uid: "", lang: "en" };
+
 export default function Profile() {
   const form = useForm<FormSchema>({
-    defaultValues: { uid: "", lang: "en" },
+    defaultValues,
     resolver: zodResolver(schema),
   });
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const { mutation } = useMihomoInfo();
-  const { toast } = useToast();
+  const [prof, setProf] = useState(defaultValues);
+  const { query } = useMihomoInfo(prof);
 
-  async function onSubmit(values: FormSchema) {
-    try {
-      setIsLoading(true);
-      const { uid, lang } = values;
-      await mutation.mutateAsync({ uid, lang });
-    } catch (err) {
-      toast({
-        variant: "destructive",
-        title: "Error encountered",
-        description: err as string,
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  function onSubmit(values: FormSchema) {
+    setProf(values);
   }
 
+  const router = useRouter();
   useEffect(() => {
-    console.log("mutation", mutation.data);
-  }, [mutation]);
+    if (!!query.data) {
+      const url = `/profile/${prof.uid}?lang=${prof.lang}`;
+      router.prefetch(url);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query.data]);
 
   return (
-    <main className="flex flex-col items-center gap-8">
+    <main className="flex flex-col items-center">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col items-center justify-center gap-4 pt-12 md:flex-row md:items-start"
+          className="mt-12 flex h-32 flex-col items-center justify-center gap-4 md:flex-row md:items-start"
         >
           <FormField
             name="uid"
@@ -87,9 +76,13 @@ export default function Profile() {
               <FormItem>
                 <FormLabel>UID</FormLabel>
                 <FormControl>
-                  <Input placeholder="enter your UID" {...field} />
+                  <Input
+                    placeholder="Enter your UID..."
+                    className="w-56"
+                    {...field}
+                  />
                 </FormControl>
-                <FormMessage className="whitespace-pre-wrap" />
+                <FormMessage className="w-56 whitespace-pre-wrap" />
               </FormItem>
             )}
           />
@@ -130,28 +123,8 @@ export default function Profile() {
         </form>
       </Form>
 
-      {isLoading && <Loader2 className="mr-1 animate-spin" />}
-      {/* mutation.data && (
-        <Button
-          className="flex h-fit items-center gap-2.5"
-          variant="outline"
-          onClick={() => {
-            if (mutation.variables) {
-              const { uid, lang } = mutation.variables;
-              router.push(`profile/${uid}?lang=${lang}`);
-            }
-          }}
-        >
-          <Image
-            src={img(mutation.data.player.avatar.icon)}
-            alt={mutation.data.player.avatar.name}
-            height={64}
-            width={64}
-          />
-
-          <span>{mutation.data.player.nickname}</span>
-        </Button>
-      )*/}
+      {query.isInitialLoading && <Loader2 className="mr-1 animate-spin" />}
+      {query.data && <PlayerCard data={query.data} {...prof} />}
     </main>
   );
 }

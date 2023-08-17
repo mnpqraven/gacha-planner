@@ -1,3 +1,4 @@
+import { MihomoResponse } from "@/app/profile/types";
 import { NextRequest, NextResponse } from "next/server";
 
 interface Params {
@@ -21,4 +22,20 @@ export async function GET(request: NextRequest, { params }: Params) {
   } catch (error) {
     return NextResponse.json({ error }, { status: 400 });
   }
+}
+
+export async function getMihomoInfo(
+  uid: string,
+  lang: string = "en",
+  host?: string
+): Promise<MihomoResponse> {
+  let url = `/api/profile/${uid}?lang=${lang}`;
+  if (!!host) url = host + url;
+  const response = await fetch(url);
+  if (!response.ok) {
+    return response.json().then(({ error }: { error: string }) => {
+      return Promise.reject(error);
+    });
+  }
+  return response.json();
 }
