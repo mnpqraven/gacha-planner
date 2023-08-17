@@ -11,9 +11,7 @@ interface Props {
 }
 
 export async function generateMetadata({ params, searchParams }: Props) {
-  const { uid } = params;
-  const { lang } = searchParams;
-  const { player } = await getMihomoInfo(uid, lang);
+  const { player } = await getMihomoInfo(params.uid, searchParams.lang);
   return {
     title: `${player.nickname}'s Player Card`,
     description: `${player.nickname}'s Player Card`,
@@ -21,9 +19,7 @@ export async function generateMetadata({ params, searchParams }: Props) {
 }
 
 export default async function ProfileCard({ params, searchParams }: Props) {
-  const { uid } = params;
-  const { lang } = searchParams;
-  const blob = await getMihomoInfo(uid, lang);
+  const blob = await getMihomoInfo(params.uid, searchParams.lang);
 
   return (
     <CardConfigController>
