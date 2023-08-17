@@ -13,14 +13,10 @@ interface Props {
 export async function generateMetadata({ params, searchParams }: Props) {
   const { uid } = params;
   const { lang } = searchParams;
-  // const { player } = await getMihomoInfo(uid, lang);
-  // return {
-  //   title: `${player.nickname}'s Player Card`,
-  //   description: `${player.nickname}'s Player Card`,
-  // };
+  const { player } = await getMihomoInfo(uid, lang);
   return {
-    title: `Player Card`,
-    description: `Player Card`,
+    title: `${player.nickname}'s Player Card`,
+    description: `${player.nickname}'s Player Card`,
   };
 }
 
