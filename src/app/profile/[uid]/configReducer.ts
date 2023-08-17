@@ -24,6 +24,8 @@ export function configReducer(
         ...state,
         statTableConfig: { ...state.statTableConfig, showEmptyStat: payload },
       };
+    case "updateWholeConfig":
+      return { ...payload };
     default:
       return state;
   }
@@ -52,6 +54,7 @@ interface CardConfigActionSchema {
   toggleStatName: boolean;
   changeHoverVerbosity: "none" | "simple" | "detailed";
   toggleEmptyStat: boolean;
+  updateWholeConfig: CardConfig;
 }
 
 type TypePayloadPair<K extends keyof CardConfigActionSchema> = {

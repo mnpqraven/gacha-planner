@@ -1,9 +1,14 @@
 import { getMihomoInfo } from "@/app/api/profile/[uid]/route";
-import { ConfigController } from "./ConfigController";
+import { ConfigController, ConfigControllerDialog } from "./ConfigController";
 import { CardConfigController } from "./ConfigControllerContext";
 import { CharacterCardWrapper } from "./_components/CharacterCard";
 import { Exporter } from "./_components/Exporter";
 import { LineupSelector } from "./_components/LineupSelector";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from "@/app/components/ui/Dialog";
 
 interface Props {
   params: { uid: string };
@@ -23,19 +28,18 @@ export async function generateMetadata({ params, searchParams }: Props) {
 }
 
 export default async function ProfileCard({ params, searchParams }: Props) {
-  // const blob = await getMihomoInfo(
-  //   params.uid,
-  //   searchParams.lang,
-  //   process.env["NEXT_PUBLIC_BASE_URL"]
-  // );
-
   return (
     <CardConfigController>
       <main className="flex flex-col items-center justify-center">
         <div className="mt-2 flex items-center justify-center gap-2">
           <LineupSelector />
           <Exporter />
-          <ConfigController />
+          <Dialog>
+            <DialogTrigger asChild>
+              <ConfigController variant="outline" />
+            </DialogTrigger>
+            <ConfigControllerDialog />
+          </Dialog>
         </div>
 
         <CharacterCardWrapper />
