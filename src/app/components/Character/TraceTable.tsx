@@ -77,13 +77,13 @@ const TraceTableInner = ({
   });
 
   const iconWrapVariants = cva(
-    "flex items-center justify-center rounded-full transition duration-500 hover:ring-2 hover:ring-offset-2 ring-offset-transparent",
+    "flex items-center justify-center rounded-full ring-offset-transparent transition duration-500 hover:ring-2 hover:ring-offset-2",
     {
       variants: {
         variant: {
-          SMALL: "bg-zinc-300 scale-50",
-          BIG: "bg-zinc-300 scale-[.85]",
-          CORE: "bg-zinc-700 scale-75",
+          SMALL: "scale-50 bg-zinc-300",
+          BIG: "scale-[.85] bg-zinc-300",
+          CORE: "scale-75 bg-zinc-700",
         },
       },
       defaultVariants: {
@@ -173,7 +173,7 @@ const TraceTableInner = ({
  * SMALL denotes small nodes in the left
  * BIG denotes unique character traces
  */
-function getNodeType(node: SkillTreeConfig): "CORE" | "SMALL" | "BIG" {
+export function getNodeType(node: SkillTreeConfig): "CORE" | "SMALL" | "BIG" {
   if (node.icon_path.includes("_SkillTree")) return "BIG";
   if (
     ["Normal.png", "BP.png", "Maze.png", "Passive.png", "Ultra.png"].some(

@@ -26,7 +26,7 @@ export const SpiderChartWrapper = forwardRef<HTMLDivElement, Props>(
     const data = normalizedData
       .map(({ field, value: val }) => {
         const [lowerBound, upperBound] = getBounds(field);
-        console.log( field, val, upperBound)
+        console.log(field, val, upperBound);
         return {
           field,
           // base of 100
@@ -76,6 +76,7 @@ const FIELDS = [
   "imaginary_dmg",
   "ice_dmg",
   "physical_dmg",
+  "all_dmg",
 ] as const;
 const zField = z.enum(FIELDS);
 export type Field = z.infer<typeof zField>;
@@ -174,7 +175,7 @@ function normalizeData(
 
     const numerator = left + right;
     let denominator = left;
-    if (field == "crit_rate" || field =='crit_dmg') denominator = 1
+    if (field == "crit_rate" || field == "crit_dmg") denominator = 1;
 
     const value = denominator == 0 ? numerator : numerator / denominator;
 
@@ -184,26 +185,44 @@ function normalizeData(
 }
 
 export function propertyPath(field: Field): string {
-  const prefix = (val: string) => `/property/Icon${val}.svg`
-  switch(field) {
-    case "hp": return prefix('MaxHP')
-    case "atk": return prefix('Attack')
-    case "def": return prefix('Defence')
-    case "spd": return prefix('Speed')
-    case "crit_rate": return prefix('CriticalChance')
-    case "crit_dmg": return prefix('CriticalDamage')
-    case "break_dmg": return prefix('BreakUp')
-    case "heal_rate": return prefix('HealRatio')
-    case "sp_rate":return prefix('EnergyRecovery')
-    case "effect_hit":return prefix('StatusProbability')
-    case "effect_res":return prefix('StatusResistance')
-    case "lightning_dmg":return prefix('ThunderAddedRatio')
-    case "wind_dmg":return prefix('WindAddedRatio')
-    case "fire_dmg":return prefix('FireAddedRatio')
-    case "quantum_dmg":return prefix('QuantumAddedRatio')
-    case "imaginary_dmg":return prefix('ImagineryAddedRatio')
-    case "ice_dmg":return prefix('IceAddedRatio')
-    case "physical_dmg":return prefix('PhysicalAddedRatio')
+  const prefix = (val: string) => `/property/Icon${val}.svg`;
+  switch (field) {
+    case "hp":
+      return prefix("MaxHP");
+    case "atk":
+      return prefix("Attack");
+    case "def":
+      return prefix("Defence");
+    case "spd":
+      return prefix("Speed");
+    case "crit_rate":
+      return prefix("CriticalChance");
+    case "crit_dmg":
+      return prefix("CriticalDamage");
+    case "break_dmg":
+      return prefix("BreakUp");
+    case "heal_rate":
+      return prefix("HealRatio");
+    case "sp_rate":
+      return prefix("EnergyRecovery");
+    case "effect_hit":
+      return prefix("StatusProbability");
+    case "effect_res":
+      return prefix("StatusResistance");
+    case "lightning_dmg":
+      return prefix("ThunderAddedRatio");
+    case "wind_dmg":
+      return prefix("WindAddedRatio");
+    case "fire_dmg":
+      return prefix("FireAddedRatio");
+    case "quantum_dmg":
+      return prefix("QuantumAddedRatio");
+    case "imaginary_dmg":
+      return prefix("ImagineryAddedRatio");
+    case "ice_dmg":
+      return prefix("IceAddedRatio");
+    case "physical_dmg":
+      return prefix("PhysicalAddedRatio");
   }
 }
 

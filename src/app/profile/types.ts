@@ -1,6 +1,7 @@
 import { Element, Path } from "@/bindings/AvatarConfig";
 import { AssetPath, SkillType } from "@/bindings/AvatarSkillConfig";
 import { Anchor, Property } from "@/bindings/SkillTreeConfig";
+import { Field } from "./[uid]/_components/SpiderChartWrapper";
 
 export interface MihomoResponse {
   player: MihomoPlayer;
@@ -52,7 +53,11 @@ export interface MihomoCharacter {
   relics: MihomoRelicConfig[];
   relic_sets: MihomoRelicSetConfig[];
   attributes: MihomoAttributeConfig[];
+  /** added stat from relic
+   * */
   additions: MihomoAttributeConfig[];
+  /** base stat of a character at specific level and light cone
+   * */
   properties: MihomoPropertyConfig[];
 }
 
@@ -111,7 +116,7 @@ export interface MihomoPath {
 }
 
 export interface MihomoAttributeConfig {
-  field: string;
+  field: Field;
   name: string;
   icon: AssetPath;
   value: number;
@@ -121,7 +126,7 @@ export interface MihomoAttributeConfig {
 
 export interface MihomoPropertyConfig {
   type: Property;
-  field: string;
+  field: Field;
   name: string;
   icon: AssetPath;
   value: number;
