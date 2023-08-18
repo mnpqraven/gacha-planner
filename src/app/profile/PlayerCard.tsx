@@ -1,5 +1,5 @@
 import { ButtonHTMLAttributes, forwardRef } from "react";
-import { MihomoResponse } from "./types";
+import { MihomoPlayer } from "./types";
 import { Button } from "../components/ui/Button";
 import Image from "next/image";
 import { cn, img } from "@/lib/utils";
@@ -7,13 +7,12 @@ import { Separator } from "../components/ui/Separator";
 import Link from "next/link";
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
-  data: MihomoResponse;
+  player: MihomoPlayer;
   uid: string;
   lang: string;
 }
 export const PlayerCard = forwardRef<HTMLButtonElement, Props>(
-  ({ data, uid, lang, className, ...props }, ref) => {
-    const { player } = data;
+  ({ player, uid, lang, className, ...props }, ref) => {
     return (
       <Button
         className={cn("flex h-fit items-center gap-2.5", className)}

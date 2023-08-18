@@ -21,11 +21,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/Select";
-import { Loader2 } from "lucide-react";
+import { Loader2, Pin, PinOff } from "lucide-react";
 import { useMihomoInfo } from "./[uid]/_fetcher";
 import { useEffect, useState } from "react";
 import { PlayerCard } from "./PlayerCard";
 import { useRouter } from "next/navigation";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../components/ui/Tooltip";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { MihomoPlayer } from "./types";
+import STORAGE from "@/server/storage";
+import { Toggle } from "../components/ui/Toggle";
+import { cn } from "@/lib/utils";
 
 const schema = z.object({
   uid: z
@@ -48,17 +58,22 @@ export default function Profile() {
     resolver: zodResolver(schema),
   });
   const [prof, setProf] = useState(defaultValues);
-  const { query } = useMihomoInfo(prof);
+  const { query, prefetch } = useMihomoInfo(prof);
+  const router = useRouter();
+  const [playerProfiles, setPlayerProfiles] = useLocalStorage<MihomoPlayer[]>(
+    STORAGE.playerProfiles,
+    []
+  );
 
   function onSubmit(values: FormSchema) {
     setProf(values);
   }
 
-  const router = useRouter();
   useEffect(() => {
     if (!!query.data) {
       const url = `/profile/${prof.uid}?lang=${prof.lang}`;
       router.prefetch(url);
+      prefetch(prof.uid, prof.lang);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query.data]);
@@ -124,7 +139,96 @@ export default function Profile() {
       </Form>
 
       {query.isInitialLoading && <Loader2 className="mr-1 animate-spin" />}
-      {query.data && <PlayerCard data={query.data} {...prof} />}
+      {query.data && (
+        <div className="flex items-center gap-3">
+          <PinProfileButton
+            profile={query.data.player}
+            storage={playerProfiles ?? []}
+            onStorageUpdate={setPlayerProfiles}
+          />
+
+          <PlayerCard player={query.data.player} {...prof} />
+        </div>
+      )}
+      {playerProfiles && playerProfiles.length > 0 && (
+        <>
+          <h1 className="my-4">Saved Profile</h1>
+          <div className="flex flex-col gap-4">
+            {playerProfiles.map((profile) => (
+              <div className="flex items-center gap-3" key={profile.uid}>
+                <PinProfileButton
+                  profile={profile}
+                  storage={playerProfiles ?? []}
+                  onStorageUpdate={setPlayerProfiles}
+                />
+
+                <PlayerCard player={profile} uid={profile.uid} lang="en" />
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </main>
+  );
+}
+
+function PinProfileButton({
+  profile,
+  storage: playerProfiles,
+  onStorageUpdate,
+}: {
+  profile: MihomoPlayer;
+  storage: MihomoPlayer[];
+  onStorageUpdate: (storage: MihomoPlayer[]) => void;
+}) {
+  const isSaved = (data: MihomoPlayer, storage: MihomoPlayer[] | undefined) =>
+    !!storage?.find((e) => e.uid === data.uid);
+
+  function upsertLocalSave(saveState: boolean, data: MihomoPlayer) {
+    let next = !!playerProfiles ? [...playerProfiles] : [];
+    const findIndex = next.findIndex((e) => e.uid == data.uid);
+    if (saveState) {
+      // upsert logic
+      if (findIndex === -1) {
+        // push
+        next = [...next, data];
+      } else {
+        // update
+        next = next.map((profile, index) =>
+          index === findIndex ? data : profile
+        );
+      }
+    } else {
+      const n = !!playerProfiles ? [...playerProfiles] : [];
+      const index = n.findIndex((e) => e.uid === data.uid);
+      n.splice(index, 1);
+      next = n;
+    }
+
+    onStorageUpdate(next);
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Toggle onPressedChange={(state) => upsertLocalSave(state, profile)}>
+          <Pin
+            className={cn(
+              "h-4 w-4",
+              isSaved(profile, playerProfiles) ? "hidden" : ""
+            )}
+          />
+          <PinOff
+            className={cn(
+              "h-4 w-4",
+              isSaved(profile, playerProfiles) ? "" : "hidden"
+            )}
+          />
+        </Toggle>
+      </TooltipTrigger>
+      <TooltipContent>
+        {isSaved(profile, playerProfiles) ? "Unsave" : "Save"} Profile
+      </TooltipContent>
+    </Tooltip>
   );
 }
