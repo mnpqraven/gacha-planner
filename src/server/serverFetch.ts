@@ -1,3 +1,5 @@
+import { env } from "@/envSchema.mjs";
+
 export async function serverFetch<TPayload, TResponse>(
   endpoint: string,
   opt?: {
@@ -6,7 +8,7 @@ export async function serverFetch<TPayload, TResponse>(
   },
   params?: string | number
 ): Promise<TResponse> {
-  let url = process.env["NEXT_PUBLIC_WORKER_API"] + endpoint;
+  let url = env.NEXT_PUBLIC_WORKER_API + endpoint;
   if (params) {
     if (url.includes(":id")) url = url.replace(":id", `${params}`);
     else url += `/${params}`;

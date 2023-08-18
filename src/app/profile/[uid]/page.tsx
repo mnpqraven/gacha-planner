@@ -4,11 +4,8 @@ import { CardConfigController } from "./ConfigControllerContext";
 import { CharacterCardWrapper } from "./_components/CharacterCard";
 import { Exporter } from "./_components/Exporter";
 import { LineupSelector } from "./_components/LineupSelector";
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from "@/app/components/ui/Dialog";
+import { Dialog, DialogTrigger } from "@/app/components/ui/Dialog";
+import { env } from "@/envSchema.mjs";
 
 interface Props {
   params: { uid: string };
@@ -19,7 +16,7 @@ export async function generateMetadata({ params, searchParams }: Props) {
   const { player } = await getMihomoInfo(
     params.uid,
     searchParams.lang,
-    process.env["NEXT_PUBLIC_BASE_URL"]
+    env.NEXT_PUBLIC_BASE_URL
   );
   return {
     title: `${player.nickname}'s Player Card`,

@@ -75,8 +75,8 @@ export const ConfigControllerDialog = forwardRef<
     { value: "detailed", label: "Detailed" },
   ];
 
-  function onSubmit(value: CardConfig) {
-    changeConfig({ type: "updateWholeConfig", payload: value });
+  function onSubmit(payload: CardConfig) {
+    changeConfig({ type: "updateWholeConfig", payload });
   }
 
   return (

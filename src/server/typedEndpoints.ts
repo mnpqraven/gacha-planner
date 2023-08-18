@@ -14,6 +14,7 @@ import { PatchBanner } from "@/bindings/PatchBanner";
 import { createPromiseClient } from "@bufbuild/connect";
 import { createGrpcWebTransport } from "@bufbuild/connect-web";
 import { ServiceType } from "@bufbuild/protobuf";
+import { env } from "@/envSchema.mjs";
 
 const API = {
   patchDates: route<List<Patch>>("/honkai/patch_dates", "GET"),
@@ -107,7 +108,7 @@ export function rpc<T extends ServiceType>(service: T) {
   const client = createPromiseClient(
     service,
     createGrpcWebTransport({
-      baseUrl: process.env["NEXT_PUBLIC_WORKER_API"] + "/rpc",
+      baseUrl: env.NEXT_PUBLIC_WORKER_API + "/rpc",
     })
   );
   return client;
