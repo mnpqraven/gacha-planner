@@ -1,8 +1,8 @@
 import { cn, img } from "@/lib/utils";
-import { HTMLAttributes, forwardRef, useContext } from "react";
+import { HTMLAttributes, forwardRef } from "react";
 import Image from "next/image";
 import { ImpositionIcon } from "../ImpositionIcon";
-import { CardConfigContext } from "../../ConfigControllerContext";
+import { useCardConfigContext } from "../../ConfigControllerContext";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   displayStat?: boolean;
@@ -10,7 +10,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
   ({ displayStat = false, className, ...props }, ref) => {
     const ratio = 902 / 1260;
-    const { currentCharacter } = useContext(CardConfigContext);
+    const { currentCharacter } = useCardConfigContext();
 
     if (!currentCharacter) return null;
 

@@ -1,20 +1,16 @@
-import { cn, rotate } from "@/lib/utils";
-import { HTMLAttributes, forwardRef, useContext } from "react";
-import { CardConfigContext } from "../ConfigControllerContext";
+import { cn } from "@/lib/utils";
+import { HTMLAttributes, forwardRef } from "react";
+import { useCardConfigContext } from "../ConfigControllerContext";
 import { ParentSize } from "@visx/responsive";
 import { SpiderChart } from "./SpiderChart";
 import * as z from "zod";
-import { MihomoAttributeConfig } from "../../types";
-import { Element } from "@/bindings/AvatarConfig";
-import { useDataProcess } from "./useDataProcess";
+import { StatRadarData, useDataProcess } from "./useDataProcess";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {}
 export const SpiderChartWrapper = forwardRef<HTMLDivElement, Props>(
   ({ className, ...props }, ref) => {
-    const { currentCharacter } = useContext(CardConfigContext);
+    const { currentCharacter } = useCardConfigContext();
     const { data } = useDataProcess({ character: currentCharacter });
-
-    if (!currentCharacter) return null;
 
     return (
       <div
@@ -30,6 +26,9 @@ export const SpiderChartWrapper = forwardRef<HTMLDivElement, Props>(
               data={data}
               valueAccessor={(e: (typeof data)[number]) => e.value}
               iconAccessor={(e: (typeof data)[number]) => propertyPath(e.field)}
+              tooltipRender={({ label, tooltipValue }: StatRadarData) =>
+                `${label}: ${tooltipValue}`
+              }
             />
           )}
         </ParentSize>

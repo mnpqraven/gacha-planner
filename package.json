@@ -46,6 +46,7 @@
     "@visx/scale": "^3.3.0",
     "@visx/shape": "^3.3.0",
     "@visx/tooltip": "^3.3.0",
+    "@visx/voronoi": "^3.3.0",
     "autoprefixer": "10.4.14",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",

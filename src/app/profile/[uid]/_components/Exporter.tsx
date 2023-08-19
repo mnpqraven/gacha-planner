@@ -3,7 +3,7 @@
 import { Button } from "@/app/components/ui/Button";
 import { toBlob, toPng } from "html-to-image";
 import { useContext, useEffect, useState } from "react";
-import { CardConfigContext } from "../ConfigControllerContext";
+import { useCardConfigContext } from "../ConfigControllerContext";
 import { Clipboard, Download } from "lucide-react";
 import { useToast } from "@/app/components/ui/Toast/useToast";
 import {
@@ -16,7 +16,7 @@ import {
 declare const InstallTrigger: any;
 
 export function Exporter() {
-  const { enkaRef } = useContext(CardConfigContext);
+  const { enkaRef } = useCardConfigContext();
   // we need a firefox check cause firefox can't directly copy image
   const [isFirefox, setIsFirefox] = useState(false);
   const { toast } = useToast();
@@ -68,7 +68,8 @@ export function Exporter() {
             <span>
               Direct clipboard copying is not supported on Firefox.
               <br />
-              Please use the {"'"}Download Image{"'"} button on the left instead.
+              Please use the {"'"}Download Image{"'"} button on the left
+              instead.
             </span>
           ) : (
             "Copy to clipboard"

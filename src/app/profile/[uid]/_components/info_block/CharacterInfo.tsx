@@ -1,15 +1,15 @@
-import { HTMLAttributes, forwardRef, useContext } from "react";
+import { HTMLAttributes, forwardRef } from "react";
 import { RarityIcon } from "@/app/character-db/CharacterCardWrapper";
 import { Badge } from "@/app/components/ui/Badge";
 import { cn } from "@/lib/utils";
 import { PathIcon } from "@/app/character-db/PathIcon";
 import { ElementIcon } from "@/app/character-db/ElementIcon";
-import { CardConfigContext } from "../../ConfigControllerContext";
+import { useCardConfigContext } from "../../ConfigControllerContext";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {}
 export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
   ({ className, ...props }: Props, ref) => {
-    const { currentCharacter, mihomoResponse } = useContext(CardConfigContext);
+    const { currentCharacter, mihomoResponse } = useCardConfigContext();
     if (!currentCharacter) return null;
     const { name, level, rarity, rank, path, element } = currentCharacter;
     const maxLevel = currentCharacter.promotion * 10 + 20;

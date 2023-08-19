@@ -1,26 +1,31 @@
 import { asPercentage, cn, img, range } from "@/lib/utils";
-import { HTMLAttributes, forwardRef, useContext } from "react";
+import { HTMLAttributes, forwardRef } from "react";
 import {
   MihomoPropertyConfig,
   MihomoRelicConfig,
   MihomoRelicSetConfig,
   MihomoSubAffixInfo,
 } from "@/app/profile/types";
-import Image from "next/image";
 import { Badge } from "@/app/components/ui/Badge";
-import { CardConfigContext } from "../../ConfigControllerContext";
+import { useCardConfigContext } from "../../ConfigControllerContext";
 import SVG from "react-inlinesvg";
 import { cva } from "class-variance-authority";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {}
 export const RelicInfo = forwardRef<HTMLDivElement, Props>(
   ({ className, ...props }, ref) => {
-    const { currentCharacter } = useContext(CardConfigContext);
+    const { currentCharacter } = useCardConfigContext();
+
     if (!currentCharacter) return null;
     // TODO: add indicator for relic_set
     const { relics, relic_sets } = currentCharacter;
+
     return (
-      <div className={cn(className, "grid grid-cols-2 gap-2")} ref={ref} {...props}>
+      <div
+        className={cn(className, "grid grid-cols-2 gap-2")}
+        ref={ref}
+        {...props}
+      >
         {relics.map((relic, index) => (
           <Relic data={relic} key={index} setList={relic_sets} />
         ))}
@@ -38,10 +43,7 @@ function Relic({ data }: RelicProps) {
   // NOTED: upperbound = 6
   return (
     <div className="flex h-fit rounded-md border p-2 shadow-md shadow-border">
-      <div
-        id="main"
-        className="relative flex w-24 items-end justify-center"
-      >
+      <div id="main" className="relative flex w-24 items-end justify-center">
         <div
           className="absolute top-0 z-0 h-24 w-24"
           style={{

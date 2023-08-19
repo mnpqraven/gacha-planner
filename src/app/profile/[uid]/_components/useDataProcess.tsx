@@ -12,6 +12,7 @@ import { Property, SkillTreeConfig } from "@/bindings/SkillTreeConfig";
 import { getNodeType } from "@/app/components/Character/TraceTable";
 import { Field } from "./SpiderChartWrapper";
 import { Element, Path } from "@/bindings/PatchBanner";
+import { asPercentage, rotate } from "@/lib/utils";
 
 const accumulator: { [k in Field]: Field[] } = {
   hp: ["hp"],
@@ -35,19 +36,26 @@ const accumulator: { [k in Field]: Field[] } = {
   ice_dmg: ["ice_dmg", "all_dmg"],
 };
 
-interface HookReturn {
-  data: { field: Field; value: number }[];
-}
 interface Props {
   character: MihomoCharacter | undefined;
   // options: {}
 }
+
+export interface StatRadarData {
+  field: Field;
+  value: number;
+  label: string;
+  tooltipValue: string | number;
+}
+
 /**
  * This hook will perform the following tasks
  * - get the current character and light cone's stat at the current levels
  * - normalize sum data across the board for radar chart
  * */
-export function useDataProcess({ character }: Props): HookReturn {
+export function useDataProcess({ character }: Props): {
+  data: StatRadarData[];
+} {
   // INFO: calc order + formula
   // base char stat + lc:
   // trace
@@ -74,7 +82,7 @@ export function useDataProcess({ character }: Props): HookReturn {
     const maxedGreyLc = lcAfterPromotion({ promotionConfig: lcPromo });
 
     const { additions, attributes } = character;
-    let data: { field: Field; value: number }[] = [];
+    let data: StatRadarData[] = [];
     Object.entries(accumulator).forEach((entry) => {
       const [key, list] = entry as [Field, Field[]];
       const addition = additions.filter((e) => list.includes(e.field));
@@ -100,21 +108,39 @@ export function useDataProcess({ character }: Props): HookReturn {
         }
       );
 
+      const label = getFieldLabel(key);
+
+      let tooltipValue = "";
+
+      if (["atk", "def", "hp"].includes(key)) {
+        tooltipValue = (additionSum + attributeSum).toFixed(0);
+      } else if (key === "spd") {
+        tooltipValue = (additionSum + attributeSum).toFixed(1);
+      } else {
+        tooltipValue = asPercentage(additionSum + attributeSum);
+      }
+
       data.push({
         field: key,
         // 2nd argument (attributeSum) is spd value for spd case
         value: normalizedValue / getNormalizedBound(key, attributeSum),
+        label,
+        tooltipValue,
       });
     });
 
+    // apply rotation to outcoming data to have correct positions on the chart
+    const preRotate = data
+      .sort(
+        (fieldA, fieldB) =>
+          getSortValue(fieldA.field) - getSortValue(fieldB.field)
+      )
+      .filter(filterFieldsByRole(character.element.name))
+      .filter(filterEmptyValues())
+      .reverse();
+
     return {
-      data: data
-        .sort(
-          (fieldA, fieldB) =>
-            getSortValue(fieldA.field) - getSortValue(fieldB.field)
-        )
-        .filter(filterFieldsByRole(character.element.name))
-        .filter(filterEmptyValues()),
+      data: rotate(preRotate.length / 2, preRotate),
     };
   }
 
@@ -329,6 +355,49 @@ function getSortValue(field: Field): number {
       return 17;
     case "hp":
       return 18;
+  }
+}
+
+function getFieldLabel(field: Field): string {
+  switch (field) {
+    case "hp":
+      return "HP";
+    case "atk":
+      return "ATK";
+    case "def":
+      return "DEF";
+    case "spd":
+      return "Speed";
+    case "crit_rate":
+      return "Crit Rate";
+    case "crit_dmg":
+      return "Crit DMG";
+    case "break_dmg":
+      return "Break Effect";
+    case "heal_rate":
+      return "Outgoing Healing";
+    case "sp_rate":
+      return "Energy Regen";
+    case "effect_hit":
+      return "Effect Hit";
+    case "effect_res":
+      return "Effect Resist";
+    case "lightning_dmg":
+      return "Lightning DMG";
+    case "wind_dmg":
+      return "Wind DMG";
+    case "fire_dmg":
+      return "Fire DMG";
+    case "quantum_dmg":
+      return "Quantum DMG";
+    case "imaginary_dmg":
+      return "Imaginary DMG";
+    case "ice_dmg":
+      return "Ice DMG";
+    case "physical_dmg":
+      return "Physical DMG";
+    case "all_dmg":
+      return "All DMG";
   }
 }
 

@@ -41,7 +41,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/app/components/ui/Select";
-import { CardConfigContext } from "./ConfigControllerContext";
+import {
+  CardConfigContext,
+  useCardConfigContext,
+} from "./ConfigControllerContext";
 
 interface Props extends ButtonProps {}
 export const ConfigController = forwardRef<HTMLButtonElement, Props>(
@@ -67,7 +70,7 @@ export const ConfigControllerDialog = forwardRef<
   const form = useForm({
     defaultValues: initialConfig,
   });
-  const { changeConfig } = useContext(CardConfigContext);
+  const { changeConfig } = useCardConfigContext();
 
   const verbosityOptions = [
     { value: "none", label: "None" },

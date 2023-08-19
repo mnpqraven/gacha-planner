@@ -1,14 +1,13 @@
 "use client";
 
 import { useContext, useEffect } from "react";
-import { MihomoResponse } from "../../types";
 import { CharacterInfo } from "./info_block/CharacterInfo";
 import { SkillInfo } from "./skill_block/SkillInfo";
 import { LightConeInfo } from "./skill_block/LightConeInfo";
 import { RelicInfo } from "./relic_block/RelicInfo";
 import { StatTable } from "./stat_block/StatTable";
 import { SpiderChartWrapper } from "./SpiderChartWrapper";
-import { CardConfigContext } from "../ConfigControllerContext";
+import { useCardConfigContext } from "../ConfigControllerContext";
 import { img } from "@/lib/utils";
 import { EidolonInfo } from "./skill_block/EidolonInfo";
 import { useParams, useSearchParams } from "next/navigation";
@@ -24,8 +23,7 @@ function CharacterCardWrapper() {
     query: { data },
   } = useMihomoInfo({ uid, lang });
 
-  const { currentCharacter, enkaRef, initResponse } =
-    useContext(CardConfigContext);
+  const { currentCharacter, enkaRef, initResponse } = useCardConfigContext();
 
   useEffect(() => {
     if (!!data) initResponse(data);

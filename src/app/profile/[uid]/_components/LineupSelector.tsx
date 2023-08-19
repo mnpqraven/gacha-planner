@@ -1,9 +1,9 @@
 "use client";
 
-import { HTMLAttributes, forwardRef, useContext } from "react";
+import { HTMLAttributes, forwardRef } from "react";
 import Image from "next/image";
 import { cn, img } from "@/lib/utils";
-import { CardConfigContext } from "../ConfigControllerContext";
+import { useCardConfigContext } from "../ConfigControllerContext";
 import { Toggle } from "@/app/components/ui/Toggle";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {}
@@ -11,7 +11,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {}
 export const LineupSelector = forwardRef<HTMLDivElement, Props>(
   ({ className }, ref) => {
     const { setCurrentCharacter, currentCharacter, mihomoResponse } =
-      useContext(CardConfigContext);
+      useCardConfigContext();
 
     if (!mihomoResponse) return null;
 

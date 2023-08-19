@@ -5,6 +5,7 @@ import {
   ReactNode,
   RefObject,
   createContext,
+  useContext,
   useReducer,
   useRef,
   useState,
@@ -72,4 +73,14 @@ function useCardConfigController(): CardConfigContextPayload {
     initResponse: setMihomoResponse,
     mihomoResponse,
   };
+}
+
+export function useCardConfigContext() {
+  const context = useContext(CardConfigContext);
+  if (!context) {
+    throw new Error(
+      "useCardConfigContext must be used within a CardConfigContext wrapper!"
+    );
+  }
+  return context;
 }

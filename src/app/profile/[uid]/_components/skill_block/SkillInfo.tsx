@@ -1,10 +1,8 @@
-import { HTMLAttributes, forwardRef, useContext } from "react";
+import { HTMLAttributes, forwardRef } from "react";
 import { SkillType } from "@/bindings/AvatarSkillConfig";
 import { cn, img } from "@/lib/utils";
 import Image from "next/image";
-import { Badge } from "@/app/components/ui/Badge";
-import { CardConfigContext } from "../../ConfigControllerContext";
-import { Separator } from "@/app/components/ui/Separator";
+import { useCardConfigContext } from "../../ConfigControllerContext";
 
 const DISPLAY_SKILL_TYPES: SkillType[] = [
   "Talent",
@@ -17,7 +15,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {}
 
 export const SkillInfo = forwardRef<HTMLDivElement, Props>(
   ({ className, ...props }, ref) => {
-    const { currentCharacter } = useContext(CardConfigContext);
+    const { currentCharacter } = useCardConfigContext();
 
     if (!currentCharacter) return null;
 
