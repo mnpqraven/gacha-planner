@@ -53,7 +53,7 @@ const API = {
   trace: route<List<SkillTreeConfig>>("/honkai/avatar/:id/trace", "GET"),
   properties: route<List<AvatarPropertyConfig>>("/honkai/properties", "GET"),
   eidolon: route<List<AvatarRankConfig>>("/honkai/avatar/:id/eidolon", "GET"),
-  promotion: route<AvatarPromotionConfig>("honkai/avatar/:id/promotion", "GET"),
+  promotion: route<AvatarPromotionConfig>("/honkai/avatar/:id/promotion", "GET"),
 };
 
 type ApiRoute = {

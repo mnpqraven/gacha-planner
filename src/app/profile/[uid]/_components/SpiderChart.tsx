@@ -2,17 +2,17 @@ import { Group } from "@visx/group";
 import { scaleLinear } from "@visx/scale";
 import { Point } from "@visx/point";
 import { Line, LineRadial } from "@visx/shape";
-import { Text } from "@visx/text";
 import { rotate } from "@/lib/utils";
 import SVG from "react-inlinesvg";
-import { Field, propertyPath } from "./SpiderChartWrapper";
 
-export type RadarProps = {
+export type RadarProps<T> = {
   width: number;
   height: number;
   margin?: { top: number; right: number; bottom: number; left: number };
   levels?: number;
-  data: { field: Field; value: number }[];
+  data: T[];
+  valueAccessor: (data: T) => number;
+  iconAccessor: (data: T) => string;
 };
 
 const DEGREES = 360;
@@ -22,26 +22,6 @@ const pumpkin = "#f5810c";
 const silver = "#d9d9d9";
 // export const background = "#FAF7E900";
 const background = "#00000000";
-
-const letterFrequency: LetterFrequency[] = [
-  { letter: "a", frequency: 1 },
-  { letter: "b", frequency: 2 },
-  { letter: "c", frequency: 3 },
-  { letter: "d", frequency: 4 },
-  { letter: "e", frequency: 5 },
-  { letter: "f", frequency: 6 },
-  { letter: "g", frequency: 7 },
-  { letter: "h", frequency: 8 },
-  { letter: "i", frequency: 9 },
-];
-type LetterFrequency = {
-  letter: string;
-  frequency: number;
-};
-
-const data = rotate(-5, letterFrequency.reverse());
-
-const y = (d: { field: string; value: number }) => d.value;
 
 const genAngles = (length: number) =>
   [...new Array(length + 1)].map((_, i) => ({
@@ -80,15 +60,20 @@ function genPolygonPoints<Datum>(
 
   return { points, pointString };
 }
-const defaultMargin = { top: 0, left: 60, right: 60, bottom: 0 };
 
-export function SpiderChart({
+const DEFAULT_MARGINS = { top: 0, left: 60, right: 60, bottom: 0 };
+
+export function SpiderChart<T>({
   width,
   height,
   levels = 5,
-  margin = defaultMargin,
-  data,
-}: RadarProps) {
+  margin = DEFAULT_MARGINS,
+  data: preRotate,
+  valueAccessor,
+  iconAccessor,
+}: RadarProps<T>) {
+  const data = rotate(preRotate.length / 2, preRotate.reverse());
+
   const xMax = width - margin.left - margin.right;
   const yMax = height - margin.top - margin.bottom;
   const radius = Math.min(xMax, yMax) / 2;
@@ -100,15 +85,23 @@ export function SpiderChart({
 
   const yScale = scaleLinear<number>({
     range: [0, radius],
-    domain: [0, Math.max(...data.map(y))],
+    // NOTE: this domain uses the data's max value as edge
+    // domain: [0, Math.max(...data.map(y))],
+    // NOTE: this domain uses normalized value range from 0 to 1
+    domain: [0, 1],
   });
 
   const webs = genAngles(data.length);
   const points = genPoints(data.length, radius);
   const textAnchors = rotate(-1, genPoints(data.length, radius + 20));
 
-  const polygonPoints = genPolygonPoints(data, (d) => yScale(d) ?? 0, y);
+  const polygonPoints = genPolygonPoints(
+    data,
+    (d) => yScale(d) ?? 0,
+    valueAccessor
+  );
   const zeroPoint = new Point({ x: 0, y: 0 });
+
   return width < 10 ? null : (
     <svg width={width} height={height}>
       <rect fill={background} width={width} height={height} rx={14} />
@@ -121,8 +114,8 @@ export function SpiderChart({
             radius={((i + 1) * radius) / levels}
             fill="none"
             stroke={silver}
-            strokeWidth={i == 2 ? 3 : 2}
-            strokeOpacity={i == 2 ? 1 : 0.8}
+            strokeWidth={i % 2 == 0 ? 2 : 1}
+            strokeOpacity={0.6}
             strokeLinecap="round"
           />
         ))}
@@ -134,19 +127,7 @@ export function SpiderChart({
             stroke={silver}
           />
         ))}
-        {/* data.map((text, i) => (
-          // TODO: dynamic x y coords according to index
-          <Text
-            key={`annotate-${i}`}
-            verticalAnchor="middle"
-            fill="white"
-            x={textAnchors[i].x - 5}
-            y={textAnchors[i].y}
-          >
-            {text.field}
-          </Text>
-        )) */}
-        {data.map((text, i) => (
+        {data.map((item, i) => (
           // TODO: dynamic x y coords according to index
           <SVG
             key={`annotate-${i}`}
@@ -155,7 +136,7 @@ export function SpiderChart({
             y={textAnchors[i].y - 10}
             width={24}
             height={24}
-            src={propertyPath(text.field)}
+            src={iconAccessor(item)}
           />
         ))}
         <polygon
@@ -163,7 +144,7 @@ export function SpiderChart({
           fill={orange}
           fillOpacity={0.3}
           stroke={orange}
-          strokeWidth={1}
+          strokeWidth={2}
         />
         {polygonPoints.points.map((point, i) => (
           <circle

@@ -24,7 +24,7 @@ export async function generateMetadata({ params, searchParams }: Props) {
   };
 }
 
-export default async function ProfileCard({ params, searchParams }: Props) {
+export default async function ProfileCard() {
   return (
     <CardConfigController>
       <main className="flex flex-col items-center justify-center">
