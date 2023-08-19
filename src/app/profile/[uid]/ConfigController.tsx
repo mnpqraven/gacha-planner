@@ -43,7 +43,7 @@ import {
 } from "@/app/components/ui/Select";
 import {
   CardConfigContext,
-  useCardConfigContext,
+  useCardConfigController,
 } from "./ConfigControllerContext";
 
 interface Props extends ButtonProps {}
@@ -70,7 +70,7 @@ export const ConfigControllerDialog = forwardRef<
   const form = useForm({
     defaultValues: initialConfig,
   });
-  const { changeConfig } = useCardConfigContext();
+  const { changeConfig } = useCardConfigController();
 
   const verbosityOptions = [
     { value: "none", label: "None" },

@@ -3,7 +3,7 @@
 import { Button } from "@/app/components/ui/Button";
 import { toBlob, toPng } from "html-to-image";
 import { useContext, useEffect, useState } from "react";
-import { useCardConfigContext } from "../ConfigControllerContext";
+import { useCardConfigController } from "../ConfigControllerContext";
 import { Clipboard, Download } from "lucide-react";
 import { useToast } from "@/app/components/ui/Toast/useToast";
 import {
@@ -16,7 +16,7 @@ import {
 declare const InstallTrigger: any;
 
 export function Exporter() {
-  const { enkaRef } = useCardConfigContext();
+  const { enkaRef } = useCardConfigController();
   // we need a firefox check cause firefox can't directly copy image
   const [isFirefox, setIsFirefox] = useState(false);
   const { toast } = useToast();

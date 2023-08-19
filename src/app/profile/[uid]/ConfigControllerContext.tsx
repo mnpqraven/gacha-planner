@@ -10,7 +10,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { MihomoCharacter, MihomoPlayer, MihomoResponse } from "../types";
+import { MihomoCharacter, MihomoResponse } from "../types";
 import {
   CardConfig,
   CardConfigAction,
@@ -41,8 +41,9 @@ export const defaultCardConfig: CardConfigContextPayload = {
 export const CardConfigContext =
   createContext<CardConfigContextPayload>(defaultCardConfig);
 
-export const CardConfigController = ({ children }: { children: ReactNode }) => {
-  const value = useCardConfigController();
+export const CardConfigProvider = ({ children }: { children: ReactNode }) => {
+  const value = useCardConfigProvider();
+
   return (
     <CardConfigContext.Provider value={value}>
       {children}
@@ -50,7 +51,7 @@ export const CardConfigController = ({ children }: { children: ReactNode }) => {
   );
 };
 
-function useCardConfigController(): CardConfigContextPayload {
+function useCardConfigProvider(): CardConfigContextPayload {
   // for the character selector
   const [currentCharacter, setCurrentCharacter] = useState<
     MihomoCharacter | undefined
@@ -75,7 +76,7 @@ function useCardConfigController(): CardConfigContextPayload {
   };
 }
 
-export function useCardConfigContext() {
+export function useCardConfigController() {
   const context = useContext(CardConfigContext);
   if (!context) {
     throw new Error(

@@ -7,14 +7,14 @@ import {
   MihomoSubAffixInfo,
 } from "@/app/profile/types";
 import { Badge } from "@/app/components/ui/Badge";
-import { useCardConfigContext } from "../../ConfigControllerContext";
+import { useCardConfigController } from "../../ConfigControllerContext";
 import SVG from "react-inlinesvg";
 import { cva } from "class-variance-authority";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {}
 export const RelicInfo = forwardRef<HTMLDivElement, Props>(
   ({ className, ...props }, ref) => {
-    const { currentCharacter } = useCardConfigContext();
+    const { currentCharacter } = useCardConfigController();
 
     if (!currentCharacter) return null;
     // TODO: add indicator for relic_set

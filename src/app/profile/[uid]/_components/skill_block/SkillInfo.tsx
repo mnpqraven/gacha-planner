@@ -2,7 +2,7 @@ import { HTMLAttributes, forwardRef } from "react";
 import { SkillType } from "@/bindings/AvatarSkillConfig";
 import { cn, img } from "@/lib/utils";
 import Image from "next/image";
-import { useCardConfigContext } from "../../ConfigControllerContext";
+import { useCardConfigController } from "../../ConfigControllerContext";
 
 const DISPLAY_SKILL_TYPES: SkillType[] = [
   "Talent",
@@ -15,7 +15,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {}
 
 export const SkillInfo = forwardRef<HTMLDivElement, Props>(
   ({ className, ...props }, ref) => {
-    const { currentCharacter } = useCardConfigContext();
+    const { currentCharacter } = useCardConfigController();
 
     if (!currentCharacter) return null;
 

@@ -1,12 +1,12 @@
 import { cn, img, range } from "@/lib/utils";
 import { HTMLAttributes, forwardRef } from "react";
-import { useCardConfigContext } from "../../ConfigControllerContext";
+import { useCardConfigController } from "../../ConfigControllerContext";
 import Image from "next/image";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {}
 export const EidolonInfo = forwardRef<HTMLDivElement, Props>(
   ({ className, ...props }, ref) => {
-    const { currentCharacter } = useCardConfigContext();
+    const { currentCharacter } = useCardConfigController();
 
     if (!currentCharacter) return null;
     const { rank, rank_icons } = currentCharacter;

@@ -7,7 +7,7 @@ import { LightConeInfo } from "./skill_block/LightConeInfo";
 import { RelicInfo } from "./relic_block/RelicInfo";
 import { StatTable } from "./stat_block/StatTable";
 import { SpiderChartWrapper } from "./SpiderChartWrapper";
-import { useCardConfigContext } from "../ConfigControllerContext";
+import { useCardConfigController } from "../ConfigControllerContext";
 import { img } from "@/lib/utils";
 import { EidolonInfo } from "./skill_block/EidolonInfo";
 import { useParams, useSearchParams } from "next/navigation";
@@ -23,7 +23,7 @@ function CharacterCardWrapper() {
     query: { data },
   } = useMihomoInfo({ uid, lang });
 
-  const { currentCharacter, enkaRef, initResponse } = useCardConfigContext();
+  const { currentCharacter, enkaRef, initResponse } = useCardConfigController();
 
   useEffect(() => {
     if (!!data) initResponse(data);

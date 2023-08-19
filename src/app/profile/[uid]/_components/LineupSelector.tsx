@@ -3,7 +3,7 @@
 import { HTMLAttributes, forwardRef } from "react";
 import Image from "next/image";
 import { cn, img } from "@/lib/utils";
-import { useCardConfigContext } from "../ConfigControllerContext";
+import { useCardConfigController } from "../ConfigControllerContext";
 import { Toggle } from "@/app/components/ui/Toggle";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {}
@@ -11,7 +11,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {}
 export const LineupSelector = forwardRef<HTMLDivElement, Props>(
   ({ className }, ref) => {
     const { setCurrentCharacter, currentCharacter, mihomoResponse } =
-      useCardConfigContext();
+      useCardConfigController();
 
     if (!mihomoResponse) return null;
 

@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { HTMLAttributes, forwardRef } from "react";
-import { useCardConfigContext } from "../ConfigControllerContext";
+import { useCardConfigController } from "../ConfigControllerContext";
 import { ParentSize } from "@visx/responsive";
 import { SpiderChart } from "./SpiderChart";
 import * as z from "zod";
@@ -9,7 +9,7 @@ import { StatRadarData, useDataProcess } from "./useDataProcess";
 interface Props extends HTMLAttributes<HTMLDivElement> {}
 export const SpiderChartWrapper = forwardRef<HTMLDivElement, Props>(
   ({ className, ...props }, ref) => {
-    const { currentCharacter } = useCardConfigContext();
+    const { currentCharacter } = useCardConfigController();
     const { data } = useDataProcess({ character: currentCharacter });
 
     return (

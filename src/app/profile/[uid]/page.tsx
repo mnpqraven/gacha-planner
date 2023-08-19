@@ -1,6 +1,6 @@
 import { getMihomoInfo } from "@/app/api/profile/[uid]/route";
 import { ConfigController, ConfigControllerDialog } from "./ConfigController";
-import { CardConfigController } from "./ConfigControllerContext";
+import { CardConfigProvider } from "./ConfigControllerContext";
 import { CharacterCardWrapper } from "./_components/CharacterCard";
 import { Exporter } from "./_components/Exporter";
 import { LineupSelector } from "./_components/LineupSelector";
@@ -26,7 +26,7 @@ export async function generateMetadata({ params, searchParams }: Props) {
 
 export default async function ProfileCard() {
   return (
-    <CardConfigController>
+    <CardConfigProvider>
       <main className="flex flex-col items-center justify-center">
         <div className="mt-2 flex items-center justify-center gap-2">
           <LineupSelector />
@@ -41,6 +41,6 @@ export default async function ProfileCard() {
 
         <CharacterCardWrapper />
       </main>
-    </CardConfigController>
+    </CardConfigProvider>
   );
 }
