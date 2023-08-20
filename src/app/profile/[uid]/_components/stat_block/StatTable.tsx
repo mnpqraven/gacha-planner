@@ -21,14 +21,17 @@ export const StatTable = forwardRef<HTMLDivElement, Props>(
   ) => {
     return (
       <div className={cn(className)} ref={ref} {...props}>
-        {mihomoPropertyList(element).map(({ value, icon, percent }, index) =>
-          !addStat(attributes, additions, value, percent).isEmpty ? (
-            <div key={index} className="flex">
-              <SVG src={icon} width={32} height={32} className="text-white" />
-              <div>{addStat(attributes, additions, value, percent).label}</div>
+        {mihomoPropertyList(element).map(({ value, icon, percent }, index) => {
+          const stat = addStat(attributes, additions, value, percent);
+          if (stat.isEmpty || (stat.field == "sp_rate" && stat.value == 1))
+            return null;
+          return (
+            <div key={index} className="flex items-center gap-2">
+              <SVG src={icon} className="text-white" />
+              <div>{stat.label}</div>
             </div>
-          ) : null
-        )}
+          );
+        })}
       </div>
     );
   }
@@ -40,7 +43,13 @@ export function addStat(
   additionArray: MihomoAttributeConfig[],
   field: string,
   isPercent: boolean = false
-): { label: string; isEmpty: boolean; value: number; field: string, percent: boolean } {
+): {
+  label: string;
+  isEmpty: boolean;
+  value: number;
+  field: string;
+  percent: boolean;
+} {
   const inAttribute = attributeArray.find((e) => e.field == field);
   const inAddition = additionArray.find((e) => e.field == field);
 
@@ -54,7 +63,7 @@ export function addStat(
     isEmpty: value === 0,
     value,
     field,
-    percent: isPercent
+    percent: isPercent,
   };
 }
 

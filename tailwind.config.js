@@ -74,11 +74,6 @@ module.exports = {
       },
     },
   },
-  safelist: [
-    {
-      pattern: /(border)-(fire|ice|wind|lightning|physical|quantum|imaginary)/,
-    },
-  ],
   plugins: [
     require("tailwindcss-animate"),
     /** @type {import('tailwindcss/types/config').PluginCreator} */

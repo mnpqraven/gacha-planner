@@ -27,7 +27,7 @@ export const SkillInfo = forwardRef<HTMLDivElement, Props>(
 
     return (
       <div
-        className={cn(className, "flex items-center justify-center gap-2")}
+        className={cn(className, "flex items-center justify-evenly")}
         ref={ref}
         {...props}
       >

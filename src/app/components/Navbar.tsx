@@ -87,9 +87,9 @@ const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {
         </TooltipProvider>
       </nav>
 
-      <CommandCenter routes={menu} />
+      <div className="flex items-center justify-end space-x-4 lg:space-x-6">
+        <CommandCenter routes={menu} />
 
-      <div className="flex flex-1 items-center justify-end space-x-4 lg:space-x-6">
         <a
           href="https://github.com/mnpqraven/gacha-planner"
           target="_blank"

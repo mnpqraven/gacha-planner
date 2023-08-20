@@ -27,8 +27,7 @@ function CharacterCardWrapper() {
 
   useEffect(() => {
     if (!!data) initResponse(data);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  }, [data, initResponse]);
 
   if (!currentCharacter) return null;
 
@@ -50,36 +49,33 @@ function CharacterCardWrapper() {
             backgroundImage: `url(${img(preview)})`,
             boxShadow: "0 0 10px 10px hsl(var(--background)) inset",
           }}
-        ></div>
+        />
 
         <CharacterInfo id="block-1" className="z-10" />
 
-        <div id="block-2" className="flex flex-col gap-2">
-          <div className="flex justify-evenly">
-            <EidolonInfo className="w-14" />
-            <LightConeInfo id="lightcone-2.1" />
-          </div>
-
-          <div className="flex justify-evenly gap-2">
-            <div className="w-14" />
+        <div id="block-2" className="flex justify-evenly">
+          <EidolonInfo className="w-14" />
+          <div className="flex flex-col pb-6">
+            <LightConeInfo id="lightcone-2.1" className="grow" />
             <SkillInfo id="skill-2.2" />
           </div>
         </div>
 
         <div id="block-3" className="col-span-2 flex">
-          <div className="flex grow flex-col gap-2 place-self-center">
+          <div className="flex grow flex-col gap-2 place-self-end pb-6">
             <SpiderChartWrapper />
 
             <StatTable
               id="stat-3"
-              className="grid grid-cols-2"
+              className="grid grid-cols-2 gap-y-2"
               element={currentCharacter.element.name}
               attributes={currentCharacter.attributes}
               properties={currentCharacter.properties}
               additions={currentCharacter.additions}
             />
           </div>
-          <RelicInfo id="relic-4" className="h-min place-self-center" />
+
+          <RelicInfo id="relic-4" className="pb-6 justify-end" />
         </div>
       </div>
     </div>

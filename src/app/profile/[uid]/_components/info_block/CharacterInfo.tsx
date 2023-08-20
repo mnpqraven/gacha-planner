@@ -31,14 +31,20 @@ export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
             <div>
               <span className="font-bold">Lv. {level}</span>/{maxLevel}
             </div>
+
             <div>
               <Badge>Eidolon {rank}</Badge>
             </div>
           </div>
 
-          <div className="flex justify-evenly gap-4">
-            <PathIcon path={path.name} size="36px" />
-            <ElementIcon element={element.name} size="36px" />
+          <div className="relative flex justify-evenly">
+            <div className="absolute bottom-0 h-full w-[1px] rotate-45 border"></div>
+            <PathIcon path={path.name} size="30px" />
+            <ElementIcon
+              element={element.name}
+              size="30px"
+              className="self-end"
+            />
           </div>
         </div>
 

@@ -22,7 +22,6 @@ import {
   ElementRef,
   ReactNode,
   forwardRef,
-  useContext,
 } from "react";
 import { CardConfig, initialConfig } from "./configReducer";
 import { useForm } from "react-hook-form";
@@ -41,10 +40,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/app/components/ui/Select";
-import {
-  CardConfigContext,
-  useCardConfigController,
-} from "./ConfigControllerContext";
+import { useCardConfigController } from "./ConfigControllerContext";
 
 interface Props extends ButtonProps {}
 export const ConfigController = forwardRef<HTMLButtonElement, Props>(

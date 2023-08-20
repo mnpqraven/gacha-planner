@@ -6,6 +6,7 @@ import { Exporter } from "./_components/Exporter";
 import { LineupSelector } from "./_components/LineupSelector";
 import { Dialog, DialogTrigger } from "@/app/components/ui/Dialog";
 import { env } from "@/envSchema.mjs";
+import { Share } from "./_components/Share";
 
 interface Props {
   params: { uid: string };
@@ -31,6 +32,7 @@ export default async function ProfileCard() {
         <div className="mt-2 flex items-center justify-center gap-2">
           <LineupSelector />
           <Exporter />
+          <Share />
           <Dialog>
             <DialogTrigger asChild>
               <ConfigController variant="outline" />

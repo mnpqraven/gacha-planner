@@ -2,7 +2,7 @@
 
 import { Button } from "@/app/components/ui/Button";
 import { toBlob, toPng } from "html-to-image";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useCardConfigController } from "../ConfigControllerContext";
 import { Clipboard, Download } from "lucide-react";
 import { useToast } from "@/app/components/ui/Toast/useToast";
@@ -12,9 +12,6 @@ import {
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
 
-// firefox-only var
-declare const InstallTrigger: any;
-
 export function Exporter() {
   const { enkaRef } = useCardConfigController();
   // we need a firefox check cause firefox can't directly copy image
@@ -22,7 +19,7 @@ export function Exporter() {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (typeof InstallTrigger !== "undefined") setIsFirefox(true);
+    if (navigator.userAgent.indexOf("Firefox") > 0) setIsFirefox(true);
   }, []);
 
   function onExportClick({ mode }: Options) {
