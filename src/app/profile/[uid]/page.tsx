@@ -1,10 +1,9 @@
 import { getMihomoInfo } from "@/app/api/profile/[uid]/route";
-import { ConfigController, ConfigControllerDialog } from "./ConfigControllerDialog";
+import { ConfigController } from "./ConfigControllerDialog";
 import { CardConfigProvider } from "./ConfigControllerContext";
 import { CharacterCardWrapper } from "./_components/CharacterCard";
 import { Exporter } from "./_components/Exporter";
 import { LineupSelector } from "./_components/LineupSelector";
-import { Dialog, DialogTrigger } from "@/app/components/ui/Dialog";
 import { env } from "@/envSchema.mjs";
 import { Share } from "./_components/Share";
 
@@ -33,12 +32,7 @@ export default async function ProfileCard() {
           <LineupSelector />
           <Exporter />
           <Share />
-          <Dialog>
-            <DialogTrigger asChild>
-              <ConfigController variant="outline" />
-            </DialogTrigger>
-            <ConfigControllerDialog className="max-w-4xl" />
-          </Dialog>
+          <ConfigController />
         </div>
 
         <CharacterCardWrapper />

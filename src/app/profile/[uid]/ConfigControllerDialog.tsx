@@ -2,13 +2,6 @@
 
 import { Button, ButtonProps } from "@/app/components/ui/Button";
 import { Close } from "@radix-ui/react-dialog";
-import {
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/app/components/ui/Dialog";
 import { Switch } from "@/app/components/ui/Switch";
 import {
   Tooltip,
@@ -20,11 +13,12 @@ import { SlidersHorizontal } from "lucide-react";
 import {
   ComponentPropsWithoutRef,
   ElementRef,
+  HTMLAttributes,
   ReactNode,
   forwardRef,
 } from "react";
 import { CardConfig, initialConfig } from "./configReducer";
-import { useForm } from "react-hook-form";
+import { UseFormReturn, useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -41,55 +35,93 @@ import {
   SelectValue,
 } from "@/app/components/ui/Select";
 import { useCardConfigController } from "./ConfigControllerContext";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/app/components/ui/Sheet";
 
-interface Props extends ButtonProps {}
-export const ConfigController = forwardRef<HTMLButtonElement, Props>(
-  ({ className, ...props }, ref) => {
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button className={cn("px-2", className)} ref={ref} {...props}>
-            <SlidersHorizontal />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>Configure Card</TooltipContent>
-      </Tooltip>
-    );
-  }
-);
-ConfigController.displayName = "ConfigController";
-
-export const ConfigControllerDialog = forwardRef<
-  ElementRef<typeof DialogContent>,
-  ComponentPropsWithoutRef<typeof DialogContent>
->(({ ...props }, ref) => {
+export const ConfigController = () => {
+  const { changeConfig } = useCardConfigController();
   const form = useForm({
     defaultValues: initialConfig,
   });
-  const { changeConfig } = useCardConfigController();
-
-  const verbosityOptions = [
-    { value: "none", label: "None" },
-    { value: "simple", label: "Simple" },
-    { value: "detailed", label: "Detailed" },
-  ];
 
   function onSubmit(payload: CardConfig) {
     changeConfig({ type: "updateWholeConfig", payload });
   }
 
   return (
-    <DialogContent ref={ref} {...props}>
-      <DialogHeader>
-        <DialogTitle>Display Setting</DialogTitle>
-        <DialogDescription>
+    <Sheet
+      onOpenChange={(e) => {
+        if (!e) form.handleSubmit(onSubmit)();
+      }}
+    >
+      <Tooltip>
+        <SheetTrigger asChild>
+          <TooltipTrigger asChild>
+            <ConfigIcon className="px-2" variant="outline" />
+          </TooltipTrigger>
+        </SheetTrigger>
+
+        <TooltipContent>Configure Card</TooltipContent>
+      </Tooltip>
+
+      <ConfigControllerSheet
+        side="left"
+        form={form}
+        onFormSubmit={onSubmit}
+        showSubmit={false}
+      />
+    </Sheet>
+  );
+};
+
+interface ConfigIconProps extends ButtonProps {}
+const ConfigIcon = forwardRef<HTMLButtonElement, ConfigIconProps>(
+  ({ className, ...props }, ref) => {
+    return (
+      <Button className={cn("", className)} {...props} ref={ref}>
+        <SlidersHorizontal />
+      </Button>
+    );
+  }
+);
+ConfigIcon.displayName = "ConfigIcon";
+
+interface ConfigControllerSheetProps
+  extends ComponentPropsWithoutRef<typeof SheetContent> {
+  form: UseFormReturn<CardConfig>;
+  onFormSubmit: (payload: CardConfig) => void;
+  showSubmit?: boolean;
+}
+
+export const ConfigControllerSheet = forwardRef<
+  ElementRef<typeof SheetContent>,
+  ConfigControllerSheetProps
+>(({ onFormSubmit, form, showSubmit = true, ...props }, ref) => {
+  const verbosityOptions = [
+    { value: "none", label: "None" },
+    { value: "simple", label: "Simple" },
+    { value: "detailed", label: "Detailed" },
+  ];
+
+  return (
+    <SheetContent ref={ref} {...props}>
+      <SheetHeader className="mb-4">
+        <SheetTitle>Display Setting</SheetTitle>
+        <SheetDescription>
           Show or hide various elements in the character card
-        </DialogDescription>
-      </DialogHeader>
+        </SheetDescription>
+      </SheetHeader>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="grid grid-cols-3 items-center gap-4">
+        <form onSubmit={form.handleSubmit(onFormSubmit)}>
+          <div className="flex flex-col gap-4">
             <FormSwitch<CardConfig>
               name="showPlayerInfo"
               label="Show player info"
@@ -102,20 +134,25 @@ export const ConfigControllerDialog = forwardRef<
               labelAccessor={(item) => item.label}
               className="w-28 gap-2"
             />
-            <FormSwitch<CardConfig> name="showBaseUrl" label="Show Website URL" />
+            <FormSwitch<CardConfig>
+              name="showBaseUrl"
+              label="Show Website URL"
+            />
           </div>
 
-          <DialogFooter className="mt-4">
-            <Close asChild>
-              <Button type="submit">Save Changes</Button>
-            </Close>
-          </DialogFooter>
+          {showSubmit && (
+            <SheetFooter className="mt-4">
+              <Close asChild>
+                <Button type="submit">Save Changes</Button>
+              </Close>
+            </SheetFooter>
+          )}
         </form>
       </Form>
-    </DialogContent>
+    </SheetContent>
   );
 });
-ConfigControllerDialog.displayName = "ConfigControllerDialog";
+ConfigControllerSheet.displayName = "ConfigControllerDialog";
 
 interface FormSwitchProps<TForm extends object>
   extends Omit<ComponentPropsWithoutRef<typeof FormField>, "render"> {

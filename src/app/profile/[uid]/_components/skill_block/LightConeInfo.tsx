@@ -3,6 +3,13 @@ import { HTMLAttributes, forwardRef } from "react";
 import Image from "next/image";
 import { ImpositionIcon } from "../ImpositionIcon";
 import { useCardConfigController } from "../../ConfigControllerContext";
+import { useLightConeSkill } from "@/hooks/queries/useLightConeSkill";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/app/components/ui/Tooltip";
+import { SkillDescription } from "@/app/components/Db/SkillDescription";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   displayStat?: boolean;
@@ -10,7 +17,10 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
   ({ displayStat = false, className, ...props }, ref) => {
     const ratio = 902 / 1260;
-    const { currentCharacter } = useCardConfigController();
+    const { currentCharacter, config } = useCardConfigController();
+    const { skill } = useLightConeSkill(
+      currentCharacter ? Number(currentCharacter.light_cone.id) : undefined
+    );
 
     if (!currentCharacter) return null;
 
@@ -44,15 +54,30 @@ export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
           )}
         </div>
 
-        <div className="flex grow items-center">
-          <Image
-            src={img(portrait)}
-            alt=""
-            width={350 * ratio}
-            height={350}
-            className="justify-self-end shadow-xl shadow-border"
-          />
-        </div>
+        <Tooltip>
+          <TooltipTrigger disabled={config.hoverVerbosity === "none"}>
+            <Image
+              src={img(portrait)}
+              alt=""
+              width={350 * ratio}
+              height={350}
+              className="justify-self-end shadow-xl shadow-border"
+            />
+          </TooltipTrigger>
+          {config.hoverVerbosity !== "none" && !!skill && (
+            <TooltipContent className="w-96 text-base" side="left">
+              <p className="mb-2 font-bold text-accent-foreground">
+                {skill.skill_name}
+              </p>
+
+              <SkillDescription
+                skillDesc={skill.skill_desc}
+                paramList={skill.param_list}
+                slv={rank}
+              />
+            </TooltipContent>
+          )}
+        </Tooltip>
       </div>
     );
   }
