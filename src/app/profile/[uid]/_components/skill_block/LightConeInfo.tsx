@@ -21,7 +21,6 @@ export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
     return (
       <div
         className={cn("flex flex-grow-0 flex-col items-center", className)}
-        // style={{ width: `${ratio * 350}px` }}
         ref={ref}
         {...props}
       >
@@ -32,6 +31,17 @@ export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
             <span className="font-bold">Lv. {level}</span> / {maxLevel}
             <ImpositionIcon imposition={rank} className="ml-2.5" />
           </span>
+
+          {displayStat && (
+            <div className="flex">
+              {attributes.map((attr) => (
+                <div key={attr.field} className="flex items-center">
+                  <Image src={img(attr.icon)} alt="" width={32} height={32} />
+                  {attr.display}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex grow items-center">
@@ -43,16 +53,6 @@ export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
             className="justify-self-end shadow-xl shadow-border"
           />
         </div>
-        {displayStat && (
-          <div className="flex">
-            {attributes.map((attr) => (
-              <div key={attr.field}>
-                <Image src={img(attr.icon)} alt="" width={32} height={32} />
-                {attr.display}
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     );
   }

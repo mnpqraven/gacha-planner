@@ -1,3 +1,4 @@
+import { Separator } from "@/app/components/ui/Separator";
 import {
   MihomoAttributeConfig,
   MihomoPropertyConfig,
@@ -19,19 +20,37 @@ export const StatTable = forwardRef<HTMLDivElement, Props>(
     { element, attributes, properties, additions, className, ...props },
     ref
   ) => {
+    // filter out empty stat and 100% sp_rate
+    const statTable = mihomoPropertyList(element).filter(
+      ({ value, percent }) => {
+        const stat = addStat(attributes, additions, value, percent);
+        if (stat.isEmpty || (stat.field == "sp_rate" && stat.value == 1))
+          return false;
+        return true;
+      }
+    );
+
     return (
-      <div className={cn(className)} ref={ref} {...props}>
-        {mihomoPropertyList(element).map(({ value, icon, percent }, index) => {
-          const stat = addStat(attributes, additions, value, percent);
-          if (stat.isEmpty || (stat.field == "sp_rate" && stat.value == 1))
-            return null;
-          return (
-            <div key={index} className="flex items-center gap-2">
-              <SVG src={icon} className="text-white" />
-              <div>{stat.label}</div>
-            </div>
-          );
-        })}
+      <div
+        className={cn(
+          "rounded-md border p-2 shadow-md shadow-border",
+          className
+        )}
+        ref={ref}
+        {...props}
+      >
+        {statTable.map(({ value, icon, percent }, index) => (
+          <div
+            key={index}
+            className={cn(
+              "flex items-center gap-2 py-1",
+              index % 2 === 0 ? "border-r" : ""
+            )}
+          >
+            <SVG src={icon} className="text-black dark:text-white" />
+            <div>{addStat(attributes, additions, value, percent).label}</div>
+          </div>
+        ))}
       </div>
     );
   }

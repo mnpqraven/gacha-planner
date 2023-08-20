@@ -89,18 +89,10 @@ export const ConfigControllerDialog = forwardRef<
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="grid grid-cols-2 items-center gap-4">
+          <div className="grid grid-cols-3 items-center gap-4">
             <FormSwitch<CardConfig>
               name="showPlayerInfo"
               label="Show player info"
-            />
-            <FormSwitch<CardConfig>
-              name="showStatName"
-              label="Show stat name"
-            />
-            <FormSwitch<CardConfig>
-              name="statTableConfig.showEmptyStat"
-              label="Show empty stat"
             />
             <FormSelect<(typeof verbosityOptions)[number], CardConfig>
               name="hoverVerbosity"
@@ -110,6 +102,7 @@ export const ConfigControllerDialog = forwardRef<
               labelAccessor={(item) => item.label}
               className="w-28 gap-2"
             />
+            <FormSwitch<CardConfig> name="showBaseUrl" label="Show Website URL" />
           </div>
 
           <DialogFooter className="mt-4">

@@ -1,12 +1,20 @@
-import { cn, img, range } from "@/lib/utils";
-import { HTMLAttributes, forwardRef } from "react";
+import { cn, img, range, sanitizeNewline } from "@/lib/utils";
+import { Fragment, HTMLAttributes, forwardRef } from "react";
 import { useCardConfigController } from "../../ConfigControllerContext";
 import Image from "next/image";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/app/components/ui/Tooltip";
+import { useCharacterEidolon } from "@/hooks/queries/useCharacterEidolon";
+import { AvatarRankConfig } from "@/bindings/AvatarRankConfig";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {}
 export const EidolonInfo = forwardRef<HTMLDivElement, Props>(
   ({ className, ...props }, ref) => {
     const { currentCharacter } = useCardConfigController();
+    const { eidolons } = useCharacterEidolon(currentCharacter?.id);
 
     if (!currentCharacter) return null;
     const { rank, rank_icons } = currentCharacter;
@@ -21,18 +29,85 @@ export const EidolonInfo = forwardRef<HTMLDivElement, Props>(
         {...props}
       >
         {Array.from(range(1, 6)).map((eid) => (
-          <div key={eid}>
-            <Image
-              src={img(rank_icons[eid - 1])}
-              alt={String(eid)}
-              width={48}
-              height={48}
-              className={eid <= rank ? "opacity-100" : "opacity-25"}
-            />
-          </div>
+          <EidolonIcon
+            key={eid}
+            src={img(rank_icons[eid - 1])}
+            currentEidolon={eid}
+            eidolonInfo={eidolons?.at(eid - 1)}
+            eidolon={rank}
+          />
         ))}
       </div>
     );
   }
 );
 EidolonInfo.displayName = "EidolonInfo ";
+
+interface IconProps extends HTMLAttributes<HTMLDivElement> {
+  src: string;
+  currentEidolon: number;
+  eidolon: number;
+  width?: number;
+  height?: number;
+  eidolonInfo: AvatarRankConfig | undefined;
+}
+const EidolonIcon = forwardRef<HTMLDivElement, IconProps>(
+  (
+    {
+      src,
+      currentEidolon,
+      eidolonInfo,
+      eidolon,
+      width = 48,
+      height = 48,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    const { config } = useCardConfigController();
+    const { hoverVerbosity } = config;
+
+    return (
+      <Tooltip>
+        <TooltipTrigger disabled={hoverVerbosity === "none"}>
+          <div className={cn("", className)} ref={ref} {...props}>
+            <Image
+              src={src}
+              alt={String(currentEidolon)}
+              width={width}
+              height={height}
+              className={cn(
+                "invert dark:invert-0",
+                currentEidolon <= eidolon ? "opacity-100" : "opacity-25"
+              )}
+            />
+          </div>
+        </TooltipTrigger>
+        {hoverVerbosity === "simple" ? (
+          <TooltipContent side="left">{eidolonInfo?.name}</TooltipContent>
+        ) : hoverVerbosity === "detailed" ? (
+          <TooltipContent
+            className="w-96 py-2 text-justify text-base"
+            side="left"
+          >
+            <p className="mb-2 text-base font-bold text-accent-foreground">
+              {eidolonInfo?.name}
+            </p>
+            {eidolonInfo?.desc.map((descPart, index) => (
+              <Fragment key={index}>
+                <span className="whitespace-pre-wrap">
+                  {sanitizeNewline(descPart)}
+                </span>
+                <span className="font-semibold text-accent-foreground">
+                  {eidolonInfo.param[index]}
+                </span>
+              </Fragment>
+            ))}
+          </TooltipContent>
+        ) : null}
+      </Tooltip>
+    );
+  }
+);
+EidolonIcon.displayName = "EidolonIcon ";

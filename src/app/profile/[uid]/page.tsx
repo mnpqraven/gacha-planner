@@ -1,5 +1,5 @@
 import { getMihomoInfo } from "@/app/api/profile/[uid]/route";
-import { ConfigController, ConfigControllerDialog } from "./ConfigController";
+import { ConfigController, ConfigControllerDialog } from "./ConfigControllerDialog";
 import { CardConfigProvider } from "./ConfigControllerContext";
 import { CharacterCardWrapper } from "./_components/CharacterCard";
 import { Exporter } from "./_components/Exporter";
@@ -37,7 +37,7 @@ export default async function ProfileCard() {
             <DialogTrigger asChild>
               <ConfigController variant="outline" />
             </DialogTrigger>
-            <ConfigControllerDialog />
+            <ConfigControllerDialog className="max-w-4xl" />
           </Dialog>
         </div>
 

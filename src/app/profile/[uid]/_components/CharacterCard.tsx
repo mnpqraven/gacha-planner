@@ -55,19 +55,19 @@ function CharacterCardWrapper() {
 
         <div id="block-2" className="flex justify-evenly">
           <EidolonInfo className="w-14" />
-          <div className="flex flex-col pb-6">
+          <div className="flex flex-col pb-2">
             <LightConeInfo id="lightcone-2.1" className="grow" />
             <SkillInfo id="skill-2.2" />
           </div>
         </div>
 
-        <div id="block-3" className="col-span-2 flex">
-          <div className="flex grow flex-col gap-2 place-self-end pb-6">
+        <div id="block-3" className="col-span-2 flex gap-4">
+          <div className="flex grow flex-col gap-2 place-self-end pb-2">
             <SpiderChartWrapper />
 
             <StatTable
               id="stat-3"
-              className="grid grid-cols-2 gap-y-2"
+              className="grid grid-cols-2 gap-x-2"
               element={currentCharacter.element.name}
               attributes={currentCharacter.attributes}
               properties={currentCharacter.properties}
@@ -75,7 +75,7 @@ function CharacterCardWrapper() {
             />
           </div>
 
-          <RelicInfo id="relic-4" className="pb-6 justify-end" />
+          <RelicInfo id="relic-4" className="pb-2 justify-end" />
         </div>
       </div>
     </div>

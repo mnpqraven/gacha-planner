@@ -3,6 +3,13 @@ import { SkillType } from "@/bindings/AvatarSkillConfig";
 import { cn, img } from "@/lib/utils";
 import Image from "next/image";
 import { useCardConfigController } from "../../ConfigControllerContext";
+import { ChevronsUp } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/app/components/ui/Tooltip";
+import { MihomoSkillConfig } from "@/app/profile/types";
 
 const DISPLAY_SKILL_TYPES: SkillType[] = [
   "Talent",
@@ -27,21 +34,36 @@ export const SkillInfo = forwardRef<HTMLDivElement, Props>(
 
     return (
       <div
-        className={cn(className, "flex items-center justify-evenly")}
+        className={cn(
+          className,
+          "flex items-center justify-evenly rounded-md border py-2 shadow-md shadow-border"
+        )}
         ref={ref}
         {...props}
       >
-        {skills.map(({ icon, id, level: slv, type }) => (
-          <div key={id} className="flex flex-col items-center">
-            <span className="mb-1">{getLabel(type)}</span>
-            <Image src={img(icon)} alt="" height={48} width={48} />
+        {skills.map((skillInfo) => (
+          <div key={skillInfo.id} className="flex flex-col items-center">
+            <span>{getLabel(skillInfo.type)}</span>
+            <SkillIcon src={img(skillInfo.icon)} skillInfo={skillInfo} />
             <span
               className={cn(
-                isImprovedByEidolon(type, eidolon) ? "text-[#6cfff7]" : "",
-                "font-bold"
+                "w-full text-center font-bold",
+                isImprovedByEidolon(skillInfo.type, eidolon)
+                  ? "text-[#6cfff7]"
+                  : ""
               )}
             >
-              {slv} / {getSkillMaxLevel(type, eidolon)}
+              {skillInfo.level == getSkillMaxLevel(skillInfo.type, eidolon) ? (
+                <span className="flex items-center justify-end">
+                  {skillInfo.level}
+                  <ChevronsUp className="h-4 w-4 text-green-600" />
+                </span>
+              ) : (
+                <span>
+                  {skillInfo.level} /{" "}
+                  {getSkillMaxLevel(skillInfo.type, eidolon)}
+                </span>
+              )}
             </span>
           </div>
         ))}
@@ -50,6 +72,44 @@ export const SkillInfo = forwardRef<HTMLDivElement, Props>(
   }
 );
 SkillInfo.displayName = "SkillInfo";
+
+interface IconProps extends HTMLAttributes<HTMLDivElement> {
+  src: string;
+  skillInfo: MihomoSkillConfig;
+  width?: number;
+  height?: number;
+}
+const SkillIcon = forwardRef<HTMLDivElement, IconProps>(
+  ({ src, skillInfo, width = 48, height = 48, className, ...props }, ref) => {
+    const { config } = useCardConfigController();
+    const { hoverVerbosity } = config;
+
+    return (
+      <Tooltip>
+        <TooltipTrigger disabled={hoverVerbosity === "none"}>
+          <Image
+            src={src}
+            alt={skillInfo.name}
+            width={width}
+            height={height}
+            className="invert dark:invert-0"
+          />
+        </TooltipTrigger>
+        {hoverVerbosity === "simple" ? (
+          <TooltipContent>{skillInfo.name}</TooltipContent>
+        ) : hoverVerbosity === "detailed" ? (
+          <TooltipContent className="w-96 py-2 text-justify text-base">
+            <p className="mb-2 text-base font-bold text-accent-foreground">
+              {skillInfo.name}
+            </p>
+            {skillInfo.desc}
+          </TooltipContent>
+        ) : null}
+      </Tooltip>
+    );
+  }
+);
+SkillIcon.displayName = "SkillIcon ";
 
 function getLabel(skillType: SkillType): string {
   switch (skillType) {

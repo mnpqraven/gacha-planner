@@ -9,7 +9,8 @@ import { useCardConfigController } from "../../ConfigControllerContext";
 interface Props extends HTMLAttributes<HTMLDivElement> {}
 export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
   ({ className, ...props }: Props, ref) => {
-    const { currentCharacter, mihomoResponse } = useCardConfigController();
+    const { currentCharacter, mihomoResponse, config } =
+      useCardConfigController();
     if (!currentCharacter) return null;
     const { name, level, rarity, rank, path, element } = currentCharacter;
     const maxLevel = currentCharacter.promotion * 10 + 20;
@@ -21,10 +22,19 @@ export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
         {...props}
       >
         <div className="grid w-full grid-cols-3">
-          <div className="flex flex-col">
-            <span className="font-bold">{mihomoResponse?.player.nickname}</span>
-            <span>{mihomoResponse?.player.uid}</span>
-          </div>
+          {config.showPlayerInfo ? (
+            <div className="flex flex-col">
+              <span className="font-bold">
+                {mihomoResponse?.player.nickname}
+              </span>
+              <span>{mihomoResponse?.player.uid}</span>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-end">
+              <PathIcon path={path.name} size="30px" className="flex-1" />
+              <Badge>{path.name}</Badge>
+            </div>
+          )}
 
           <div className="flex flex-col place-self-center">
             <div className="font-bold">{name}</div>
@@ -37,15 +47,26 @@ export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
             </div>
           </div>
 
-          <div className="relative flex justify-evenly">
-            <div className="absolute bottom-0 h-full w-[1px] rotate-45 border"></div>
-            <PathIcon path={path.name} size="30px" />
-            <ElementIcon
-              element={element.name}
-              size="30px"
-              className="self-end"
-            />
-          </div>
+          {config.showPlayerInfo ? (
+            <div className="relative flex justify-evenly">
+              <div className="absolute bottom-0 h-full w-[1px] rotate-45 border"></div>
+              <PathIcon path={path.name} size="30px" />
+              <ElementIcon
+                element={element.name}
+                size="30px"
+                className="self-end"
+              />
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-end">
+              <ElementIcon
+                element={element.name}
+                size="30px"
+                className="flex-1"
+              />
+              <Badge>{element.name}</Badge>
+            </div>
+          )}
         </div>
 
         <RarityIcon

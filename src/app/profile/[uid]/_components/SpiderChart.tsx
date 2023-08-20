@@ -66,7 +66,7 @@ function genPolygonPoints<Datum>(
   return { points, pointString };
 }
 
-const DEFAULT_MARGINS = { top: 0, left: 60, right: 60, bottom: 0 };
+const DEFAULT_MARGINS = { top: 0, left: 40, right: 40, bottom: 0 };
 
 export function SpiderChart<T>({
   width,

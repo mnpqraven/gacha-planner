@@ -1,10 +1,11 @@
 export const initialConfig: CardConfig = {
-  showStatName: true,
-  showPlayerInfo: false,
-  hoverVerbosity: "none",
+  showStatName: false,
+  showPlayerInfo: true,
+  hoverVerbosity: "simple",
   statTableConfig: {
     showEmptyStat: false,
   },
+  showBaseUrl: true,
 };
 
 export function configReducer(
@@ -42,6 +43,7 @@ export interface CardConfig {
   statTableConfig: {
     showEmptyStat: boolean;
   };
+  showBaseUrl: boolean;
 }
 
 /**

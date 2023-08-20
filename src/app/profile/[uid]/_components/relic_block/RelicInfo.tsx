@@ -10,11 +10,16 @@ import { Badge } from "@/app/components/ui/Badge";
 import { useCardConfigController } from "../../ConfigControllerContext";
 import SVG from "react-inlinesvg";
 import { cva } from "class-variance-authority";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/app/components/ui/Tooltip";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {}
 export const RelicInfo = forwardRef<HTMLDivElement, Props>(
   ({ className, ...props }, ref) => {
-    const { currentCharacter } = useCardConfigController();
+    const { currentCharacter, config } = useCardConfigController();
 
     if (!currentCharacter) return null;
     const { relics, relic_sets } = currentCharacter;
@@ -29,6 +34,12 @@ export const RelicInfo = forwardRef<HTMLDivElement, Props>(
         ref={ref}
         {...props}
       >
+        {config.showBaseUrl && (
+          <span className="flex-1 self-end text-muted-foreground">
+            hsr.othi.dev/profile
+          </span>
+        )}
+
         <div className={cn("grid grid-cols-2 gap-2 place-self-center")}>
           {relics.map((relic, index) => (
             <Relic
@@ -42,15 +53,7 @@ export const RelicInfo = forwardRef<HTMLDivElement, Props>(
 
         <div className="gap-2 rounded-md border p-2 shadow-md shadow-border">
           {uniqueSets.map((relicSet, index) => (
-            <div key={index} className="flex items-center">
-              <MarkerIcon className="inline-block align-middle" />
-
-              <span className="font-semibold text-green-600 ml-2">
-                {relicSet.num}pc
-              </span>
-
-              <span className="ml-4">{relicSet.name}</span>
-            </div>
+            <SetInfo relicSet={relicSet} key={index} />
           ))}
         </div>
       </div>
@@ -58,6 +61,61 @@ export const RelicInfo = forwardRef<HTMLDivElement, Props>(
   }
 );
 RelicInfo.displayName = "RelicInfo";
+
+interface SetInfoProps extends HTMLAttributes<HTMLButtonElement> {
+  relicSet: MihomoRelicSetConfig;
+}
+const SetInfo = forwardRef<HTMLButtonElement, SetInfoProps>(
+  ({ relicSet, className, ...props }, ref) => {
+    const { config, currentCharacter } = useCardConfigController();
+    const { hoverVerbosity } = config;
+    const sets = currentCharacter?.relic_sets.filter(
+      (e) => e.id == relicSet.id
+    );
+
+    return (
+      <Tooltip>
+        <TooltipTrigger
+          className={cn("flex items-center", className)}
+          ref={ref}
+          disabled={hoverVerbosity === "none"}
+          {...props}
+        >
+          <MarkerIcon className="inline-block align-middle" />
+
+          <span className="ml-2 font-semibold text-green-600">
+            {relicSet.num}pc
+          </span>
+
+          <span className="ml-4">{relicSet.name}</span>
+        </TooltipTrigger>
+        {hoverVerbosity !== "none" && (
+          <TooltipContent
+            side="left"
+            sideOffset={25}
+            className="w-96 py-2 text-justify text-base"
+          >
+            {!!sets ? (
+              <div className="flex flex-col">
+                <p className="mb-2 text-base font-bold text-accent-foreground">
+                  {sets[0].name}
+                </p>
+
+                {sets.map((set, index) => (
+                  <div key={index}>
+                    <span className="text-green-600">{set.num}pc</span>
+                    : {set.desc}
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </TooltipContent>
+        )}
+      </Tooltip>
+    );
+  }
+);
+SetInfo.displayName = "SetInfo ";
 
 interface RelicProps extends HTMLAttributes<HTMLDivElement> {
   data: MihomoRelicConfig;

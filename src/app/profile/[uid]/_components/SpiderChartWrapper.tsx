@@ -14,7 +14,7 @@ export const SpiderChartWrapper = forwardRef<HTMLDivElement, Props>(
 
     return (
       <div
-        className={cn("relative h-[300px] w-[300px]", className)}
+        className={cn("relative h-[300px] w-full", className)}
         ref={ref}
         {...props}
       >
