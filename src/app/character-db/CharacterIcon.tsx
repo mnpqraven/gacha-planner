@@ -19,8 +19,8 @@ function CharacterIcon({ data: avatar }: Props) {
       <p className="whitespace-pre-wrap text-center"></p>
       <div className="flex gap-2.5">
         <Dialog>
-          <DialogTrigger>
-            <Tooltip>
+          <Tooltip>
+            <DialogTrigger asChild>
               <TooltipTrigger>
                 <Image
                   src={`https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/icon/character/${avatar.avatar_id}.png`}
@@ -33,12 +33,13 @@ function CharacterIcon({ data: avatar }: Props) {
                   height={128}
                 />
               </TooltipTrigger>
-              <TooltipContent>
-                {avatar.avatar_name} - {avatar.rarity} ✦{" "}
-                {avatar.avatar_base_type}
-              </TooltipContent>
-            </Tooltip>
-          </DialogTrigger>
+            </DialogTrigger>
+
+            <TooltipContent>
+              {avatar.avatar_name} - {avatar.rarity} ✦ {avatar.avatar_base_type}
+            </TooltipContent>
+          </Tooltip>
+
           <DialogContent className="min-h-[16rem] sm:max-w-4xl">
             {avatar.avatar_id && (
               <CharacterTabWrapper characterId={avatar.avatar_id} />

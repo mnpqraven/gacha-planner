@@ -15,6 +15,8 @@ export async function GET() {
 export interface PatchBanner {
   phase: 1 | 2;
   version: `${number}.${number}.${1 | 2}`;
-  chara: [number, number, number, number];
-  lc: [number, number, number, number];
+  chara: [number | null, number | null, number | null, number | null];
+  lc: [number | null, number | null, number | null, number | null];
+  placeholderChar?: [string, string, string, string];
+  placeholderLc?: [string, string, string, string];
 }

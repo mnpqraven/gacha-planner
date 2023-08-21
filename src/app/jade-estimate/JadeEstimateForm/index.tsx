@@ -235,9 +235,9 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
-                          variant={"outline"}
+                          variant="outline"
                           className={cn(
-                            "w-fit pl-3 text-left font-normal",
+                            "min-w-[208px] justify-between pl-3 text-left font-normal",
                             !dateField.value && "text-muted-foreground"
                           )}
                         >

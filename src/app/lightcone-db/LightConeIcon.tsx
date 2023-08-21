@@ -17,8 +17,8 @@ function LightConeIcon({ data: lc }: Props) {
       <p className="whitespace-pre-wrap text-center"></p>
       <div className="flex gap-2.5">
         <Dialog>
-          <DialogTrigger>
-            <Tooltip>
+          <Tooltip>
+            <DialogTrigger asChild>
               <TooltipTrigger>
                 <Image
                   src={`https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/icon/light_cone/${lc.equipment_id}.png`}
@@ -28,11 +28,13 @@ function LightConeIcon({ data: lc }: Props) {
                   height={48}
                 />
               </TooltipTrigger>
-              <TooltipContent>
-                {lc.equipment_name} - {lc.rarity} ✦
-              </TooltipContent>
-            </Tooltip>
-          </DialogTrigger>
+            </DialogTrigger>
+
+            <TooltipContent>
+              {lc.equipment_name} - {lc.rarity} ✦
+            </TooltipContent>
+          </Tooltip>
+
           <DialogContent className="min-h-[16rem] sm:max-w-4xl">
             {/* lc.avatar_id && (
               <CharacterTabWrapper characterId={lc.avatar_id} />
