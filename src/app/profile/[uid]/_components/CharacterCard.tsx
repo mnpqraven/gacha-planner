@@ -31,27 +31,16 @@ function CharacterCardWrapper() {
 
   if (!currentCharacter) return null;
 
-  const { preview } = currentCharacter;
-
   return (
     <div className="h-fit w-fit p-4" ref={enkaRef}>
       <div
         id="enka-container"
-        className="relative grid h-[600px] w-[1496px] grid-cols-4 rounded-2xl border border-border bg-background p-3"
+        className="grid h-[600px] w-[1496px] grid-cols-4 rounded-2xl border border-border bg-background p-3"
         style={{
           boxShadow: "0 1px 10px hsl(var(--border))",
         }}
       >
-        <div
-          id="left-avatar"
-          className="absolute top-11 flex h-[512px] w-[374px] items-center"
-          style={{
-            backgroundImage: `url(${img(preview)})`,
-            boxShadow: "0 0 10px 10px hsl(var(--background)) inset",
-          }}
-        />
-
-        <CharacterInfo id="block-1" className="z-10" />
+        <CharacterInfo id="block-1" className="relative z-10" />
 
         <div id="block-2" className="flex justify-evenly">
           <EidolonInfo className="w-14" />
