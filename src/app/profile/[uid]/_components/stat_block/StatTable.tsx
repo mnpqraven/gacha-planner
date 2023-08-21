@@ -1,4 +1,3 @@
-import { Separator } from "@/app/components/ui/Separator";
 import {
   MihomoAttributeConfig,
   MihomoPropertyConfig,
@@ -7,6 +6,12 @@ import { Element } from "@/bindings/AvatarConfig";
 import { asPercentage, cn } from "@/lib/utils";
 import { HTMLAttributes, forwardRef } from "react";
 import SVG from "react-inlinesvg";
+import { useCardConfigController } from "../../ConfigControllerContext";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/app/components/ui/Tooltip";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   element: Element;
@@ -29,6 +34,7 @@ export const StatTable = forwardRef<HTMLDivElement, Props>(
         return true;
       }
     );
+    const { config } = useCardConfigController();
 
     return (
       <div
@@ -40,16 +46,26 @@ export const StatTable = forwardRef<HTMLDivElement, Props>(
         {...props}
       >
         {statTable.map(({ value, icon, percent }, index) => (
-          <div
-            key={index}
-            className={cn(
-              "flex items-center gap-2 py-1",
-              index % 2 === 0 ? "border-r" : ""
+          <Tooltip key={index}>
+            <TooltipTrigger
+              disabled={config.hoverVerbosity === "none"}
+              className={cn(
+                "flex items-center gap-2 py-1",
+                index % 2 === 0 ? "border-r" : ""
+              )}
+            >
+              <SVG src={icon} className="text-black dark:text-white" />
+              <div>
+                {addStat(attributes, additions, value, percent).valueDisplay}
+              </div>
+            </TooltipTrigger>
+
+            {config.hoverVerbosity !== "none" && (
+              <TooltipContent side={index % 2 === 0 ? "left" : "right"}>
+                {addStat(attributes, additions, value, percent).label}
+              </TooltipContent>
             )}
-          >
-            <SVG src={icon} className="text-black dark:text-white" />
-            <div>{addStat(attributes, additions, value, percent).label}</div>
-          </div>
+          </Tooltip>
         ))}
       </div>
     );
@@ -64,6 +80,7 @@ export function addStat(
   isPercent: boolean = false
 ): {
   label: string;
+  valueDisplay: string;
   isEmpty: boolean;
   value: number;
   field: string;
@@ -78,7 +95,8 @@ export function addStat(
   else value = (inAttribute?.value ?? 0) + (inAddition?.value ?? 0);
 
   return {
-    label: isPercent ? asPercentage(value, 1) : value.toFixed(0),
+    label: inAttribute?.name ?? inAddition?.name ?? "",
+    valueDisplay: isPercent ? asPercentage(value, 1) : value.toFixed(0),
     isEmpty: value === 0,
     value,
     field,
@@ -91,9 +109,8 @@ export function mihomoPropertyList(
 ): { value: string; icon: string; percent: boolean }[] {
   const ele = {
     value: `${element.toLowerCase()}_dmg`,
-    icon: `/property/Icon${
-      element == "Lightning" ? "Thunder" : element
-    }AddedRatio.svg`,
+    icon: `/property/Icon${element == "Lightning" ? "Thunder" : element
+      }AddedRatio.svg`,
     percent: true,
   };
   // TODO: field for healing
