@@ -13,7 +13,6 @@ import { SlidersHorizontal } from "lucide-react";
 import {
   ComponentPropsWithoutRef,
   ElementRef,
-  HTMLAttributes,
   ReactNode,
   forwardRef,
 } from "react";
@@ -81,7 +80,7 @@ export const ConfigController = () => {
   );
 };
 
-interface ConfigIconProps extends ButtonProps {}
+interface ConfigIconProps extends ButtonProps { }
 const ConfigIcon = forwardRef<HTMLButtonElement, ConfigIconProps>(
   ({ className, ...props }, ref) => {
     return (
@@ -126,6 +125,10 @@ export const ConfigControllerSheet = forwardRef<
               name="showPlayerInfo"
               label="Show player info"
             />
+            <FormSwitch<CardConfig>
+              name="showBaseUrl"
+              label="Show Website URL"
+            />
             <FormSelect<(typeof verbosityOptions)[number], CardConfig>
               name="hoverVerbosity"
               label="Hover info"
@@ -133,10 +136,6 @@ export const ConfigControllerSheet = forwardRef<
               valueAccessor={(item) => item.value}
               labelAccessor={(item) => item.label}
               className="w-28 gap-2"
-            />
-            <FormSwitch<CardConfig>
-              name="showBaseUrl"
-              label="Show Website URL"
             />
           </div>
 

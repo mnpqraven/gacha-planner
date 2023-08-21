@@ -30,7 +30,7 @@ export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
 
     return (
       <div
-        className={cn("flex flex-grow-0 flex-col items-center", className)}
+        className={cn("flex flex-col items-center", className)}
         ref={ref}
         {...props}
       >

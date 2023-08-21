@@ -6,7 +6,7 @@ import { SpiderChart } from "./SpiderChart";
 import * as z from "zod";
 import { StatRadarData, useDataProcess } from "./useDataProcess";
 
-interface Props extends HTMLAttributes<HTMLDivElement> {}
+interface Props extends HTMLAttributes<HTMLDivElement> { }
 export const SpiderChartWrapper = forwardRef<HTMLDivElement, Props>(
   ({ className, ...props }, ref) => {
     const { currentCharacter } = useCardConfigController();

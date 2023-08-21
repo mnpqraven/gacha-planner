@@ -75,7 +75,7 @@ function CharacterCardWrapper() {
             />
           </div>
 
-          <RelicInfo id="relic-4" className="pb-2 justify-end" />
+          <RelicInfo id="relic-4" className="justify-end pb-2" />
         </div>
       </div>
     </div>

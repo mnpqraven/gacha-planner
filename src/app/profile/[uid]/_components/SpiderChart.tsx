@@ -114,6 +114,11 @@ export function SpiderChart<T>({
     showTooltip,
     hideTooltip,
   } = useTooltip<{ index: number }>();
+  const isTooltipVisible =
+    tooltipOpen &&
+    !!tooltipData &&
+    !!tooltipRender &&
+    !!data.at(tooltipData.index);
 
   const voronoiLayout = useMemo(
     () =>
@@ -205,7 +210,7 @@ export function SpiderChart<T>({
           onMouseLeave={hideTooltip}
         />
       </svg>
-      {tooltipOpen && tooltipData && !!tooltipRender && (
+      {isTooltipVisible && (
         <TooltipWithBounds
           // set this to random so it correctly updates with parent bounds
           key={Math.random()}
