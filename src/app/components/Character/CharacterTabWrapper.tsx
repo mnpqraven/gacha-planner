@@ -2,11 +2,10 @@ import { SkillOverview } from "./SkillOverview";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
 import { TraceTable } from "./TraceTable";
 import { EidolonTable } from "./EidolonTable";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { typedFetch } from "@/server/fetchHelper";
-import ENDPOINT from "@/server/endpoints";
+import { useQueryClient } from "@tanstack/react-query";
 import API from "@/server/typedEndpoints";
 import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
+import { useCharacterSkill } from "@/hooks/queries/useCharacterSkill";
 
 type Props = {
   characterId: number;
@@ -14,10 +13,7 @@ type Props = {
 const CharacterTabWrapper = ({ characterId }: Props) => {
   const { character } = useCharacterMetadata(characterId);
 
-  const { data: skills } = useQuery({
-    queryKey: ["skillsByCharId", characterId],
-    queryFn: async () => await API.skillsByCharId.get(characterId),
-  });
+  const { skills } = useCharacterSkill(characterId);
 
   const client = useQueryClient();
   client.prefetchQuery({

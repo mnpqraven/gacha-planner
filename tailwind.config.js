@@ -74,8 +74,15 @@ module.exports = {
       },
     },
   },
-  safelist: [
-    { pattern: /(border)-(fire|ice|wind|lightning|physical|quantum|imaginary)/ },
+  plugins: [
+    require("tailwindcss-animate"),
+    /** @type {import('tailwindcss/types/config').PluginCreator} */
+    ({ addUtilities }) => {
+      addUtilities({
+        ".border-skewed": {
+          "clip-path": "polygon(10% 0, 100% 0, 90% 100%, 0 100%)",
+        },
+      });
+    },
   ],
-  plugins: [require("tailwindcss-animate")],
 };

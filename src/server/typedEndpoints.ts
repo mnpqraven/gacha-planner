@@ -14,6 +14,9 @@ import { PatchBanner } from "@/bindings/PatchBanner";
 import { createPromiseClient } from "@bufbuild/connect";
 import { createGrpcWebTransport } from "@bufbuild/connect-web";
 import { ServiceType } from "@bufbuild/protobuf";
+import { env } from "@/envSchema.mjs";
+import { EquipmentPromotionConfig } from "@/bindings/EquipmentPromotionConfig";
+import { AvatarPromotionConfig } from "@/bindings/AvatarPromotionConfig";
 
 const API = {
   patchDates: route<List<Patch>>("/honkai/patch_dates", "GET"),
@@ -36,6 +39,10 @@ const API = {
     "/honkai/light_cone/ranking",
     "GET"
   ),
+  lightConePromotion: route<EquipmentPromotionConfig>(
+    "/honkai/light_cone/:id/promotion",
+    "GET"
+  ),
   character: route<AvatarConfig>("/honkai/avatar", "GET"),
   characters: route<List<number>, List<AvatarConfig>>("/honkai/avatar"),
   signatureAtlas: route<List<SignatureAtlas>>("/honkai/signature_atlas", "GET"),
@@ -46,6 +53,7 @@ const API = {
   trace: route<List<SkillTreeConfig>>("/honkai/avatar/:id/trace", "GET"),
   properties: route<List<AvatarPropertyConfig>>("/honkai/properties", "GET"),
   eidolon: route<List<AvatarRankConfig>>("/honkai/avatar/:id/eidolon", "GET"),
+  promotion: route<AvatarPromotionConfig>("/honkai/avatar/:id/promotion", "GET"),
 };
 
 type ApiRoute = {
@@ -107,7 +115,7 @@ export function rpc<T extends ServiceType>(service: T) {
   const client = createPromiseClient(
     service,
     createGrpcWebTransport({
-      baseUrl: process.env["NEXT_PUBLIC_WORKER_API"] + "/rpc",
+      baseUrl: env.NEXT_PUBLIC_WORKER_API + "/rpc",
     })
   );
   return client;

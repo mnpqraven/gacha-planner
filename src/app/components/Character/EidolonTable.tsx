@@ -9,6 +9,7 @@ import { Badge } from "../ui/Badge";
 import API from "@/server/typedEndpoints";
 import { AvatarRankConfig } from "@/bindings/AvatarRankConfig";
 import { Skeleton } from "../ui/Skeleton";
+import { useCharacterEidolon } from "@/hooks/queries/useCharacterEidolon";
 
 type Props = {
   characterId: number;
@@ -16,20 +17,16 @@ type Props = {
 
 const EidolonTable = ({ characterId }: Props) => {
   const [selectedEidolon, setSelectedEidolon] = useState(1);
-  const { data } = useQuery({
-    queryKey: ["eidolon", characterId],
-    queryFn: async () => await API.eidolon.get(characterId),
-    suspense: true,
-  });
+  const { eidolons } = useCharacterEidolon(characterId, { suspense: true });
 
-  const top = data?.list
-    .filter((e) => e.rank <= 3)
+  const top = eidolons
+    ?.filter((e) => e.rank <= 3)
     .sort((a, b) => a.rank - b.rank);
-  const bottom = data?.list
-    .filter((e) => e.rank > 3)
+  const bottom = eidolons
+    ?.filter((e) => e.rank > 3)
     .sort((a, b) => a.rank - b.rank);
 
-  const currentEidolon = data?.list.find((e) => e.rank === selectedEidolon);
+  const currentEidolon = eidolons?.find((e) => e.rank === selectedEidolon);
 
   return (
     <>

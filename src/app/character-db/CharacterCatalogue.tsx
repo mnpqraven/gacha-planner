@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CharacterCard } from "./CharacterCard";
+import { CharacterCard } from "./CharacterCardWrapper";
 import { IMAGE_URL } from "@/server/endpoints";
 import { DbFilter } from "../components/Db/DbFilter";
 import Fuse from "fuse.js";
@@ -69,6 +69,7 @@ const CharacterCatalogue = ({ data }: Props) => {
                 avatar_base_type={chara.avatar_base_type}
                 avatar_name={chara.avatar_name}
                 rarity={chara.rarity}
+                damage_type={chara.damage_type}
               />
             </Link>
 

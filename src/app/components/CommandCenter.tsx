@@ -10,8 +10,15 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "./ui/Command";
-import { useEffect, useState } from "react";
+import {
+  ComponentPropsWithoutRef,
+  ElementRef,
+  forwardRef,
+  useEffect,
+  useState,
+} from "react";
 import { Button } from "./ui/Button";
+import { Command as CommandPrimitive } from "cmdk";
 import { useRouter } from "next/navigation";
 import { useLightConeList } from "@/hooks/queries/useLightConeList";
 import { useCharacterList } from "@/hooks/queries/useCharacterList";
@@ -39,9 +46,17 @@ const kbdVariants = cva(
   }
 );
 
-type Props = {
-  routes: { path: string; label: string; icon: JSX.Element; keybind: string }[];
-};
+interface Route {
+  path: string;
+  label: string;
+  icon: JSX.Element;
+  keybind: string;
+}
+
+interface Props {
+  routes: Route[];
+}
+
 const CommandCenter = ({ routes }: Props) => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
@@ -77,14 +92,6 @@ const CommandCenter = ({ routes }: Props) => {
         e.preventDefault();
         setOpen((open) => !open);
       }
-
-      routes.forEach(({ keybind, path }) => {
-        if (e.key === keybind && (e.altKey || e.metaKey)) {
-          e.preventDefault();
-          router.push(path);
-          setOpen((open) => !open);
-        }
-      });
     };
 
     document.addEventListener("keydown", down);
@@ -201,18 +208,12 @@ const CommandCenter = ({ routes }: Props) => {
           )}
           <CommandSeparator />
           <CommandGroup heading="Tools">
-            {routes.map(({ path, icon, label, keybind }) => (
-              <CommandItem onSelect={() => commandSelectRoute(path)} key={path}>
-                <span className="mr-2">{icon}</span>
-                <span>{label}</span>
-                {keybind && (
-                  <CommandShortcut>
-                    <kbd className={kbdVariants()}>
-                      ⌘/Alt + {keybind.toUpperCase()}
-                    </kbd>
-                  </CommandShortcut>
-                )}
-              </CommandItem>
+            {routes.map((route) => (
+              <RouteItem
+                onSelect={() => commandSelectRoute(route.path)}
+                key={route.path}
+                {...route}
+              />
             ))}
           </CommandGroup>
         </CommandList>
@@ -220,5 +221,40 @@ const CommandCenter = ({ routes }: Props) => {
     </>
   );
 };
-
 export { CommandCenter };
+
+interface RouteItemProps
+  extends Route,
+  ComponentPropsWithoutRef<typeof CommandItem> { }
+
+const RouteItem = forwardRef<
+  ElementRef<typeof CommandPrimitive.Item>,
+  RouteItemProps
+>(({ keybind, path, icon, label, onSelect, ...props }, ref) => {
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === keybind && (e.altKey || e.metaKey)) {
+        e.preventDefault();
+        if (!!onSelect) {
+          onSelect(path);
+        }
+      }
+    };
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <CommandItem onSelect={onSelect} {...props} ref={ref}>
+      <span className="mr-2">{icon}</span>
+      <span>{label}</span>
+      {keybind && (
+        <CommandShortcut>
+          <kbd className={kbdVariants()}>⌘/Alt + {keybind.toUpperCase()}</kbd>
+        </CommandShortcut>
+      )}
+    </CommandItem>
+  );
+});
+RouteItem.displayName = "RouteItem";

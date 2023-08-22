@@ -84,9 +84,7 @@ export const defaultValues: PartialMessage<JadeEstimateCfg> = {
 export default function JadeEstimateForm({ submitButton = false }: Props) {
   const { toast } = useToast();
   const [mounted, setMounted] = useState(false);
-  const [uncontrolledDate, setUncontrolledDate] = useState<Date | undefined>(
-    new Date()
-  );
+  const [uncontrolledDate, setUncontrolledDate] = useState<Date>(new Date());
   const [monthController, setMonthController] = useState<Date | undefined>(
     uncontrolledDate
   );
@@ -237,9 +235,9 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
-                          variant={"outline"}
+                          variant="outline"
                           className={cn(
-                            "w-fit pl-3 text-left font-normal",
+                            "min-w-[208px] justify-between pl-3 text-left font-normal",
                             !dateField.value && "text-muted-foreground"
                           )}
                         >

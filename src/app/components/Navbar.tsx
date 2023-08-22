@@ -12,6 +12,7 @@ import {
   Ticket,
   UserSquare,
   GalleryHorizontalEnd,
+  BookCopy,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { usePathname } from "next/navigation";
@@ -48,6 +49,12 @@ const menu = [
     icon: <GalleryHorizontalEnd className="h-4 w-4" />,
     keybind: "r",
   },
+  {
+    path: "/profile",
+    label: "Character Card",
+    icon: <BookCopy className="h-4 w-4" />,
+    keybind: "c",
+  },
 ];
 const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {
   const pathname = usePathname();
@@ -58,7 +65,7 @@ const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {
     cn(defaultLinkClass, pathname !== path ? "text-muted-foreground" : "");
 
   return (
-    <div className="flex h-12 items-center border-b px-4 sticky top-0 bg-background z-50">
+    <div className="sticky top-0 z-50 flex h-12 items-center border-b bg-background px-4">
       <nav
         className={cn(
           "mr-auto flex flex-1 items-center space-x-4 lg:space-x-6",
@@ -80,9 +87,9 @@ const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {
         </TooltipProvider>
       </nav>
 
-      <CommandCenter routes={menu} />
+      <div className="flex items-center justify-end space-x-4 lg:space-x-6">
+        <CommandCenter routes={menu} />
 
-      <div className="flex flex-1 items-center justify-end space-x-4 lg:space-x-6">
         <a
           href="https://github.com/mnpqraven/gacha-planner"
           target="_blank"
