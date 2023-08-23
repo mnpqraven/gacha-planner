@@ -1,21 +1,24 @@
 import { AvatarRankConfig } from "@/bindings/AvatarRankConfig";
 import { List } from "@/lib/generics";
 import API from "@/server/typedEndpoints";
-import { UseQueryOptions, useQuery } from "@tanstack/react-query";
+import {
+  UseSuspenseQueryOptions,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 
 type Options = Omit<
-  UseQueryOptions<List<AvatarRankConfig>, unknown, AvatarRankConfig[]>,
-  "initialData"
+  UseSuspenseQueryOptions<List<AvatarRankConfig>, unknown, AvatarRankConfig[]>,
+  "initialData" | "queryKey" | "queryFn" | "select"
 >;
 
 export function useCharacterEidolon(
   characterId: number | undefined,
   opt: Options = {}
 ) {
-  const query = useQuery({
+  const query = useSuspenseQuery({
     queryKey: ["eidolon", characterId],
     queryFn: async () => await API.eidolon.get(characterId),
-    enabled: !!characterId,
+    // enabled: !!characterId,
     select: (data) => data.list,
     initialData: { list: [] },
     ...opt,

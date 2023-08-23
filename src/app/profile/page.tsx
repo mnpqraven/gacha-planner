@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "../components/ui/Select";
 import { Loader2, Pin, PinOff } from "lucide-react";
-import { useMihomoInfo } from "./[uid]/_fetcher";
+import { useMihomoInfo } from "./[uid]/useMihomoInfo";
 import { useEffect, useState } from "react";
 import { PlayerCard } from "./PlayerCard";
 import { useRouter } from "next/navigation";
@@ -58,7 +58,7 @@ export default function Profile() {
     resolver: zodResolver(schema),
   });
   const [prof, setProf] = useState(defaultValues);
-  const { query, prefetch } = useMihomoInfo(prof, { suspense: true });
+  const { query, prefetch } = useMihomoInfo(prof);
   const router = useRouter();
   const [playerProfiles, setPlayerProfiles] = useLocalStorage<MihomoPlayer[]>(
     STORAGE.playerProfiles,

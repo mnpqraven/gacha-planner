@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { useState } from "react";
 import { TooltipProvider } from "./ui/Tooltip";
+import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experimental";
 
 type RootProps = {
   children: React.ReactNode;
@@ -20,7 +21,7 @@ export default function RQProvider({ children }: RootProps) {
     <ThemeProvider attribute="class">
       <TooltipProvider delayDuration={300}>
         <QueryClientProvider client={queryClient}>
-          {children}
+          <ReactQueryStreamedHydration>{children}</ReactQueryStreamedHydration>
         </QueryClientProvider>
       </TooltipProvider>
     </ThemeProvider>

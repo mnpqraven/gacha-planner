@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { use, useEffect } from "react";
 import { CharacterInfo } from "./info_block/CharacterInfo";
 import { SkillInfo } from "./skill_block/SkillInfo";
 import { LightConeInfo } from "./skill_block/LightConeInfo";
@@ -10,7 +10,7 @@ import { SpiderChartWrapper } from "./SpiderChartWrapper";
 import { useCardConfigController } from "../ConfigControllerContext";
 import { EidolonInfo } from "./skill_block/EidolonInfo";
 import { useParams, useSearchParams } from "next/navigation";
-import { useMihomoInfo } from "../_fetcher";
+import { useMihomoInfo, useSuspendedMihomoInfo } from "../useMihomoInfo";
 
 function CharacterCardWrapper() {
   const searchParams = useSearchParams();
@@ -18,15 +18,19 @@ function CharacterCardWrapper() {
   const params = useParams();
   const uid = params["uid"] as string;
 
-  const {
-    query: { data },
-  } = useMihomoInfo({ uid, lang }, { suspense: true });
+  // const {
+  //   query: { data },
+  // } = useSuspendedMihomoInfo({ uid, lang });
 
-  const { currentCharacter, enkaRef, initResponse } = useCardConfigController();
+  const { currentCharacter, enkaRef, updateParam } = useCardConfigController();
+
+  // useEffect(() => {
+  //   if (!!data) initResponse(data);
+  // }, [data, initResponse]);
 
   useEffect(() => {
-    if (!!data) initResponse(data);
-  }, [data, initResponse]);
+    updateParam(uid, lang);
+  }, [uid, lang, updateParam]);
 
   if (!currentCharacter) return null;
 
