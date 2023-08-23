@@ -37,7 +37,7 @@ export function chartOptions({
     series: Array.from(
       range(currentEidolon + 1, selectedBanner.maxConst, 1)
     ).map((eidolon) =>
-      createChartSeries(selectedBanner.constShorthand, eidolon, data)
+      createChartSeries(selectedBanner.constShorthand, eidolon, data, selectedBanner.bannerType === 'LC' ? 1 : 0)
     ),
     color: [
       "#caffbf",
@@ -69,7 +69,8 @@ export function chartOptions({
 function createChartSeries(
   constShorthand: string,
   eidolon: number,
-  queryData: ChartData
+  queryData: ChartData,
+  padding: number = 0
 ): SeriesOption {
   const data = queryData.data.map((eidsInRoll) => {
     const currentEid =
@@ -77,7 +78,7 @@ function createChartSeries(
     return Number(currentEid * 100).toFixed(2);
   });
   const opt: EChartsOption["series"] = {
-    name: `${constShorthand}${eidolon}`,
+    name: `${constShorthand}${eidolon + padding}`,
     type: "line",
     showSymbol: false,
     areaStyle: { opacity: 0.2 + eidolon * 0.1 },
