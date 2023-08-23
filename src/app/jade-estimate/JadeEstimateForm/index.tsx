@@ -98,6 +98,7 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
   const { futurePatchDateList } = useFuturePatchDateList();
   const { futurePatchBannerList } = useFuturePatchBannerList();
   const { updateForm } = useContext(JadeEstimateFormContext);
+  console.log("dev", futurePatchBannerList);
 
   // FORM SETUP
   const form = useForm<JadeEstimateCfg>({
