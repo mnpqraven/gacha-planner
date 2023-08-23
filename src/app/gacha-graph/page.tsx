@@ -108,7 +108,7 @@ export default function GachaGraph() {
       chartOptions({
         data: definedData,
         currentEidolon: eidolonSubscriber,
-        selectedBanner: defaultBanner,
+        selectedBanner,
         theme,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
