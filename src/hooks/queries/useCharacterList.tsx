@@ -1,7 +1,9 @@
+import { AvatarConfig } from "@/bindings/AvatarConfig";
 import API from "@/server/typedEndpoints";
-import { useQuery } from "@tanstack/react-query";
+import { UseQueryOptions, useQuery } from "@tanstack/react-query";
 
-export const useCharacterList = () => {
+type Options = Omit<UseQueryOptions<AvatarConfig[]>, "initialData">;
+export const useCharacterList = (opt: Options = {}) => {
   const query = useQuery({
     queryKey: ["characterList"],
     queryFn: async () => {
@@ -9,6 +11,7 @@ export const useCharacterList = () => {
       return list;
     },
     initialData: [],
+    ...opt,
   });
   return { characterList: query.data };
 };

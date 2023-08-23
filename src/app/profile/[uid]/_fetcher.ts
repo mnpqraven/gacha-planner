@@ -2,11 +2,17 @@
 
 import { getMihomoInfo } from "@/app/api/profile/[uid]/route";
 import { useToast } from "@/app/components/ui/Toast/useToast";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  UseQueryOptions,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useEffect } from "react";
+import { MihomoResponse } from "../types";
 
-interface Options {
-  displayToast: boolean;
+interface Options
+  extends Omit<UseQueryOptions<MihomoResponse>, "enabled" | "retry"> {
+  displayToast?: boolean;
 }
 
 interface ProfileParam {
@@ -16,8 +22,10 @@ interface ProfileParam {
 
 export function useMihomoInfo(
   { uid, lang }: Partial<ProfileParam>,
-  { displayToast }: Options = { displayToast: true }
+  opt: Options = {}
 ) {
+  const displayToast = opt.displayToast ?? true;
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -26,6 +34,7 @@ export function useMihomoInfo(
     queryFn: async () => await getMihomoInfo(uid!, lang!),
     retry: false,
     enabled: !!uid && !!lang,
+    ...opt,
   });
 
   function prefetch(uid: string, lang: string = "en") {

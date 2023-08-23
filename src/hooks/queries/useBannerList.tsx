@@ -1,8 +1,9 @@
 import { PatchBanner } from "@/app/api/patch_banners/route";
 import { List } from "@/lib/generics";
-import { useQuery } from "@tanstack/react-query";
+import { UseQueryOptions, useQuery } from "@tanstack/react-query";
 
-export function useBannerList() {
+type Options = Omit<UseQueryOptions<List<PatchBanner>>, "initialData">;
+export function useBannerList(opt: Options = {}) {
   const query = useQuery({
     queryKey: ["bannerList"],
     queryFn: async () => {
@@ -15,6 +16,7 @@ export function useBannerList() {
       }
     },
     initialData: { list: [] },
+    ...opt,
   });
 
   return { bannerList: query.data.list };

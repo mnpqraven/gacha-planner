@@ -58,7 +58,7 @@ export default function Profile() {
     resolver: zodResolver(schema),
   });
   const [prof, setProf] = useState(defaultValues);
-  const { query, prefetch } = useMihomoInfo(prof);
+  const { query, prefetch } = useMihomoInfo(prof, { suspense: true });
   const router = useRouter();
   const [playerProfiles, setPlayerProfiles] = useLocalStorage<MihomoPlayer[]>(
     STORAGE.playerProfiles,
