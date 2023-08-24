@@ -26,7 +26,7 @@ type FormSchema = PlainMessage<ProbabilityRatePayload>;
 
 type Props = {
   updateQuery: (payload: FormSchema) => void;
-  bannerOnChange: (value: "SSR" | "SR" | "LC") => void;
+  bannerOnChange?: (value: "SSR" | "SR" | "LC") => void;
   selectedBanner: Banner;
   form: UseFormReturn<FormSchema>;
 };
@@ -65,7 +65,7 @@ export function GachaForm({
                       | "SSR"
                       | "SR"
                       | "LC";
-                    bannerOnChange(parsed);
+                    if (!!bannerOnChange) bannerOnChange(parsed);
                     field.onChange(parseInt(bannerType));
                   }}
                 >

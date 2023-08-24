@@ -1,14 +1,13 @@
 "use client";
 
-import { ReactNode, createContext, useEffect, useState } from "react";
+import { ReactNode, createContext, useState } from "react";
 import { defaultValues } from "./JadeEstimateForm";
 import { PartialMessage } from "@bufbuild/protobuf";
 import { JadeEstimateCfg, JadeEstimateResponse } from "@grpc/jadeestimate_pb";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { rpc } from "@/server/typedEndpoints";
 import { JadeEstimateService } from "@grpc/jadeestimate_connect";
 import { placeholderTableData } from "./defaultTableData";
-import equal from "fast-deep-equal/react";
 
 interface JadeEstimateFormContextPayload {
   rewardTable: JadeEstimateResponse | undefined;
@@ -28,17 +27,11 @@ function useJadeEstimateForm(): JadeEstimateFormContextPayload {
   const [formPayload, setFormPayload] =
     useState<PartialMessage<JadeEstimateCfg>>(defaultValues);
 
-  const {
-    data: rewardTable,
-    isLoading,
-    isError,
-  } = useQuery({
+  const { data: rewardTable, isLoading } = useQuery({
     queryKey: ["jadeEstimate", formPayload],
     queryFn: async () => await rpc(JadeEstimateService).post(formPayload),
-    initialData: equal(formPayload, defaultValues)
-      ? new JadeEstimateResponse(placeholderTableData)
-      : undefined,
-    suspense: false,
+    initialData: new JadeEstimateResponse(placeholderTableData),
+    placeholderData: keepPreviousData,
   });
 
   function updateForm(to: PartialMessage<JadeEstimateCfg>) {
