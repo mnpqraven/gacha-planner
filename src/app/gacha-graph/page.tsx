@@ -25,6 +25,8 @@ import {
 } from "@grpc/probabilityrate_pb";
 import { schema } from "./schema";
 import { chartOptions } from "./chartOptions";
+import { useToast } from "../components/ui/Toast/useToast";
+import { ToastAction } from "../components/ui/Toast/Toast";
 
 type FormSchema = PlainMessage<ProbabilityRatePayload>;
 
@@ -39,6 +41,9 @@ export default function GachaGraph() {
     STORAGE.gachaForm,
     undefined
   );
+
+  const [mounted, setMounted] = useState(false);
+  const { toast } = useToast();
 
   const { data } = useQuery({
     queryKey: ["probabilityRate", payload],
@@ -71,6 +76,30 @@ export default function GachaGraph() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [savedFormData]);
 
+  useEffect(() => {
+    const { success } = schema.safeParse(savedFormData);
+    if (!mounted && savedFormData && !success) {
+      toast({
+        title: "Outdated Local Cache",
+        description:
+          "The local cache seems to be outdated, this is usually due to an update to the website, if you are seeing this please click the following 'Reload' button.",
+        action: (
+          <ToastAction
+            altText="Reload"
+            onClick={() => {
+              setSavedFormData(defaultGachaQuery);
+              form.reset(defaultGachaQuery);
+            }}
+          >
+            Reload
+          </ToastAction>
+        ),
+      });
+      setMounted(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted, savedFormData]);
+
   const eidolonSubscriber = form.watch("currentEidolon");
 
   // this is getting triggered every re-render
@@ -79,7 +108,7 @@ export default function GachaGraph() {
       chartOptions({
         data: definedData,
         currentEidolon: eidolonSubscriber,
-        selectedBanner: defaultBanner,
+        selectedBanner,
         theme,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps

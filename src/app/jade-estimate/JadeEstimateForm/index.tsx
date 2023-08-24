@@ -114,7 +114,7 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
       toast({
         title: "Outdated Local Cache",
         description:
-          "The local cache seems to be outdated, this is usually due to an update to the website, if you are seeing this please either do a hard reload with Ctrl + Shift + R or click the 'Reload' button.",
+          "The local cache seems to be outdated, this is usually due to an update to the website, if you are seeing this please click the following 'Reload' button.",
         action: (
           <ToastAction
             altText="Reload"
