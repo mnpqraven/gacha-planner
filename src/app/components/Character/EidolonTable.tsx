@@ -7,7 +7,7 @@ import { sanitizeNewline } from "@/lib/utils";
 import { Badge } from "../ui/Badge";
 import { AvatarRankConfig } from "@/bindings/AvatarRankConfig";
 import { Skeleton } from "../ui/Skeleton";
-import { useCharacterEidolon } from "@/hooks/queries/useCharacterEidolon";
+import { useSuspendedCharacterEidolon } from "@/hooks/queries/useCharacterEidolon";
 
 type Props = {
   characterId: number;
@@ -15,7 +15,7 @@ type Props = {
 
 const EidolonTable = ({ characterId }: Props) => {
   const [selectedEidolon, setSelectedEidolon] = useState(1);
-  const { eidolons } = useCharacterEidolon(characterId);
+  const { eidolons } = useSuspendedCharacterEidolon(characterId);
 
   const top = eidolons
     ?.filter((e) => e.rank <= 3)

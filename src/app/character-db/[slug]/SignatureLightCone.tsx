@@ -5,10 +5,10 @@ import { Content } from "@/app/lightcone-db/[slug]/Content";
 import { Portrait } from "@/app/lightcone-db/[slug]/Portrait";
 import { EquipmentConfig } from "@/bindings/EquipmentConfig";
 import { EquipmentSkillConfig } from "@/bindings/EquipmentSkillConfig";
+import { useSuspendedSignatureAtlas } from "@/hooks/queries/useSignatureAtlas";
 import { IMAGE_URL } from "@/server/endpoints";
-import API, { rpc } from "@/server/typedEndpoints";
-import { SignatureAtlasService } from "@grpc/atlas_connect";
-import { useQueries, useSuspenseQuery } from "@tanstack/react-query";
+import API from "@/server/typedEndpoints";
+import { useSuspenseQueries } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
 interface Props {
@@ -16,30 +16,25 @@ interface Props {
 }
 
 const SignatureLightCone = ({ characterId }: Props) => {
-  const { data: atlas } = useSuspenseQuery({
-    queryKey: ["signature_atlas"],
-    queryFn: async () => await rpc(SignatureAtlasService).list({}),
-  });
+  const { data } = useSuspendedSignatureAtlas();
 
-  const lc_ids = atlas?.list.find((e) => e.charId === characterId)?.lcId;
+  const lc_ids = data?.find((e) => e.charId === characterId)?.lcId ?? [];
 
-  const [metadataQuery, skillQuery] = useQueries({
+  const [metadataQuery, skillQuery] = useSuspenseQueries({
     queries: [
       {
         queryKey: ["lightconeMetadata", lc_ids],
         queryFn: async () =>
           await API.lightConeMetadataMany.post({
-            payload: { list: lc_ids ?? [] },
+            payload: { list: lc_ids },
           }),
-        enabled: !!lc_ids,
       },
       {
         queryKey: ["lightconeSkill", lc_ids],
         queryFn: async () =>
           await API.lightConeSkillMany.post({
-            payload: { list: lc_ids ?? [] },
+            payload: { list: lc_ids },
           }),
-        enabled: !!lc_ids,
       },
     ],
   });
