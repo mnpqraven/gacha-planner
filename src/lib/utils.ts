@@ -107,3 +107,7 @@ export function rotate<T>(by: number, data: T[]): T[] {
     return temp;
   }
 }
+
+export function keepPreviousData<T>(data: T | undefined): T | undefined {
+  return data;
+}

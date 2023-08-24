@@ -8,7 +8,7 @@ import { EquipmentSkillConfig } from "@/bindings/EquipmentSkillConfig";
 import { IMAGE_URL } from "@/server/endpoints";
 import API, { rpc } from "@/server/typedEndpoints";
 import { SignatureAtlasService } from "@grpc/atlas_connect";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
 interface Props {
@@ -16,10 +16,9 @@ interface Props {
 }
 
 const SignatureLightCone = ({ characterId }: Props) => {
-  const { data: atlas } = useQuery({
+  const { data: atlas } = useSuspenseQuery({
     queryKey: ["signature_atlas"],
     queryFn: async () => await rpc(SignatureAtlasService).list({}),
-    suspense: true
   });
 
   const lc_ids = atlas?.list.find((e) => e.charId === characterId)?.lcId;
