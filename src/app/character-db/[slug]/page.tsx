@@ -13,20 +13,33 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/app/components/ui/Tabs";
-import API from "@/server/typedEndpoints";
+import API, { rpc } from "@/server/typedEndpoints";
 import { TraceSummaryWrapper } from "./TraceSummaryWrapper";
 import { SignatureLightCone } from "./SignatureLightCone";
 import { Suspense } from "react";
+import getQueryClient from "@/lib/queryClientHelper";
+import { SignatureAtlasService } from "@grpc/atlas_connect";
+import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
+import { optionsSignatureAtlas } from "@/hooks/queries/useSignatureAtlas";
+import { optionsLightConeMetadataMany } from "@/hooks/queries/useLightConeMetadataMany";
+import { optionsLightConeSkillMany } from "@/hooks/queries/useLightConeSkillMany";
+import { optionsCharacterEidolon } from "@/hooks/queries/useCharacterEidolon";
 import Loading from "./loading";
+import { optionsCharacterTrace } from "@/hooks/queries/useCharacterTrace";
+import { optionsProperties } from "@/hooks/queries/useProperties";
 
 interface Props {
-  params: { slug: string };
+  params: { slug: number };
 }
 
-export default async function Character({ params }: Props) {
-  const { slug } = params;
-  const characterId = parseInt(slug);
+export default async function Character({ params: { slug } }: Props) {
+  const characterId = slug;
   const character = await API.character.get(characterId);
+  const { list: signatureAtlas } = await rpc(SignatureAtlasService).list({});
+  const lc_ids =
+    signatureAtlas.find((e) => e.charId === characterId)?.lcId ?? [];
+
+  const dehydratedState = await prefetchOptions(lc_ids, characterId);
 
   return (
     <Tabs defaultValue="skill">
@@ -37,40 +50,58 @@ export default async function Character({ params }: Props) {
         <TabsTrigger value="trace">Traces</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="skill">
-        <Suspense fallback={<SkillOverviewLoading />}>
-          <SkillOverview characterId={characterId} />
-        </Suspense>
-      </TabsContent>
+      <HydrationBoundary state={dehydratedState}>
+        <TabsContent value="skill">
+          <Suspense fallback={<SkillOverviewLoading />}>
+            <SkillOverview characterId={characterId} />
+          </Suspense>
+        </TabsContent>
 
-      <TabsContent value="eidolon">
-        <Suspense fallback={<LoadingEidolonTable />}>
-          <EidolonTable characterId={characterId} />
-        </Suspense>
-      </TabsContent>
+        <TabsContent value="eidolon">
+          <Suspense fallback={<LoadingEidolonTable />}>
+            <EidolonTable characterId={characterId} />
+          </Suspense>
+        </TabsContent>
 
-      <TabsContent value="sig-lc">
-        <Suspense fallback={<Loading />}>
-          <SignatureLightCone characterId={characterId} />
-        </Suspense>
-      </TabsContent>
+        <TabsContent value="sig-lc">
+          <Suspense fallback={<Loading />}>
+            <SignatureLightCone characterId={characterId} />
+          </Suspense>
+        </TabsContent>
 
-      <TabsContent value="trace">
-        <div className="mt-2 flex flex-col items-center gap-4 xl:flex-row xl:items-start">
-          <div className="flex w-[30rem] grow justify-center">
-            <TraceTable
-              characterId={characterId}
-              wrapperSize={480}
-              path={character.avatar_base_type}
-              maxEnergy={character.spneed}
-            />
+        <TabsContent value="trace">
+          <div className="mt-2 flex flex-col items-center gap-4 xl:flex-row xl:items-start">
+            <div className="flex w-[30rem] grow justify-center">
+              <TraceTable
+                characterId={characterId}
+                wrapperSize={480}
+                path={character.avatar_base_type}
+                maxEnergy={character.spneed}
+              />
+            </div>
+
+            <div className="w-full">
+              <TraceSummaryWrapper characterId={characterId} />
+            </div>
           </div>
-
-          <div className="w-full">
-            <TraceSummaryWrapper characterId={characterId} />
-          </div>
-        </div>
-      </TabsContent>
+        </TabsContent>
+      </HydrationBoundary>
     </Tabs>
   );
+}
+
+async function prefetchOptions(lc_ids: number[], characterId: number) {
+  const queryClient = getQueryClient();
+  const options = [
+    optionsSignatureAtlas(),
+    optionsLightConeMetadataMany(lc_ids),
+    optionsLightConeSkillMany(lc_ids),
+    optionsCharacterEidolon(characterId),
+    optionsCharacterTrace(characterId),
+    optionsProperties(),
+  ];
+  await Promise.allSettled(
+    options.map((option) => queryClient.prefetchQuery(option as any))
+  );
+  return dehydrate(queryClient);
 }

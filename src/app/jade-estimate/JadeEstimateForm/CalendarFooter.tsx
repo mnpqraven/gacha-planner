@@ -13,6 +13,7 @@ import {
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
 import { useFuturePatchDateList } from "@/hooks/queries/useFuturePatchDate";
+import { ExternalLink } from "lucide-react";
 
 type Props = {
   date: Date;
@@ -32,22 +33,28 @@ const CalendarFooter = ({ date }: Props) => {
     () => bannerList.find((e) => e.version == getVersion(date)),
     [bannerList, getVersion, date]
   );
-  const charas = banner?.chara ?? [];
-  const lcs = banner?.lc ?? [];
+  const charas = banner?.chara ?? [null, null, null, null];
+  const lcs = banner?.lc ?? [null, null, null, null];
 
   const avatarQueries = useQueries({
-    queries: charas.map((id) => ({
-      queryKey: ["character", id],
-      queryFn: async () => API.character.get(id!),
-      enabled: !!banner && !!id,
+    queries: charas.map((chara) => ({
+      queryKey: ["character", chara?.id],
+      queryFn: async () => {
+        if (chara && "id" in chara) return await API.character.get(chara.id);
+        else return Promise.reject();
+      },
+      enabled: !!banner && !!chara && !!chara.id,
     })),
   });
 
   const lcQueries = useQueries({
-    queries: lcs.map((id) => ({
-      queryKey: ["lightConeMetadata", id],
-      queryFn: async () => await API.lightConeMetadata.get(id!),
-      enabled: !!id,
+    queries: lcs.map((lc) => ({
+      queryKey: ["lightConeMetadata", lc?.id],
+      queryFn: async () => {
+        if (lc && "id" in lc) return await API.lightConeMetadata.get(lc.id);
+        else return Promise.reject();
+      },
+      enabled: !!lc && !!lc.id,
     })),
   });
 
@@ -69,12 +76,16 @@ const CalendarFooter = ({ date }: Props) => {
             <CharacterIcon key={index} data={query.data} />
           ) : (
             <Tooltip key={index}>
-              <TooltipTrigger>
-                <LoadingIcon key={index} rounded />
+              <TooltipTrigger disabled={!banner?.chara?.at(index)?.placeholder}>
+                <LoadingIcon
+                  key={index}
+                  rounded
+                  href={banner?.chara.at(index)?.href}
+                />
               </TooltipTrigger>
-              {banner?.placeholderChar?.at(index) && (
+              {!!banner?.chara?.at(index)?.placeholder && (
                 <TooltipContent>
-                  {banner?.placeholderChar[index]}
+                  {banner?.chara[index]?.placeholder}
                 </TooltipContent>
               )}
             </Tooltip>
@@ -90,11 +101,13 @@ const CalendarFooter = ({ date }: Props) => {
             <LightConeIcon key={index} data={query.data} />
           ) : (
             <Tooltip key={index}>
-              <TooltipTrigger>
-                <LoadingIcon key={index} />
+              <TooltipTrigger disabled={!banner?.lc?.at(index)?.placeholder}>
+                <LoadingIcon key={index} href={banner?.lc.at(index)?.href} />
               </TooltipTrigger>
-              {banner?.placeholderLc?.at(index) && (
-                <TooltipContent>{banner?.placeholderLc[index]}</TooltipContent>
+              {!!banner?.lc?.at(index)?.placeholder && (
+                <TooltipContent>
+                  {banner?.lc[index]?.placeholder}
+                </TooltipContent>
               )}
             </Tooltip>
           )
@@ -104,10 +117,31 @@ const CalendarFooter = ({ date }: Props) => {
   );
 };
 
-const LoadingIcon = ({ rounded = false }: { rounded?: boolean }) => (
-  <Skeleton
-    className={cn("h-12 w-12", rounded ? "rounded-full" : "rounded-md")}
-  />
-);
+const LoadingIcon = ({
+  rounded = false,
+  href,
+}: {
+  rounded?: boolean;
+  href?: string;
+}) => {
+  if (!href)
+    return (
+      <Skeleton
+        className={cn("h-12 w-12", rounded ? "rounded-full" : "rounded-md")}
+      />
+    );
+  return (
+    <a href={href}>
+      <Skeleton
+        className={cn(
+          "flex h-12 w-12 items-center justify-center",
+          rounded ? "rounded-full" : "rounded-md"
+        )}
+      >
+        <ExternalLink />
+      </Skeleton>
+    </a>
+  );
+};
 
 export { CalendarFooter };

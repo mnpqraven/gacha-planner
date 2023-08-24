@@ -17,7 +17,6 @@ export function chartOptions({
   theme: string | undefined;
   selectedBanner: Banner;
 }): EChartsOption {
-  if (!data) console.warn("SHOULD NEVER SEE THIS");
   return {
     xAxis: {
       type: "category",

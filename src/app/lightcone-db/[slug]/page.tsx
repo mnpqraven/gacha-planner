@@ -12,12 +12,11 @@ export default async function LightConePage({ params }: Props) {
   const callLc = API.lightConeMetadata.get(lightConeId);
   const callLcSkill = API.lightConeSkill.get(lightConeId);
 
-  console.log(API.lightConeSkill.path);
   const [lc, lcSkill] = await Promise.all([callLc, callLcSkill]);
 
   return (
     <>
-      <div className="aspect-[5/7] p-12 md:max-w-[50%]">
+      <div className="p-12 md:max-w-[50%] h-fit">
         <Portrait data={lc} />
       </div>
       <div className="flex flex-col md:max-w-[50%] gap-4">

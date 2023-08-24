@@ -58,8 +58,7 @@ import {
 import { JadeEstimateFormContext } from "@/app/jade-estimate/formProvider";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { schema } from "./schema";
-import { useToast } from "@/app/components/ui/Toast/useToast";
-import { ToastAction } from "@/app/components/ui/Toast/Toast";
+import { useCacheValidate } from "@/hooks/useCacheValidate";
 
 type Props = {
   submitButton?: boolean;
@@ -82,17 +81,14 @@ export const defaultValues: PartialMessage<JadeEstimateCfg> = {
 };
 
 export default function JadeEstimateForm({ submitButton = false }: Props) {
-  const { toast } = useToast();
-  const [mounted, setMounted] = useState(false);
   const [uncontrolledDate, setUncontrolledDate] = useState<Date>(new Date());
   const [monthController, setMonthController] = useState<Date | undefined>(
     uncontrolledDate
   );
-  const [savedFormData, setSavedFormData] = useLocalStorage<
+  const [storagedForm, setStoragedForm] = useLocalStorage<
     FormSchema | undefined
   >(STORAGE.jadeEstimateForm, undefined);
 
-  // keybinds for jumper
   const [open, setOpen] = useState(false);
 
   const { futurePatchDateList } = useFuturePatchDateList();
@@ -107,29 +103,14 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
   const debounceOnChange = useDebounce(form.handleSubmit(onSubmit), 300);
   const untilDateSubscription = form.watch("untilDate");
 
-  useEffect(() => {
-    const { success } = schema.safeParse(savedFormData);
-    if (!mounted && savedFormData && !success) {
-      toast({
-        title: "Outdated Local Cache",
-        description:
-          "The local cache seems to be outdated, this is usually due to an update to the website, if you are seeing this please click the following 'Reload' button.",
-        action: (
-          <ToastAction
-            altText="Reload"
-            onClick={() => {
-              setSavedFormData(defaultValues);
-              form.reset(defaultValues);
-            }}
-          >
-            Reload
-          </ToastAction>
-        ),
-      });
-      setMounted(true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mounted, savedFormData]);
+  useCacheValidate({
+    schema,
+    schemaData: storagedForm,
+    onReload: () => {
+      setStoragedForm(defaultValues);
+      form.reset(defaultValues);
+    },
+  });
 
   useEffect(() => {
     debounceOnChange(null);
@@ -137,24 +118,24 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
   }, [untilDateSubscription]);
 
   useEffect(() => {
-    if (savedFormData) {
-      form.reset(savedFormData);
+    if (storagedForm) {
+      form.reset(storagedForm);
 
       {
         // update date states for calendar footer
-        const updatedDate = objToDate.parse(savedFormData.untilDate);
+        const updatedDate = objToDate.parse(storagedForm.untilDate);
         setUncontrolledDate(updatedDate);
         setMonthController(updatedDate);
       }
-      updateForm(savedFormData);
+      updateForm(storagedForm);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [savedFormData]);
+  }, [storagedForm]);
 
   function onSubmit(values: FormSchema) {
     // NOTE: this deep check is importnant
-    if (!equal(values, defaultValues) && !equal(values, savedFormData)) {
-      setSavedFormData(values);
+    if (!equal(values, defaultValues) && !equal(values, storagedForm)) {
+      setStoragedForm(values);
     }
   }
 

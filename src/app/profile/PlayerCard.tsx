@@ -5,14 +5,18 @@ import Image from "next/image";
 import { cn, img } from "@/lib/utils";
 import { Separator } from "../components/ui/Separator";
 import Link from "next/link";
+import { LANGS } from "@/lib/constants";
 
+type Lang = (typeof LANGS)[number];
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   player: MihomoPlayer;
   uid: string;
-  lang: string;
+  lang: Lang | undefined;
 }
 export const PlayerCard = forwardRef<HTMLButtonElement, Props>(
   ({ player, uid, lang, className, ...props }, ref) => {
+    const la = !lang || lang == "en" ? "" : `?lang=${lang}`;
+
     return (
       <Button
         className={cn("flex h-fit items-center gap-2.5", className)}
@@ -21,7 +25,7 @@ export const PlayerCard = forwardRef<HTMLButtonElement, Props>(
         {...props}
         asChild
       >
-        <Link href={`profile/${uid}?lang=${lang}`}>
+        <Link href={`profile/${uid}${la}`}>
           <Image
             src={img(player.avatar.icon)}
             alt={player.avatar.name}

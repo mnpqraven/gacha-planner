@@ -3,14 +3,7 @@
 import { Button } from "@/app/components/ui/Button";
 import { useRouter } from "next/navigation";
 
-export default function Error({
-  error,
-  reset,
-}: {
-  error: Error;
-  reset: () => void;
-}) {
-  console.log(error.message);
+export default function Error({ error }: { error: Error; reset: () => void }) {
   const router = useRouter();
   return (
     <main className="mt-4 flex flex-col items-center justify-center gap-4 text-center">

@@ -27,5 +27,5 @@ export const useBannerList = () => {
     initialData: { list: [defaultBanner] },
   });
 
-  return { bannerList: data?.list ?? [] };
+  return { bannerList: data.list };
 };

@@ -1,30 +1,19 @@
-import { getMihomoInfo } from "@/app/api/profile/[uid]/route";
 import { ConfigController } from "./ConfigControllerDialog";
 import { CardConfigProvider } from "./ConfigControllerContext";
 import { CharacterCardWrapper } from "./_components/CharacterCard";
 import { Exporter } from "./_components/Exporter";
 import { LineupSelector } from "./_components/LineupSelector";
-import { env } from "@/envSchema.mjs";
 import { Share } from "./_components/Share";
+import { LANGS } from "@/lib/constants";
 
 interface Props {
   params: { uid: string };
-  searchParams: { lang: string };
+  searchParams: { lang: (typeof LANGS)[number] | undefined };
 }
-
-export async function generateMetadata({ params, searchParams }: Props) {
-  const { player } = await getMihomoInfo(
-    params.uid,
-    searchParams.lang,
-    env.NEXT_PUBLIC_BASE_URL
-  );
-  return {
-    title: `${player.nickname}'s Player Card`,
-    description: `${player.nickname}'s Player Card`,
-  };
-}
-
-export default async function ProfileCard() {
+export default async function ProfileCard({
+  params: { uid },
+  searchParams: { lang },
+}: Props) {
   return (
     <CardConfigProvider>
       <main className="flex flex-col items-center justify-center">
@@ -35,7 +24,7 @@ export default async function ProfileCard() {
           <ConfigController />
         </div>
 
-        <CharacterCardWrapper />
+        <CharacterCardWrapper uid={uid} lang={lang} />
       </main>
     </CardConfigProvider>
   );

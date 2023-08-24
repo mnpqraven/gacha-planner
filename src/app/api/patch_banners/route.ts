@@ -12,11 +12,15 @@ export async function GET() {
   });
 }
 
+interface Item {
+  id?: number;
+  placeholder?: string;
+  href?: string;
+}
+
 export interface PatchBanner {
   phase: 1 | 2;
   version: `${number}.${number}.${1 | 2}`;
-  chara: [number | null, number | null, number | null, number | null];
-  lc: [number | null, number | null, number | null, number | null];
-  placeholderChar?: [string, string, string, string];
-  placeholderLc?: [string, string, string, string];
+  chara: [Item | null, Item | null, Item | null, Item | null];
+  lc: [Item | null, Item | null, Item | null, Item | null];
 }

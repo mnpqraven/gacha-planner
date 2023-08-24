@@ -4,11 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 export const useLightConeList = () => {
   const { data: lightConeList } = useQuery({
     queryKey: ["lightconeList"],
-    queryFn: async () => {
-      const { list } = await API.lightConeMetadataMany.get();
-      return list;
-    },
-    initialData: [],
+    queryFn: async () => await API.lightConeMetadataMany.get(),
+    select: (data) => data.list,
+    initialData: { list: [] },
+    staleTime: Infinity,
   });
   return { lightConeList };
 };

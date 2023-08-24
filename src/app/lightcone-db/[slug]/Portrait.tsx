@@ -1,10 +1,9 @@
 "use client";
 
 import useCardEffect from "@/hooks/animation/useCardEffect";
-import { IMAGE_URL } from "@/server/endpoints";
 import Image from "next/image";
 import styles from "@/css/floating-card.module.css";
-import { cn } from "@/lib/utils";
+import { cn, img } from "@/lib/utils";
 import { EquipmentConfig } from "@/bindings/EquipmentConfig";
 
 type Props = {
@@ -21,7 +20,7 @@ export function Portrait({ data }: Props) {
       onMouseMove={rotateToMouse}
     >
       <Image
-        src={url(data.equipment_id)}
+        src={img(`image/light_cone_portrait/${data.equipment_id}.png`)}
         width={902}
         height={1260}
         className="place-self-start object-contain"
@@ -30,8 +29,4 @@ export function Portrait({ data }: Props) {
       <div ref={glowRef} className={styles["glow"]} />
     </div>
   );
-}
-
-function url(id: string | number): string {
-  return IMAGE_URL + `image/light_cone_portrait/${id}.png`;
 }

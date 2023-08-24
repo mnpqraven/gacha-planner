@@ -71,7 +71,7 @@ const DEFAULT_MARGINS = { top: 0, left: 40, right: 40, bottom: 0 };
 export function SpiderChart<T>({
   width,
   height,
-  levels = 5,
+  levels = 4,
   margin = DEFAULT_MARGINS,
   data,
   valueAccessor,
@@ -159,7 +159,7 @@ export function SpiderChart<T>({
               radius={((i + 1) * radius) / levels}
               fill="none"
               stroke={silver}
-              strokeWidth={i % 2 == 0 ? 2 : 1}
+              strokeWidth={i % 2 == 0 ? 1 : 2}
               strokeOpacity={0.6}
               strokeLinecap="round"
             />
