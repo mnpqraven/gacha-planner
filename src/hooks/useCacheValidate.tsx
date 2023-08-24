@@ -15,24 +15,30 @@ export function useCacheValidate<T>({
   onReload,
 }: Props<T>) {
   const { toast } = useToast();
-  const [mounted, setMounted] = useState(false);
+  const [pressed, setPressed] = useState(false);
 
   useEffect(() => {
     const { success } = schema.safeParse(schemaData);
 
-    if (!mounted && !!schemaData && !success) {
+    if (!pressed && !!schemaData && !success) {
       toast({
+        variant: "destructive",
         title: "Outdated Local Cache",
         description:
           "The local cache seems to be outdated, this is usually due to an update to the website, if you are seeing this please click the following 'Reload' button.",
         action: (
-          <ToastAction altText="Reload" onClick={onReload}>
+          <ToastAction
+            altText="Reload"
+            onClick={() => {
+              onReload();
+              setPressed(true);
+            }}
+          >
             Reload
           </ToastAction>
         ),
       });
-      setMounted(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mounted, schemaData]);
+  }, [pressed, schemaData]);
 }
