@@ -73,7 +73,7 @@ export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
               <SkillDescription
                 skillDesc={skill.skill_desc}
                 paramList={skill.param_list}
-                slv={rank}
+                slv={rank - 1}
               />
             </TooltipContent>
           )}

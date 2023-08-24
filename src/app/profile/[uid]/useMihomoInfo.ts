@@ -3,6 +3,8 @@
 import { useToast } from "@/app/components/ui/Toast/useToast";
 import {
   UseQueryOptions,
+  UseSuspenseQueryOptions,
+  queryOptions,
   useQuery,
   useQueryClient,
   useSuspenseQuery,
@@ -10,42 +12,44 @@ import {
 import { useEffect } from "react";
 import { MihomoResponse } from "../types";
 import { env } from "@/envSchema.mjs";
-
-interface Options
-  extends Omit<
-    UseQueryOptions<MihomoResponse>,
-    "retry" | "queryKey" | "queryFn"
-  > {
-  displayToast?: boolean;
-}
+import { LANGS } from "@/lib/constants";
 
 interface ProfileParam {
   uid: string;
-  lang: string;
+  lang: Lang;
 }
+
+export const optionsMihomoInfo = (
+  uid: string | undefined = "",
+  lang: Lang = "en",
+  isServer = false
+) =>
+  queryOptions<MihomoResponse, Error, MihomoResponse>({
+    queryKey: ["mihoyoInfo", uid, lang, isServer],
+    queryFn: async () =>
+      await getMihomoInfo(
+        uid,
+        lang,
+        isServer ? env.NEXT_PUBLIC_BASE_URL : undefined
+      ),
+  });
 
 export function useMihomoInfo(
   { uid, lang }: Partial<ProfileParam>,
   opt: Options = {}
 ) {
   const displayToast = opt.displayToast ?? true;
-
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ["mihoyoInfo", uid, lang],
-    queryFn: async () => await getMihomoInfo(uid!, lang!),
-    retry: false,
-    enabled: !!uid && !!lang,
+    ...optionsMihomoInfo(uid, lang),
+    enabled: !!uid && uid !== "",
     ...opt,
   });
 
-  function prefetch(uid: string, lang: string = "en") {
-    queryClient.prefetchQuery({
-      queryKey: ["mihoyoInfo", uid, lang],
-      queryFn: async () => await getMihomoInfo(uid, lang),
-    });
+  function prefetch(uid: string, lang: Lang = "en") {
+    queryClient.prefetchQuery(optionsMihomoInfo(uid, lang));
   }
 
   useEffect(() => {
@@ -62,28 +66,22 @@ export function useMihomoInfo(
   return { query, prefetch };
 }
 
-export function useSuspendedMihomoInfo({ uid, lang }: Partial<ProfileParam>) {
-  const displayToast = false;
+export function useSuspendedMihomoInfo(
+  { uid, lang }: Partial<ProfileParam>,
+  opt: SuspendedOptions = {}
+) {
+  const displayToast = opt.displayToast ?? true;
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const query = useQuery({
-    queryKey: ["mihoyoInfo", uid, lang],
-    queryFn: async () => {
-      if (!!uid)
-        return await getMihomoInfo(uid, lang, env.NEXT_PUBLIC_BASE_URL);
-      else return Promise.reject("running on the server ?");
-    },
-    retry: false,
-    enabled: !!uid && !!lang,
+  const query = useSuspenseQuery({
+    ...optionsMihomoInfo(uid, lang, true),
+    ...opt,
   });
 
-  function prefetch(uid: string, lang: string = "en") {
-    queryClient.prefetchQuery({
-      queryKey: ["mihoyoInfo", uid, lang],
-      queryFn: async () => await getMihomoInfo(uid, lang),
-    });
+  function prefetch(uid: string, lang: Lang = "en") {
+    queryClient.prefetchQuery(optionsMihomoInfo(uid, lang, true));
   }
 
   useEffect(() => {
@@ -114,4 +112,22 @@ export async function getMihomoInfo(
     });
   }
   return response.json();
+}
+
+type Lang = (typeof LANGS)[number];
+
+interface Options
+  extends Omit<
+    UseQueryOptions<MihomoResponse, Error, MihomoResponse>,
+    "queryKey" | "queryFn"
+  > {
+  displayToast?: boolean;
+}
+
+interface SuspendedOptions
+  extends Omit<
+    UseSuspenseQueryOptions<MihomoResponse, Error, MihomoResponse>,
+    "queryKey" | "queryFn"
+  > {
+  displayToast?: boolean;
 }

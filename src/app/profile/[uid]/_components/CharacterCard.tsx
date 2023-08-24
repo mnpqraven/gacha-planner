@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect } from "react";
+import { useEffect } from "react";
 import { CharacterInfo } from "./info_block/CharacterInfo";
 import { SkillInfo } from "./skill_block/SkillInfo";
 import { LightConeInfo } from "./skill_block/LightConeInfo";
@@ -9,25 +9,17 @@ import { StatTable } from "./stat_block/StatTable";
 import { SpiderChartWrapper } from "./SpiderChartWrapper";
 import { useCardConfigController } from "../ConfigControllerContext";
 import { EidolonInfo } from "./skill_block/EidolonInfo";
-import { useParams, useSearchParams } from "next/navigation";
-import { useMihomoInfo, useSuspendedMihomoInfo } from "../useMihomoInfo";
+import { LANGS } from "@/lib/constants";
 
-function CharacterCardWrapper() {
-  const searchParams = useSearchParams();
-  const lang = searchParams.get("lang") ?? "en";
-  const params = useParams();
-  const uid = params["uid"] as string;
-
-  // const {
-  //   query: { data },
-  // } = useSuspendedMihomoInfo({ uid, lang });
-
+type Lang = (typeof LANGS)[number];
+interface Props {
+  uid: string;
+  lang: Lang | undefined;
+}
+function CharacterCardWrapper({ uid, lang }: Props) {
   const { currentCharacter, enkaRef, updateParam } = useCardConfigController();
 
-  // useEffect(() => {
-  //   if (!!data) initResponse(data);
-  // }, [data, initResponse]);
-
+  // this executes on mount to get the cached keys
   useEffect(() => {
     updateParam(uid, lang);
   }, [uid, lang, updateParam]);

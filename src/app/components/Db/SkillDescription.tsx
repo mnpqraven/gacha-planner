@@ -5,6 +5,11 @@ import { Fragment } from "react";
 type SkillDescriptionProps = {
   skillDesc: ParameterizedDescription;
   paramList: string[][] | string[];
+  /**
+   * slv/imposition value
+   *
+   * NOTE: this is 0-based, beware
+   */
   slv: number;
 };
 
@@ -20,7 +25,9 @@ export const SkillDescription = ({
     <p className="text-justify">
       {skillDesc.map((descPart, index) => (
         <Fragment key={index}>
-          <span className="whitespace-pre-wrap">{sanitizeNewline(descPart)}</span>
+          <span className="whitespace-pre-wrap">
+            {sanitizeNewline(descPart)}
+          </span>
           <span className="font-semibold text-accent-foreground">
             {currentParam[index]}
           </span>

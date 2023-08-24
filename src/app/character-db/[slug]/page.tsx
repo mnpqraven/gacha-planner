@@ -19,11 +19,7 @@ import { SignatureLightCone } from "./SignatureLightCone";
 import { Suspense } from "react";
 import getQueryClient from "@/lib/queryClientHelper";
 import { SignatureAtlasService } from "@grpc/atlas_connect";
-import {
-  HydrationBoundary,
-  QueryClient,
-  dehydrate,
-} from "@tanstack/react-query";
+import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { optionsSignatureAtlas } from "@/hooks/queries/useSignatureAtlas";
 import { optionsLightConeMetadataMany } from "@/hooks/queries/useLightConeMetadataMany";
 import { optionsLightConeSkillMany } from "@/hooks/queries/useLightConeSkillMany";
@@ -33,11 +29,11 @@ import { optionsCharacterTrace } from "@/hooks/queries/useCharacterTrace";
 import { optionsProperties } from "@/hooks/queries/useProperties";
 
 interface Props {
-  params: { slug: string };
+  params: { slug: number };
 }
 
-export default async function Character({ params }: Props) {
-  const characterId = parseInt(params.slug);
+export default async function Character({ params: { slug } }: Props) {
+  const characterId = slug;
   const character = await API.character.get(characterId);
   const { list: signatureAtlas } = await rpc(SignatureAtlasService).list({});
   const lc_ids =

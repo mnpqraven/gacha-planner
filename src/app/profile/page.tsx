@@ -71,7 +71,8 @@ export default function Profile() {
 
   useEffect(() => {
     if (!!query.data) {
-      const url = `/profile/${prof.uid}?lang=${prof.lang}`;
+      const la = prof.lang == "en" ? "" : `?lang=${prof.lang}`;
+      const url = `/profile/${prof.uid}${la}`;
       router.prefetch(url);
       prefetch(prof.uid, prof.lang);
     }
@@ -147,7 +148,11 @@ export default function Profile() {
             onStorageUpdate={setPlayerProfiles}
           />
 
-          <PlayerCard player={query.data.player} {...prof} />
+          <PlayerCard
+            player={query.data.player}
+            uid={prof.uid}
+            lang={form.watch("lang")}
+          />
         </div>
       )}
       {playerProfiles && playerProfiles.length > 0 && (

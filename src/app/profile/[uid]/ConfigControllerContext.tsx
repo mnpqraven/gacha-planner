@@ -18,6 +18,7 @@ import {
   initialConfig,
 } from "./configReducer";
 import { useMihomoInfo, useSuspendedMihomoInfo } from "./useMihomoInfo";
+import { LANGS } from "@/lib/constants";
 
 interface CardConfigContextPayload {
   currentCharacter?: MihomoCharacter;
@@ -27,7 +28,7 @@ interface CardConfigContextPayload {
   changeConfig: Dispatch<CardConfigAction>;
   // initResponse: (to: MihomoResponse) => void;
   mihomoResponse?: MihomoResponse;
-  updateParam: (toUid?: string, toLang?: string) => void;
+  updateParam: (toUid?: string, toLang?: (typeof LANGS)[number]) => void;
 }
 
 export const defaultCardConfig: CardConfigContextPayload = {
@@ -62,16 +63,12 @@ function useCardConfigProvider(): CardConfigContextPayload {
   // for image exporting
   const enkaRef = useRef<HTMLDivElement>(null);
 
-  // const [mihomoResponse, setMihomoResponse] = useState<
-  //   MihomoResponse | undefined
-  // >(undefined);
   const [uid, setUid] = useState<string | undefined>(undefined);
-  const [lang, setLang] = useState("en");
+  const [lang, setLang] = useState<(typeof LANGS)[number]>("en");
 
-  const { query } = useSuspendedMihomoInfo({ uid, lang });
+  const { query } = useMihomoInfo({ uid, lang });
 
-  function updateParam(toUid?: string, toLang?: string) {
-    console.log("updateParam");
+  function updateParam(toUid?: string, toLang?: (typeof LANGS)[number]) {
     if (!!toUid) setUid(toUid);
     if (!!toLang) setLang(toLang);
   }

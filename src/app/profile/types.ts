@@ -111,7 +111,7 @@ export interface MihomoSkillTreeConfig {
 
 export interface MihomoPath {
   id: string;
-  name: Path;
+  name: Exclude<Path, "Hunt"> | "The Hunt";
   icon: AssetPath;
 }
 

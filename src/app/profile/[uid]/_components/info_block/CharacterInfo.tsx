@@ -5,8 +5,9 @@ import { cn, img } from "@/lib/utils";
 import { PathIcon } from "@/app/character-db/PathIcon";
 import { ElementIcon } from "@/app/character-db/ElementIcon";
 import { useCardConfigController } from "../../ConfigControllerContext";
+import { Path } from "@/bindings/AvatarConfig";
 
-interface Props extends HTMLAttributes<HTMLDivElement> { }
+interface Props extends HTMLAttributes<HTMLDivElement> {}
 export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
   ({ className, ...props }: Props, ref) => {
     const { currentCharacter, mihomoResponse, config } =
@@ -59,7 +60,11 @@ export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
             </div>
           ) : (
             <div className="flex flex-col items-center justify-end">
-              <PathIcon path={path.name} size="30px" className="flex-1" />
+              <PathIcon
+                path={path.name.replaceAll("The", "").trim() as Path}
+                size="30px"
+                className="flex-1"
+              />
               <Badge>{path.name}</Badge>
             </div>
           )}
@@ -78,7 +83,10 @@ export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
           {config.showPlayerInfo ? (
             <div className="relative flex justify-evenly">
               <div className="absolute bottom-0 h-full w-[1px] rotate-45 border"></div>
-              <PathIcon path={path.name} size="30px" />
+              <PathIcon
+                path={path.name.replaceAll("The", "").trim() as Path}
+                size="30px"
+              />
               <ElementIcon
                 element={element.name}
                 size="30px"
