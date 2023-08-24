@@ -5,7 +5,7 @@ import { UseQueryOptions, useQuery } from "@tanstack/react-query";
 
 type Options = Omit<
   UseQueryOptions<List<AvatarSkillConfig>, unknown, AvatarSkillConfig[]>,
-  "enabled" | "inialData"
+  "enabled" | "queryKey" | "queryFn" | "select" | "initialData"
 >;
 export function useCharacterSkill(
   characterId: number | undefined,

@@ -17,6 +17,7 @@ import {
   configReducer,
   initialConfig,
 } from "./configReducer";
+import { useMihomoInfo, useSuspendedMihomoInfo } from "./useMihomoInfo";
 
 interface CardConfigContextPayload {
   currentCharacter?: MihomoCharacter;
@@ -24,8 +25,9 @@ interface CardConfigContextPayload {
   enkaRef: RefObject<HTMLDivElement> | null;
   config: CardConfig;
   changeConfig: Dispatch<CardConfigAction>;
-  initResponse: (to: MihomoResponse) => void;
+  // initResponse: (to: MihomoResponse) => void;
   mihomoResponse?: MihomoResponse;
+  updateParam: (toUid?: string, toLang?: string) => void;
 }
 
 export const defaultCardConfig: CardConfigContextPayload = {
@@ -34,8 +36,9 @@ export const defaultCardConfig: CardConfigContextPayload = {
   enkaRef: null,
   config: initialConfig,
   changeConfig: () => {},
-  initResponse: () => {},
+  // initResponse: () => {},
   mihomoResponse: undefined,
+  updateParam: () => {},
 };
 
 export const CardConfigContext =
@@ -59,9 +62,19 @@ function useCardConfigProvider(): CardConfigContextPayload {
   // for image exporting
   const enkaRef = useRef<HTMLDivElement>(null);
 
-  const [mihomoResponse, setMihomoResponse] = useState<
-    MihomoResponse | undefined
-  >(undefined);
+  // const [mihomoResponse, setMihomoResponse] = useState<
+  //   MihomoResponse | undefined
+  // >(undefined);
+  const [uid, setUid] = useState<string | undefined>(undefined);
+  const [lang, setLang] = useState("en");
+
+  const { query } = useSuspendedMihomoInfo({ uid, lang });
+
+  function updateParam(toUid?: string, toLang?: string) {
+    console.log("updateParam");
+    if (!!toUid) setUid(toUid);
+    if (!!toLang) setLang(toLang);
+  }
 
   const [config, changeConfig] = useReducer(configReducer, initialConfig);
 
@@ -71,8 +84,9 @@ function useCardConfigProvider(): CardConfigContextPayload {
     enkaRef,
     config,
     changeConfig,
-    initResponse: setMihomoResponse,
-    mihomoResponse,
+    // initResponse: setMihomoResponse,
+    mihomoResponse: query.data,
+    updateParam,
   };
 }
 

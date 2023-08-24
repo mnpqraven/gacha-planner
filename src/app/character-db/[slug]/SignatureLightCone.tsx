@@ -8,7 +8,7 @@ import { EquipmentSkillConfig } from "@/bindings/EquipmentSkillConfig";
 import { IMAGE_URL } from "@/server/endpoints";
 import API, { rpc } from "@/server/typedEndpoints";
 import { SignatureAtlasService } from "@grpc/atlas_connect";
-import { useQueries, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useQueries, useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
 interface Props {
