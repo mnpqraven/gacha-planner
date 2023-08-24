@@ -30,6 +30,7 @@ const ElementIcon = forwardRef<HTMLDivElement, Props>(
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [theme]);
+
     const cl = cva("", {
       variants: {
         element: {
@@ -44,7 +45,6 @@ const ElementIcon = forwardRef<HTMLDivElement, Props>(
       },
     });
 
-    // original width in svg files ???????
     return (
       <div style={{ width: size, height: size }} ref={ref} {...props}>
         <SVG
