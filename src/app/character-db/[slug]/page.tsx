@@ -17,53 +17,33 @@ import API, { rpc } from "@/server/typedEndpoints";
 import { TraceSummaryWrapper } from "./TraceSummaryWrapper";
 import { SignatureLightCone } from "./SignatureLightCone";
 import { Suspense } from "react";
-import Loading from "./loading";
 import getQueryClient from "@/lib/queryClientHelper";
 import { SignatureAtlasService } from "@grpc/atlas_connect";
-import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
+import {
+  HydrationBoundary,
+  QueryClient,
+  dehydrate,
+} from "@tanstack/react-query";
 import { optionsSignatureAtlas } from "@/hooks/queries/useSignatureAtlas";
+import { optionsLightConeMetadataMany } from "@/hooks/queries/useLightConeMetadataMany";
+import { optionsLightConeSkillMany } from "@/hooks/queries/useLightConeSkillMany";
+import { optionsCharacterEidolon } from "@/hooks/queries/useCharacterEidolon";
+import Loading from "./loading";
+import { optionsCharacterTrace } from "@/hooks/queries/useCharacterTrace";
+import { optionsProperties } from "@/hooks/queries/useProperties";
 
 interface Props {
   params: { slug: string };
 }
 
 export default async function Character({ params }: Props) {
-  const { slug } = params;
-  const characterId = parseInt(slug);
+  const characterId = parseInt(params.slug);
   const character = await API.character.get(characterId);
-
   const { list: signatureAtlas } = await rpc(SignatureAtlasService).list({});
   const lc_ids =
     signatureAtlas.find((e) => e.charId === characterId)?.lcId ?? [];
 
-  // TODO:
-  // hydration test
-  // options refactor
-  const queryClient = getQueryClient();
-  const a = queryClient.prefetchQuery(optionsSignatureAtlas());
-  // TODO: merge with useLightConeMetadataMany
-  const b = queryClient.prefetchQuery({
-    queryKey: ["lightconeMetadata", lc_ids],
-    queryFn: async () =>
-      await API.lightConeMetadataMany.post({
-        payload: { list: lc_ids },
-      }),
-  });
-  const c = queryClient.prefetchQuery({
-    queryKey: ["lightconeSkill", lc_ids],
-    queryFn: async () =>
-      await API.lightConeSkillMany.post({
-        payload: { list: lc_ids },
-      }),
-  });
-  const d = queryClient.prefetchQuery({
-    queryKey: ["eidolon", characterId],
-    queryFn: async () => await API.eidolon.get(characterId),
-  });
-
-  await Promise.allSettled([a, b, c, d]);
-
-  const dehydratedState = dehydrate(queryClient);
+  const dehydratedState = await prefetchOptions(lc_ids, characterId);
 
   return (
     <Tabs defaultValue="skill">
@@ -112,4 +92,20 @@ export default async function Character({ params }: Props) {
       </HydrationBoundary>
     </Tabs>
   );
+}
+
+async function prefetchOptions(lc_ids: number[], characterId: number) {
+  const queryClient = getQueryClient();
+  const options = [
+    optionsSignatureAtlas(),
+    optionsLightConeMetadataMany(lc_ids),
+    optionsLightConeSkillMany(lc_ids),
+    optionsCharacterEidolon(characterId),
+    optionsCharacterTrace(characterId),
+    optionsProperties(),
+  ];
+  await Promise.allSettled(
+    options.map((option) => queryClient.prefetchQuery(option as any))
+  );
+  return dehydrate(queryClient);
 }

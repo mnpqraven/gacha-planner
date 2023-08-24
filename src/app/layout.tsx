@@ -1,7 +1,7 @@
 import Navbar from "./components/Navbar";
 import Providers from "./components/Providers";
 import "@/css/globals.css";
-import { Asap, Handjet, Merriweather_Sans } from "next/font/google";
+import { Merriweather_Sans } from "next/font/google";
 import { Toaster } from "./components/ui/Toast/Toaster";
 
 const inter = Merriweather_Sans({ subsets: ["latin"], display: "swap" });

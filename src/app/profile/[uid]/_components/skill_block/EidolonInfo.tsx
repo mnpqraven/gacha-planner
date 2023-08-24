@@ -7,14 +7,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
-import { useSuspendedCharacterEidolon } from "@/hooks/queries/useCharacterEidolon";
+import { useCharacterEidolon } from "@/hooks/queries/useCharacterEidolon";
 import { AvatarRankConfig } from "@/bindings/AvatarRankConfig";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {}
 export const EidolonInfo = forwardRef<HTMLDivElement, Props>(
   ({ className, ...props }, ref) => {
     const { currentCharacter } = useCardConfigController();
-    const { eidolons } = useSuspendedCharacterEidolon(currentCharacter?.id);
+    const { eidolons } = useCharacterEidolon(currentCharacter?.id);
 
     if (!currentCharacter) return null;
     const { rank, rank_icons } = currentCharacter;

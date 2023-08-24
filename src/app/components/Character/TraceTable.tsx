@@ -11,6 +11,7 @@ import API from "@/server/typedEndpoints";
 import { SkillTreeConfig } from "@/bindings/SkillTreeConfig";
 import { getLineTrips, traceVariants } from "./lineTrips";
 import { TraceDescription } from "./TraceDescription";
+import { useCharacterTrace } from "@/hooks/queries/useCharacterTrace";
 
 const DEBUG = false;
 
@@ -66,10 +67,7 @@ const TraceTableInner = ({
 }: Props) => {
   const updateLines = useXarrow();
   const { theme } = useTheme();
-  const { data } = useQuery({
-    queryKey: ["trace", characterId],
-    queryFn: async () => await API.trace.get(characterId),
-  });
+  const { data } = useCharacterTrace(characterId);
 
   const { data: skillConfigs } = useQuery({
     queryKey: ["skill", characterId],
@@ -96,7 +94,7 @@ const TraceTableInner = ({
     <div id="parent-wrapper" className="relative h-full w-full">
       <Xwrapper>
         {data &&
-          data.list.map((traceNode) => (
+          data.map((traceNode) => (
             <div
               id={traceNode.anchor}
               key={traceNode.point_id}

@@ -13,6 +13,7 @@ export const useCharacterList = (opt: Options = {}) => {
     queryFn: async () => await API.characters.get(),
     initialData: { list: [] },
     select: (data) => data.list,
+    staleTime: Infinity,
     ...opt,
   });
   return { characterList: query.data };

@@ -8,6 +8,7 @@ import { ThemeProvider } from "next-themes";
 import { useState } from "react";
 import { TooltipProvider } from "./ui/Tooltip";
 import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experimental";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const TANSTACK_CONFIG: QueryClientConfig = {
   defaultOptions: {
@@ -24,7 +25,10 @@ export default function RQProvider({ children }: RootProps) {
     <ThemeProvider attribute="class">
       <TooltipProvider delayDuration={300}>
         <QueryClientProvider client={queryClient}>
-          <ReactQueryStreamedHydration>{children}</ReactQueryStreamedHydration>
+          <ReactQueryStreamedHydration>
+            {children}
+            <ReactQueryDevtools initialIsOpen={false} />
+          </ReactQueryStreamedHydration>
         </QueryClientProvider>
       </TooltipProvider>
     </ThemeProvider>

@@ -1,7 +1,13 @@
 import { EquipmentConfig } from "@/bindings/EquipmentConfig";
 import { List } from "@/lib/generics";
 import API from "@/server/typedEndpoints";
-import { UseQueryOptions, queryOptions, useQuery } from "@tanstack/react-query";
+import {
+  UseQueryOptions,
+  UseSuspenseQueryOptions,
+  queryOptions,
+  useQuery,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 
 export const optionsLightConeMetadataMany = (lightConeIds: number[]) =>
   queryOptions<List<EquipmentConfig>, unknown, EquipmentConfig[]>({
@@ -11,10 +17,6 @@ export const optionsLightConeMetadataMany = (lightConeIds: number[]) =>
     select: (data) => data.list,
   });
 
-type Options = Omit<
-  UseQueryOptions<List<EquipmentConfig>, unknown, EquipmentConfig[]>,
-  "queryKey" | "queryFn"
->;
 export function useLightConeMetadataMany(
   lightConeIds: number[],
   opt: Options = {}
@@ -24,5 +26,26 @@ export function useLightConeMetadataMany(
     ...opt,
   });
 
-  return { lightCone: query.data };
+  return query;
 }
+
+export function useSuspendedLightConeMetadataMany(
+  lightConeIds: number[],
+  opt: SuspendedOptions = {}
+) {
+  const query = useSuspenseQuery({
+    ...optionsLightConeMetadataMany(lightConeIds),
+    ...opt,
+  });
+
+  return query;
+}
+
+type Options = Omit<
+  UseQueryOptions<List<EquipmentConfig>, unknown, EquipmentConfig[]>,
+  "queryKey" | "queryFn"
+>;
+type SuspendedOptions = Omit<
+  UseSuspenseQueryOptions<List<EquipmentConfig>, unknown, EquipmentConfig[]>,
+  "queryKey" | "queryFn"
+>;
