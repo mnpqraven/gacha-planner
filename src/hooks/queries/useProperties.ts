@@ -14,7 +14,6 @@ export const optionsProperties = () =>
     queryKey: ["properties"],
     queryFn: async () => await API.properties.get(),
     select: (data) => data.list,
-    staleTime: Infinity,
   });
 
 export function useProperties(opt: Options = {}) {

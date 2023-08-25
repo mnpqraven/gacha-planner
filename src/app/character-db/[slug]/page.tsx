@@ -29,12 +29,12 @@ import { optionsCharacterTrace } from "@/hooks/queries/useCharacterTrace";
 import { optionsProperties } from "@/hooks/queries/useProperties";
 
 interface Props {
-  params: { slug: number };
+  params: { slug: string };
 }
 
-export default async function Character({ params: { slug } }: Props) {
-  const characterId = slug;
-  const character = await API.character.get(characterId);
+export default async function Character({ params }: Props) {
+  const characterId = parseInt(params.slug);
+  const character = await API.character.get({ characterId });
   const { list: signatureAtlas } = await rpc(SignatureAtlasService).list({});
   const lc_ids =
     signatureAtlas.find((e) => e.charId === characterId)?.lcId ?? [];

@@ -1,11 +1,6 @@
-import ENDPOINT from "@/server/endpoints";
-import { workerFetch } from "@/server/fetchHelper";
+import { Banner } from "@/bindings/Banner";
+import API from "@/server/typedEndpoints";
 import { useQuery } from "@tanstack/react-query";
-import * as z from "zod";
-
-export type Banner = z.infer<
-  (typeof ENDPOINT)["gachaBannerList"]["response"]
->["list"][number];
 
 export const defaultBanner: Banner = {
   bannerName: "5* Banner character",
@@ -18,14 +13,16 @@ export const defaultBanner: Banner = {
   constPrefix: "Eidolon",
   constShorthand: "E",
   bannerType: "SSR",
+  rarity: 5,
 };
 
 export const useBannerList = () => {
-  const { data } = useQuery({
+  const query = useQuery({
     queryKey: ["gachaBannerList"],
-    queryFn: async () => await workerFetch(ENDPOINT.gachaBannerList),
+    queryFn: async () => await API.warpBanner.get(),
     initialData: { list: [defaultBanner] },
+    select: (data) => data.list,
   });
 
-  return { bannerList: data.list };
+  return query;
 };

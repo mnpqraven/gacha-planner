@@ -1,11 +1,11 @@
 "use client";
 
-import { IMAGE_URL } from "@/server/endpoints";
 import { HTMLAttributes, forwardRef } from "react";
 import Image from "next/image";
 import { asPercentage } from "@/lib/utils";
 import { SkillTreeConfig } from "@/bindings/SkillTreeConfig";
 import { AvatarPropertyConfig } from "@/bindings/AvatarPropertyConfig";
+import { IMAGE_URL } from "@/lib/constants";
 
 type Haystack = {
   [key in string]?: { value: number; icon: string; label: string };

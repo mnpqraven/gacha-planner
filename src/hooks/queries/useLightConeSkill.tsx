@@ -12,7 +12,7 @@ export function useLightConeSkill(
 ) {
   const query = useQuery({
     queryKey: ["lightConeSkill", lightConeId],
-    queryFn: async () => await API.lightConeSkill.get(lightConeId),
+    queryFn: async () => await API.lightConeSkill.get({ lcId: lightConeId! }),
     enabled: !!lightConeId,
     ...opt,
   });

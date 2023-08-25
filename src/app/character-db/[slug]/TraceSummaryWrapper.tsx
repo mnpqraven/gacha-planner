@@ -7,22 +7,17 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/app/components/ui/Accordion";
+import { useCharacterTrace } from "@/hooks/queries/useCharacterTrace";
 import { useProperties } from "@/hooks/queries/useProperties";
-import API from "@/server/typedEndpoints";
-import { useQuery } from "@tanstack/react-query";
 
 type Props = {
   characterId: number;
 };
 const TraceSummaryWrapper = ({ characterId }: Props) => {
-  const { data } = useQuery({
-    queryKey: ["trace", characterId],
-    queryFn: async () => await API.trace.get(characterId),
-  });
-
+  const { data: traces } = useCharacterTrace(characterId);
   const { data: properties } = useProperties();
 
-  if (!data || !properties) return null;
+  if (!traces || !properties) return null;
 
   return (
     <Accordion
@@ -37,7 +32,7 @@ const TraceSummaryWrapper = ({ characterId }: Props) => {
         <AccordionContent asChild>
           <TraceSummary
             characterId={characterId}
-            skills={data.list}
+            skills={traces}
             properties={properties}
           />
         </AccordionContent>

@@ -8,10 +8,10 @@ import {
   useQuery,
 } from "@tanstack/react-query";
 
-export const optionsCharacterTrace = (id: number | undefined) =>
+export const optionsCharacterTrace = (id: number) =>
   queryOptions<List<SkillTreeConfig>, unknown, SkillTreeConfig[]>({
     queryKey: ["trace", id],
-    queryFn: async () => await API.trace.get(id),
+    queryFn: async () => await API.trace.get({ characterId: id }),
     select: (data) => data.list,
   });
 
@@ -20,7 +20,8 @@ export function useCharacterTrace(
   opt: Options = {}
 ) {
   const query = useQuery({
-    ...optionsCharacterTrace(characterId),
+    ...optionsCharacterTrace(characterId!),
+    initialData: { list: [] },
     enabled: !!characterId,
     ...opt,
   });

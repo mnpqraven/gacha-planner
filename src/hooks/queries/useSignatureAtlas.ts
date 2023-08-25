@@ -24,7 +24,6 @@ export const optionsSignatureAtlas = () =>
         .then((data) =>
           data.list.map((e) => e.toJson() as PlainMessage<SignatureReturn>)
         ),
-    staleTime: Infinity,
   });
 
 export function useSignatureAtlas(opt: Options = {}) {

@@ -13,12 +13,13 @@ export function useCharacterSkill(
 ) {
   const query = useQuery({
     queryKey: ["skill", characterId],
-    queryFn: async () => await API.skillsByCharId.get(characterId),
+    queryFn: async () =>
+      await API.skillsByCharId.get({ characterId: characterId! }),
+    select: (data) => data.list,
     initialData: { list: [] },
     enabled: !!characterId,
-    select: (data) => data.list,
     ...opt,
   });
 
-  return { skills: query.data };
+  return query;
 }
