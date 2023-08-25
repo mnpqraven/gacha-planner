@@ -10,10 +10,9 @@ type Options = Omit<
 export const useCharacterList = (opt: Options = {}) => {
   const query = useQuery({
     queryKey: ["characterList"],
-    queryFn: async () => await API.characters.get(),
+    queryFn: async () => await API.characterByIds.get(),
     initialData: { list: [] },
     select: (data) => data.list,
-    staleTime: Infinity,
     ...opt,
   });
   return { characterList: query.data };

@@ -1,17 +1,16 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
 import { cn } from "@/lib/utils";
 import { cva } from "class-variance-authority";
 import Xarrow, { Xwrapper, useXarrow } from "react-xarrows";
 import { useTheme } from "next-themes";
-import API from "@/server/typedEndpoints";
 import { SkillTreeConfig } from "@/bindings/SkillTreeConfig";
 import { getLineTrips, traceVariants } from "./lineTrips";
 import { TraceDescription } from "./TraceDescription";
 import { useCharacterTrace } from "@/hooks/queries/useCharacterTrace";
+import { useCharacterSkill } from "@/hooks/queries/useCharacterSkill";
 
 const DEBUG = false;
 
@@ -67,12 +66,9 @@ const TraceTableInner = ({
 }: Props) => {
   const updateLines = useXarrow();
   const { theme } = useTheme();
-  const { data } = useCharacterTrace(characterId);
 
-  const { data: skillConfigs } = useQuery({
-    queryKey: ["skill", characterId],
-    queryFn: async () => await API.skillsByCharId.get(characterId),
-  });
+  const { data } = useCharacterTrace(characterId);
+  const { data: skills } = useCharacterSkill(characterId);
 
   const iconWrapVariants = cva(
     "flex items-center justify-center rounded-full ring-offset-transparent transition duration-500 hover:ring-2 hover:ring-offset-2",
@@ -134,7 +130,7 @@ const TraceTableInner = ({
                   <TraceDescription
                     traceType={getNodeType(traceNode)}
                     trace={traceNode}
-                    skill={skillConfigs?.list.find(
+                    skill={skills.find(
                       (e) => e.skill_id == traceNode.level_up_skill_id[0]
                     )}
                     maxEnergy={maxEnergy}

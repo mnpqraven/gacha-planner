@@ -1,4 +1,4 @@
-import { Banner, useBannerList } from "@/hooks/queries/useGachaBannerList";
+import { useBannerList } from "@/hooks/queries/useGachaBannerList";
 import {
   Select,
   SelectContent,
@@ -21,6 +21,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { Switch } from "../components/ui/Switch";
 import { PlainMessage } from "@bufbuild/protobuf";
 import { BannerType, ProbabilityRatePayload } from "@grpc/probabilityrate_pb";
+import { Banner } from "@/bindings/Banner";
 
 type FormSchema = PlainMessage<ProbabilityRatePayload>;
 
@@ -37,7 +38,7 @@ export function GachaForm({
   bannerOnChange,
   form,
 }: Props) {
-  const { bannerList } = useBannerList();
+  const { data: bannerList } = useBannerList();
   const debounceOnChange = useDebounce(form.handleSubmit(updateQuery), 300);
 
   function preventMinus(e: React.KeyboardEvent<HTMLInputElement>) {

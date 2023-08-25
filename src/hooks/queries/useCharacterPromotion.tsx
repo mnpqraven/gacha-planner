@@ -13,7 +13,7 @@ export function useCharacterPromotion(
 ) {
   const query = useQuery({
     queryKey: ["promotion", characterId],
-    queryFn: async () => await API.promotion.get(characterId),
+    queryFn: async () => await API.promotion.get({ characterId: characterId! }),
     enabled: !!characterId,
     ...opt,
   });

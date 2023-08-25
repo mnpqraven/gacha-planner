@@ -13,7 +13,7 @@ export const optionsLightConeMetadataMany = (lightConeIds: number[]) =>
   queryOptions<List<EquipmentConfig>, unknown, EquipmentConfig[]>({
     queryKey: ["lightConeMetadata", lightConeIds],
     queryFn: async () =>
-      await API.lightConeMetadataMany.post({ payload: { list: lightConeIds } }),
+      await API.lightConeMetadataMany.post({ list: lightConeIds }),
     select: (data) => data.list,
   });
 

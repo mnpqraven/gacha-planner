@@ -7,7 +7,6 @@ export const useLightConeList = () => {
     queryFn: async () => await API.lightConeMetadataMany.get(),
     select: (data) => data.list,
     initialData: { list: [] },
-    staleTime: Infinity,
   });
   return { lightConeList };
 };

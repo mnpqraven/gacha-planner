@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { IMAGE_URL } from "@/server/endpoints";
 import { DbFilter } from "../components/Db/DbFilter";
 import Fuse from "fuse.js";
 import { useState } from "react";
@@ -9,6 +8,7 @@ import { LightConeCard } from "./LightConeCard";
 import useLightConeFilter from "../components/Db/useLightConeFilter";
 import { useRouter } from "next/navigation";
 import { EquipmentConfig } from "@/bindings/EquipmentConfig";
+import { IMAGE_URL } from "@/lib/constants";
 
 type Props = {
   data: EquipmentConfig[];

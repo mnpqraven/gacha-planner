@@ -7,7 +7,7 @@ export const metadata = {
 };
 
 export default async function CharacterDb() {
-  let { list } = await API.characters.get();
+  let { list } = await API.characterByIds.get();
   let sortedDb = list.sort((a, b) => {
     return (
       b.rarity - a.rarity ||

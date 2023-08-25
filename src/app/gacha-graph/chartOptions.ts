@@ -1,4 +1,4 @@
-import { Banner } from "@/hooks/queries/useGachaBannerList";
+import { Banner } from "@/bindings/Banner";
 import { range } from "@/lib/utils";
 import { PlainMessage } from "@bufbuild/protobuf";
 import { ProbabilityRateResponse } from "@grpc/probabilityrate_pb";
@@ -36,7 +36,12 @@ export function chartOptions({
     series: Array.from(
       range(currentEidolon + 1, selectedBanner.maxConst, 1)
     ).map((eidolon) =>
-      createChartSeries(selectedBanner.constShorthand, eidolon, data, selectedBanner.bannerType === 'LC' ? 1 : 0)
+      createChartSeries(
+        selectedBanner.constShorthand,
+        eidolon,
+        data,
+        selectedBanner.bannerType === "LC" ? 1 : 0
+      )
     ),
     color: [
       "#caffbf",
