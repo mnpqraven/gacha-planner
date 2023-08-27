@@ -278,6 +278,7 @@ function filterFieldsByRole<T extends { field: Field }>(
     "def",
     "crit_dmg",
     "crit_rate",
+    "break_dmg",
     "effect_hit",
     "effect_res",
     "heal_rate",
