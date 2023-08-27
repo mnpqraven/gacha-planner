@@ -9,10 +9,10 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 
-export const optionsCharacterEidolon = (id: number | undefined) =>
+export const optionsCharacterEidolon = (characterId: number) =>
   queryOptions<List<AvatarRankConfig>, unknown, AvatarRankConfig[]>({
-    queryKey: ["eidolon", id],
-    queryFn: async () => await API.eidolon.get(id),
+    queryKey: ["eidolon", characterId],
+    queryFn: async () => await API.eidolon.get({ characterId }),
     select: (data) => data.list,
   });
 
@@ -21,7 +21,8 @@ export function useCharacterEidolon(
   opt: Options = {}
 ) {
   const query = useQuery({
-    ...optionsCharacterEidolon(characterId),
+    ...optionsCharacterEidolon(characterId!),
+    enabled: !!characterId,
     ...opt,
   });
   return { eidolons: query.data };

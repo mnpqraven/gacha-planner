@@ -12,7 +12,7 @@ export function useCharacterMetadata(
 ) {
   const query = useQuery({
     queryKey: ["character", characterId],
-    queryFn: async () => await API.character.get(characterId),
+    queryFn: async () => await API.character.get({ characterId: characterId! }),
     enabled: !!characterId,
     ...opt,
   });

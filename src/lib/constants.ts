@@ -33,3 +33,6 @@ export const LANGS = [
   "th",
   "vi",
 ] as const;
+
+export const IMAGE_URL =
+  "https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/";

@@ -35,7 +35,7 @@ export default function GachaGraph() {
   const eidolonSubscriber = form.watch("currentEidolon");
   const bannerSubscriber = form.watch("banner");
 
-  const { bannerList } = useBannerList();
+  const { data: bannerList } = useBannerList();
   const selectedBanner =
     bannerList.find((e) => e.bannerType == BannerType[bannerSubscriber]) ??
     defaultBanner;
@@ -47,6 +47,7 @@ export default function GachaGraph() {
 
   const { data } = useQuery({
     queryKey: ["probabilityRate", storagedForm],
+    // safe cast
     queryFn: async () =>
       await rpc(ProbabilityRateService).post(storagedForm as FormSchema),
     placeholderData: keepPreviousData,

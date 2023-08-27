@@ -40,7 +40,8 @@ const CalendarFooter = ({ date }: Props) => {
     queries: charas.map((chara) => ({
       queryKey: ["character", chara?.id],
       queryFn: async () => {
-        if (chara && "id" in chara) return await API.character.get(chara.id);
+        if (chara && !!chara.id)
+          return await API.character.get({ characterId: chara.id });
         else return Promise.reject();
       },
       enabled: !!banner && !!chara && !!chara.id,
@@ -51,7 +52,8 @@ const CalendarFooter = ({ date }: Props) => {
     queries: lcs.map((lc) => ({
       queryKey: ["lightConeMetadata", lc?.id],
       queryFn: async () => {
-        if (lc && "id" in lc) return await API.lightConeMetadata.get(lc.id);
+        if (lc && !!lc.id)
+          return await API.lightConeMetadata.get({ lcId: lc.id });
         else return Promise.reject();
       },
       enabled: !!lc && !!lc.id,

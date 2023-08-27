@@ -6,8 +6,8 @@ import { Portrait } from "@/app/lightcone-db/[slug]/Portrait";
 import { useSuspendedLightConeMetadataMany } from "@/hooks/queries/useLightConeMetadataMany";
 import { useSuspendedLightConeSkillMany } from "@/hooks/queries/useLightConeSkillMany";
 import { useSuspendedSignatureAtlas } from "@/hooks/queries/useSignatureAtlas";
+import { IMAGE_URL } from "@/lib/constants";
 import { isEmpty } from "@/lib/utils";
-import { IMAGE_URL } from "@/server/endpoints";
 import { useState } from "react";
 
 interface Props {

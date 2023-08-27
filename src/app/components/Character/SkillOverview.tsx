@@ -19,7 +19,7 @@ type Props = {
 const SkillOverview = ({ characterId }: Props) => {
   const [selectedSlv, setSelectedSlv] = useState(0);
 
-  const { skills } = useCharacterSkill(characterId);
+  const { data: skills } = useCharacterSkill(characterId);
   const { character } = useCharacterMetadata(characterId);
 
   const [selectedSkill, setSelectedSkill] = useState<

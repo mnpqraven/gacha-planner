@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { CharacterCard } from "./CharacterCardWrapper";
-import { IMAGE_URL } from "@/server/endpoints";
 import { DbFilter } from "../components/Db/DbFilter";
 import Fuse from "fuse.js";
 import { useState } from "react";
 import useCharacterFilter from "../components/Db/useCharacterFilter";
 import { useRouter } from "next/navigation";
 import { AvatarConfig } from "@/bindings/AvatarConfig";
+import { IMAGE_URL } from "@/lib/constants";
 
 type Props = {
   data: AvatarConfig[];

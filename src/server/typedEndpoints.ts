@@ -17,102 +17,194 @@ import { ServiceType } from "@bufbuild/protobuf";
 import { env } from "@/envSchema.mjs";
 import { EquipmentPromotionConfig } from "@/bindings/EquipmentPromotionConfig";
 import { AvatarPromotionConfig } from "@/bindings/AvatarPromotionConfig";
+import { Banner } from "@/bindings/Banner";
 
+type CharId = { characterId: number };
+type LcId = { lcId: number };
 const API = {
-  patchDates: route<List<Patch>>("/honkai/patch_dates", "GET"),
-  patchBanners: route<List<PatchBanner>>("/honkai/patch_banners", "GET"),
-  lightConeMetadata: route<EquipmentConfig>(
-    "/honkai/light_cone/:id/metadata",
-    "GET"
+  patchDates: get<List<Patch>>("/honkai/patch_dates"),
+  lightConeMetadata: get<EquipmentConfig, LcId>(
+    ({ lcId }) => `/honkai/light_cone/${lcId}/metadata`
   ),
-  lightConeMetadataMany: route<List<number>, List<EquipmentConfig>>(
+  patchBanners: get<List<PatchBanner>>("/honkai/patch_banners"),
+  lightConeMetadataMany: getPost<List<EquipmentConfig>, List<number>>(
     "/honkai/light_cone/metadata"
   ),
-  lightConeSkill: route<EquipmentSkillConfig>(
-    "/honkai/light_cone/:id/skill",
-    "GET"
+  lightConeSkill: get<EquipmentSkillConfig, LcId>(
+    ({ lcId }) => `/honkai/light_cone/${lcId}/skill`
   ),
-  lightConeSkillMany: route<List<number>, List<EquipmentSkillConfig>>(
+  lightConeSkillMany: getPost<List<EquipmentSkillConfig>, List<number>>(
     "/honkai/light_cone/skill"
   ),
-  lightConeRanking: route<List<EquipmentRanking>>(
-    "/honkai/light_cone/ranking",
-    "GET"
+  lightConeRanking: get<List<EquipmentRanking>>("/honkai/light_cone/ranking"),
+  lightConePromotion: get<EquipmentPromotionConfig, LcId>(
+    ({ lcId }) => `/honkai/light_cone/${lcId}/promotion`
   ),
-  lightConePromotion: route<EquipmentPromotionConfig>(
-    "/honkai/light_cone/:id/promotion",
-    "GET"
+  character: get<AvatarConfig, CharId>(
+    ({ characterId }) => `/honkai/avatar/${characterId}`
   ),
-  character: route<AvatarConfig>("/honkai/avatar", "GET"),
-  characters: route<List<number>, List<AvatarConfig>>("/honkai/avatar"),
-  signatureAtlas: route<List<SignatureAtlas>>("/honkai/signature_atlas", "GET"),
-  skillsByCharId: route<List<AvatarSkillConfig>>(
-    "/honkai/avatar/:id/skill",
-    "GET"
+  characterByIds: getPost<List<AvatarConfig>, List<number>>("/honkai/avatar"),
+  signatureAtlas: get<List<SignatureAtlas>>("/honkai/signature_atlas"),
+  skillsByCharId: get<List<AvatarSkillConfig>, CharId>(
+    ({ characterId }) => `/honkai/avatar/${characterId}/skill`
   ),
-  trace: route<List<SkillTreeConfig>>("/honkai/avatar/:id/trace", "GET"),
-  properties: route<List<AvatarPropertyConfig>>("/honkai/properties", "GET"),
-  eidolon: route<List<AvatarRankConfig>>("/honkai/avatar/:id/eidolon", "GET"),
-  promotion: route<AvatarPromotionConfig>(
-    "/honkai/avatar/:id/promotion",
-    "GET"
+  trace: get<List<SkillTreeConfig>, CharId>(
+    ({ characterId }) => `/honkai/avatar/${characterId}/trace`
   ),
+  properties: get<List<AvatarPropertyConfig>>("/honkai/properties"),
+  eidolon: get<List<AvatarRankConfig>, CharId>(
+    ({ characterId }) => `/honkai/avatar/${characterId}/eidolon`
+  ),
+  promotion: get<AvatarPromotionConfig, CharId>(
+    ({ characterId }) => `/honkai/avatar/${characterId}/promotion`
+  ),
+  warpBanner: get<List<Banner>>("/honkai/warp_banners"),
 };
 
-type ApiRoute = {
-  path: string;
+type Get<TRes, P> = { get: (params: P) => Promise<TRes> };
+type DirectGet<TRes> = { get: () => Promise<TRes> };
+type Post<TRes, TPayload, P> = {
+  post: (params: P, payload?: TPayload) => Promise<TRes>;
 };
-type ApiGet<TResponse> = {
-  get: (params?: string | number) => Promise<TResponse>;
-};
-type ApiPost<TPayload, TResponse> = {
-  post: (opt?: { payload?: TPayload; params?: string }) => Promise<TResponse>;
+type DirectPost<TRes, TPayload> = {
+  post: (payload?: TPayload) => Promise<TRes>;
 };
 
-type Get<TRes> = ApiRoute & ApiGet<TRes>;
-type Post<TReq, TRes> = ApiRoute & ApiPost<TReq, TRes>;
-type GetPost<TReq, TRes> = ApiRoute & ApiGet<TRes> & ApiPost<TReq, TRes>;
+// type ReturnDev<TRes, U> = { get: (params: U) => Promise<TRes> };
+// type OptionalReturnDev<TRes> = { get: () => Promise<TRes> };
 
-type Method = "GET" | "POST" | undefined;
-function route<TReq, TRes>(path: string): GetPost<TReq, TRes>;
-function route<TRes>(path: string, method: "GET"): Get<TRes>;
-function route<TReq, TRes>(path: string, method: "POST"): Post<TReq, TRes>;
-function route<TReq, TRes>(
+function get<TRes>(path: string): DirectGet<TRes>;
+function get<TRes, TParam>(path: (t: TParam) => string): Get<TRes, TParam>;
+function get<TRes, TParam>(
+  path: string | ((params: TParam) => string)
+): DirectGet<TRes> | Get<TRes, TParam> {
+  if (typeof path === "string")
+    return {
+      get: async () => await serverFetch<unknown, TRes>(path),
+    };
+
+  return {
+    get: async (params: TParam) =>
+      await serverFetch<unknown, TRes>(path(params)),
+  };
+}
+
+function post<TRes, TPayload>(
   path: string,
-  method?: Method
-): Get<TRes> | Post<TReq, TRes> | GetPost<TReq, TRes> {
-  switch (method) {
-    case "GET":
-      return {
-        path,
-        get: async (params?: string | number) =>
-          await serverFetch<TReq, TRes>(path, undefined, params),
-      };
-    case "POST":
-      return {
-        path,
-        post: async (opt?: { payload?: TReq; params?: string }) =>
-          await serverFetch<TReq, TRes>(
-            path,
-            { payload: opt?.payload, method: "POST" },
-            opt?.params
-          ),
-      };
-    default:
-      return {
-        // no method provided, allow both post and fetch
-        path,
-        get: async (params?: string | number) =>
-          await serverFetch<TReq, TRes>(path, undefined, params),
-        post: async (opt?: { payload?: TReq; params?: string }) =>
-          await serverFetch<TReq, TRes>(
-            path,
-            { payload: opt?.payload, method: "POST" },
-            opt?.params
-          ),
-      };
+  payload?: TPayload
+): DirectPost<TRes, TPayload>;
+function post<TRes, TPayload, TParam>(
+  path: (t: TParam) => string,
+  payload?: TPayload
+): Post<TRes, TPayload, TParam>;
+function post<TRes, TPayload, TParam>(
+  path: string | ((t: TParam) => string),
+  payload?: TPayload
+): DirectPost<TRes, TPayload> | Post<TRes, TPayload, TParam> {
+  if (typeof path === "string")
+    return {
+      post: async () =>
+        await serverFetch<TPayload, TRes>(path, { method: "POST", payload }),
+    };
+
+  return {
+    post: async (params: TParam) =>
+      await serverFetch<TPayload, TRes>(path(params), {
+        method: "POST",
+        payload,
+      }),
+  };
+}
+
+function getPost<TRes, TPayload>(
+  path: string
+): DirectGet<TRes> & DirectPost<TRes, TPayload>;
+
+function getPost<TRes, TPayload, TParam>(
+  path: (t: TParam) => string
+): Get<TRes, TParam> & Post<TRes, TPayload, TParam>;
+
+function getPost<TRes, TPayload, TParam>(
+  path: string | ((t: TParam) => string)
+):
+  | (DirectGet<TRes> & DirectPost<TRes, TPayload>)
+  | (Get<TRes, TParam> & Post<TRes, TPayload, TParam>) {
+  if (typeof path === "string") {
+    return {
+      get: async () => await serverFetch<unknown, TRes>(path),
+      post: async (payload?: TPayload) =>
+        await serverFetch<TPayload, TRes>(path, {
+          method: "POST",
+          payload,
+        }),
+    };
+  } else {
+    return {
+      get: async (params: TParam) =>
+        await serverFetch<unknown, TRes>(path(params)),
+      post: async (params: TParam, payload?: TPayload) =>
+        await serverFetch<TPayload, TRes>(path(params), {
+          method: "POST",
+          payload,
+        }),
+    };
   }
 }
+
+// type ApiRoute = {
+//   path: string;
+// };
+// type ApiGet<TResponse> = {
+//   get: (params?: string | number) => Promise<TResponse>;
+// };
+// type ApiPost<TPayload, TResponse> = {
+//   post: (opt?: { payload?: TPayload; params?: string }) => Promise<TResponse>;
+// };
+//
+// type Get<TRes> = ApiRoute & ApiGet<TRes>;
+// type Post<TReq, TRes> = ApiRoute & ApiPost<TReq, TRes>;
+// type GetPost<TReq, TRes> = ApiRoute & ApiGet<TRes> & ApiPost<TReq, TRes>;
+//
+// type Method = "GET" | "POST" | undefined;
+// function route<TReq, TRes>(path: string): GetPost<TReq, TRes>;
+// function route<TRes>(path: string, method: "GET"): Get<TRes>;
+// function route<TReq, TRes>(path: string, method: "POST"): Post<TReq, TRes>;
+// function route<TReq, TRes>(
+//   path: string,
+//   method?: Method
+// ): Get<TRes> | Post<TReq, TRes> | GetPost<TReq, TRes> {
+//   switch (method) {
+//     case "GET":
+//       return {
+//         path,
+//         get: async (params?: string | number) =>
+//           await serverFetch<TReq, TRes>(path, undefined, params),
+//       };
+//     case "POST":
+//       return {
+//         path,
+//         post: async (opt?: { payload?: TReq; params?: string }) =>
+//           await serverFetch<TReq, TRes>(
+//             path,
+//             { payload: opt?.payload, method: "POST" },
+//             opt?.params
+//           ),
+//       };
+//     default:
+//       return {
+//         // no method provided, allow both post and fetch
+//         path,
+//         get: async (params?: string | number) =>
+//           await serverFetch<TReq, TRes>(path, undefined, params),
+//         post: async (opt?: { payload?: TReq; params?: string }) =>
+//           await serverFetch<TReq, TRes>(
+//             path,
+//             { payload: opt?.payload, method: "POST" },
+//             opt?.params
+//           ),
+//       };
+//   }
+// }
 
 export function rpc<T extends ServiceType>(service: T) {
   const client = createPromiseClient(

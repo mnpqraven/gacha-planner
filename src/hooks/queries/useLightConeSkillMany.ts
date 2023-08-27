@@ -12,8 +12,7 @@ import {
 export const optionsLightConeSkillMany = (ids: number[]) =>
   queryOptions<List<EquipmentSkillConfig>, unknown, EquipmentSkillConfig[]>({
     queryKey: ["lightConeSkill", ids],
-    queryFn: async () =>
-      await API.lightConeSkillMany.post({ payload: { list: ids } }),
+    queryFn: async () => await API.lightConeSkillMany.post({ list: ids }),
     select: (data) => data.list,
   });
 

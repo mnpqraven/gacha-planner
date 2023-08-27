@@ -5,14 +5,16 @@ export async function serverFetch<TPayload, TResponse>(
   opt?: {
     payload?: TPayload;
     method: "POST" | "DELETE";
-  },
-  params?: string | number
-): Promise<TResponse> {
-  let url = env.NEXT_PUBLIC_WORKER_API + endpoint;
-  if (params) {
-    if (url.includes(":id")) url = url.replace(":id", `${params}`);
-    else url += `/${params}`;
   }
+  // params?: string | number
+): Promise<TResponse> {
+  // let url = env.NEXT_PUBLIC_WORKER_API + endpoint;
+  // if (params) {
+  //   if (url.includes(":id")) url = url.replace(":id", `${params}`);
+  //   else url += `/${params}`;
+  // }
+  let url = env.NEXT_PUBLIC_WORKER_API + endpoint;
+  // if (typeof endpoint === "string") url += endpoint;
 
   // POST
   if (opt) {
