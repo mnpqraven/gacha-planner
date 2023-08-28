@@ -9,15 +9,18 @@ import {
 } from "@/app/components/ui/Tooltip";
 import { useCharacterEidolon } from "@/hooks/queries/useCharacterEidolon";
 import { AvatarRankConfig } from "@/bindings/AvatarRankConfig";
+import { MihomoCharacter } from "@/app/profile/types";
 
-interface Props extends HTMLAttributes<HTMLDivElement> {}
+interface Props extends HTMLAttributes<HTMLDivElement> {
+  characterId: number;
+  characterData: MihomoCharacter;
+}
 export const EidolonInfo = forwardRef<HTMLDivElement, Props>(
-  ({ className, ...props }, ref) => {
-    const { currentCharacter } = useCardConfigController();
-    const { eidolons } = useCharacterEidolon(currentCharacter?.id);
+  ({ className, characterId, characterData, ...props }, ref) => {
+    const { eidolons } = useCharacterEidolon(characterId);
 
-    if (!currentCharacter) return null;
-    const { rank, rank_icons } = currentCharacter;
+    if (!characterData) return null;
+    const { rank, rank_icons } = characterData;
 
     return (
       <div

@@ -6,24 +6,29 @@ import { PathIcon } from "@/app/character-db/PathIcon";
 import { ElementIcon } from "@/app/character-db/ElementIcon";
 import { useCardConfigController } from "../../ConfigControllerContext";
 import { Path } from "@/bindings/AvatarConfig";
+import { MihomoCharacter, MihomoPlayer } from "@/app/profile/types";
+import { CardConfig } from "../../configReducer";
 
-interface Props extends HTMLAttributes<HTMLDivElement> {}
+interface Props extends HTMLAttributes<HTMLDivElement> {
+  characterData: MihomoCharacter;
+  playerData: MihomoPlayer | undefined;
+  config: CardConfig;
+}
 export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
-  ({ className, ...props }: Props, ref) => {
-    const { currentCharacter, mihomoResponse, config } =
-      useCardConfigController();
-    if (!currentCharacter) return null;
-    const { name, level, rarity, rank, path, element } = currentCharacter;
-    const maxLevel = currentCharacter.promotion * 10 + 20;
+  ({ className, characterData, playerData, config, ...props }: Props, ref) => {
+    if (!characterData) return null;
 
-    const onImageDrag: DragEventHandler<HTMLDivElement> = (event) => {
-      event.stopPropagation();
-    };
-    const onImageDragEnd: DragEventHandler<HTMLDivElement> = (event) => {
-      const clientRect = event.currentTarget.getBoundingClientRect();
-      // clientRect.left - event.clientX - refX
-      // clientRect.top - event.clientY - refY
-    };
+    const { name, level, rarity, rank, path, element } = characterData;
+    const maxLevel = characterData.promotion * 10 + 20;
+
+    // const onImageDrag: DragEventHandler<HTMLDivElement> = (event) => {
+    //   event.stopPropagation();
+    // };
+    // const onImageDragEnd: DragEventHandler<HTMLDivElement> = (event) => {
+    //   const clientRect = event.currentTarget.getBoundingClientRect();
+    //   // clientRect.left - event.clientX - refX
+    //   // clientRect.top - event.clientY - refY
+    // };
 
     return (
       <div
@@ -35,14 +40,14 @@ export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
           id="left-avatar"
           className="absolute top-11 -z-10 flex h-[512px] w-[374px] items-center"
           // TODO: apply to drag
-          onClick={(event) => {
-            // stop event to bubble to parent element
-            event.stopPropagation();
-            console.log("child event");
-          }}
-          onDragOver={(e) => onImageDrag(e)}
+          // onClick={(event) => {
+          //   // stop event to bubble to parent element
+          //   event.stopPropagation();
+          //   console.log("child event");
+          // }}
+          // onDragOver={onImageDrag}
           style={{
-            backgroundImage: `url(${img(currentCharacter.preview)})`,
+            backgroundImage: `url(${img(characterData.preview)})`,
             // backgroundPositionX: "right 100px",
             // backgroundPositionY: "bottom 100px",
             backgroundRepeat: "no-repeat",
@@ -53,10 +58,8 @@ export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
         <div className="grid w-full grid-cols-3">
           {config.showPlayerInfo ? (
             <div className="flex flex-col">
-              <span className="font-bold">
-                {mihomoResponse?.player.nickname}
-              </span>
-              <span>{mihomoResponse?.player.uid}</span>
+              <span className="font-bold">{playerData?.nickname}</span>
+              <span>{playerData?.uid}</span>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-end">

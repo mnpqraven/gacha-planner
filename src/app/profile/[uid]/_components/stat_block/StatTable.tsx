@@ -12,17 +12,19 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
+import { CardConfig } from "../../configReducer";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   element: Element;
   attributes: MihomoAttributeConfig[];
   properties: MihomoPropertyConfig[];
   additions: MihomoAttributeConfig[];
+  config: CardConfig;
 }
 
 export const StatTable = forwardRef<HTMLDivElement, Props>(
   (
-    { element, attributes, properties, additions, className, ...props },
+    { element, attributes, properties, additions, config, className, ...props },
     ref
   ) => {
     // filter out empty stat and 100% sp_rate
@@ -34,7 +36,6 @@ export const StatTable = forwardRef<HTMLDivElement, Props>(
         return true;
       }
     );
-    const { config } = useCardConfigController();
 
     return (
       <div
@@ -109,11 +110,11 @@ export function mihomoPropertyList(
 ): { value: string; icon: string; percent: boolean }[] {
   const ele = {
     value: `${element.toLowerCase()}_dmg`,
-    icon: `/property/Icon${element == "Lightning" ? "Thunder" : element
-      }AddedRatio.svg`,
+    icon: `/property/Icon${
+      element == "Lightning" ? "Thunder" : element
+    }AddedRatio.svg`,
     percent: true,
   };
-  // TODO: field for healing
   const fields = [
     { value: "hp", icon: "/property/IconMaxHP.svg", percent: false },
     { value: "atk", icon: "/property/IconAttack.svg", percent: false },

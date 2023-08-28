@@ -17,9 +17,10 @@ interface Props {
   lang: Lang | undefined;
 }
 function CharacterCardWrapper({ uid, lang }: Props) {
-  const { currentCharacter, enkaRef, updateParam } = useCardConfigController();
+  const { currentCharacter, enkaRef, updateParam, mihomoResponse, config } =
+    useCardConfigController();
 
-  // this executes on mount to get the cached keys
+  // this executes on mount to update the context tracker
   useEffect(() => {
     updateParam(uid, lang);
   }, [uid, lang, updateParam]);
@@ -35,19 +36,35 @@ function CharacterCardWrapper({ uid, lang }: Props) {
           boxShadow: "0 1px 10px hsl(var(--border))",
         }}
       >
-        <CharacterInfo id="block-1" className="relative z-10" />
+        <CharacterInfo
+          id="block-1"
+          className="relative z-10"
+          characterData={currentCharacter}
+          playerData={mihomoResponse?.player}
+          config={config}
+        />
 
         <div id="block-2" className="flex justify-evenly">
-          <EidolonInfo className="w-14" />
+          <EidolonInfo
+            className="w-14"
+            characterId={currentCharacter.id}
+            characterData={currentCharacter}
+          />
           <div className="flex flex-col pb-2">
-            <LightConeInfo id="lightcone-2.1" className="grow" />
-            <SkillInfo id="skill-2.2" />
+            <LightConeInfo
+              id="lightcone-2.1"
+              className="grow"
+              lcId={currentCharacter.light_cone.id}
+              characterData={currentCharacter}
+              config={config}
+            />
+            <SkillInfo id="skill-2.2" characterData={currentCharacter} />
           </div>
         </div>
 
         <div id="block-3" className="col-span-2 flex gap-4">
           <div className="flex grow flex-col gap-2 place-self-end pb-2">
-            <SpiderChartWrapper />
+            <SpiderChartWrapper characterData={currentCharacter} />
 
             <StatTable
               id="stat-3"
@@ -56,10 +73,16 @@ function CharacterCardWrapper({ uid, lang }: Props) {
               attributes={currentCharacter.attributes}
               properties={currentCharacter.properties}
               additions={currentCharacter.additions}
+              config={config}
             />
           </div>
 
-          <RelicInfo id="relic-4" className="justify-end pb-2" />
+          <RelicInfo
+            id="relic-4"
+            className="justify-end pb-2"
+            characterData={currentCharacter}
+            config={config}
+          />
         </div>
       </div>
     </div>

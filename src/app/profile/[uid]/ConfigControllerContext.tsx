@@ -17,7 +17,7 @@ import {
   configReducer,
   initialConfig,
 } from "./configReducer";
-import { useMihomoInfo, useSuspendedMihomoInfo } from "./useMihomoInfo";
+import { useMihomoInfo } from "./useMihomoInfo";
 import { LANGS } from "@/lib/constants";
 
 interface CardConfigContextPayload {
