@@ -2,7 +2,6 @@ import { cn, img } from "@/lib/utils";
 import { HTMLAttributes, forwardRef } from "react";
 import Image from "next/image";
 import { ImpositionIcon } from "../ImpositionIcon";
-import { useCardConfigController } from "../../ConfigControllerContext";
 import { useLightConeSkill } from "@/hooks/queries/useLightConeSkill";
 import {
   Tooltip,

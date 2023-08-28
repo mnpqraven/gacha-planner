@@ -47,7 +47,30 @@ const lcSchema = z
   })
   .nullable();
 
-const relicSchema = z.array(z.object({ id: z.string() })).nullable();
+const propertySchema = z.object({
+  setId: z.number().or(z.string()).pipe(z.coerce.string()),
+  mainStat: z.object({ key: z.string(), value: z.number() }),
+  subStats: z.array(z.object({ key: z.string(), value: z.number() })),
+});
+
+export type RelicCategory =
+  | "HEAD"
+  | "HAND"
+  | "BODY"
+  | "FOOT"
+  | "OBJECT"
+  | "NECK";
+export const relicCategories = [
+  "HEAD",
+  "HAND",
+  "BODY",
+  "FOOT",
+  "OBJECT",
+  "NECK",
+] as const;
+const relicSchema = z
+  .record(z.enum(relicCategories), propertySchema)
+  .nullable();
 
 const formConfigSchema = z.object({ mounted: z.boolean() });
 
