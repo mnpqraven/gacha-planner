@@ -61,10 +61,7 @@ const SkillOverview = ({ characterId }: Props) => {
             <Toggle
               key={index}
               className="flex h-fit flex-col items-center px-1 py-1.5"
-              pressed={
-                skill.attack_type === selectedSkill.attack_type &&
-                skill.skill_name === selectedSkill.skill_name
-              }
+              pressed={skill.skill_id === selectedSkill.skill_id}
               onPressedChange={() => setSelectedSkill(skill)}
             >
               {getImagePath(characterId, skill) && (
@@ -123,9 +120,9 @@ const SkillOverviewLoading = () => (
   <div className="flex flex-col">
     <div className="flex h-fit flex-col sm:flex-row">
       <div className="grid grid-cols-4">
-        {["Talent", "Skill", "Ultimate", "Technique"].map((name) => (
+        {["Talent", "Skill", "Ultimate", "Technique"].map((name, index) => (
           <Toggle
-            key={name}
+            key={index}
             className="flex h-fit flex-col items-center px-1 py-1.5"
             pressed={name === "Talent"}
           >
