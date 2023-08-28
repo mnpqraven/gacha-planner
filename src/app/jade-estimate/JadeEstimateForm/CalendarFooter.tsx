@@ -25,7 +25,7 @@ const CalendarFooter = ({ date }: Props) => {
   const { getVersion, currentPatch } = usePatchDateHelper();
 
   const major = getVersion(date)?.slice(0, 3) ?? "";
-  const versionInfo = futurePatchDateList.list.find((e) =>
+  const versionInfo = futurePatchDateList.find((e) =>
     e.version.startsWith(major)
   );
 

@@ -5,6 +5,7 @@ export const useFuturePatchDateList = () => {
   const { data: futurePatchDateList } = useQuery({
     queryKey: ["patchDates"],
     queryFn: async () => await API.patchDates.get(),
+    select: data => data.list,
     initialData: { list: [] },
   });
 

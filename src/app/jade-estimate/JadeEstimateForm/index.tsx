@@ -91,10 +91,6 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
 
   const [open, setOpen] = useState(false);
 
-  const { futurePatchDateList } = useFuturePatchDateList();
-  const { futurePatchBannerList } = useFuturePatchBannerList();
-  const { updateForm } = useContext(JadeEstimateFormContext);
-
   // FORM SETUP
   const form = useForm<JadeEstimateCfg>({
     resolver: zodResolver(schema),
@@ -102,6 +98,33 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
   });
   const debounceOnChange = useDebounce(form.handleSubmit(onSubmit), 300);
   const untilDateSubscription = form.watch("untilDate");
+
+  const server = form.watch("server"); // 0 asia 1 america
+  // console.log("server", server);
+  const { futurePatchDateList: binding } = useFuturePatchDateList();
+  // console.log("binding", binding);
+  // const { futurePatchBannerList } = useFuturePatchBannerList();
+
+  const asia_us_diff = 10 * 60 * 60 * 1000; // h m s ms
+
+  const futurePatchDateList =
+    server == 0
+      ? binding
+      : binding.map((e) => ({
+          ...e,
+          date2ndBanner: new Date(
+            new Date(e.date2ndBanner).getTime() + asia_us_diff
+          ).toISOString(),
+          dateEnd: new Date(
+            new Date(e.dateEnd).getTime() + asia_us_diff
+          ).toISOString(),
+          dateStart: new Date(
+            new Date(e.dateStart).getTime() + asia_us_diff
+          ).toISOString(),
+        }));
+  // console.log("transformed", futurePatchDateList);
+
+  const { updateForm } = useContext(JadeEstimateFormContext);
 
   useCacheValidate({
     schema,
@@ -255,7 +278,7 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
                             >
                               Today
                             </CommandItem>
-                            {futurePatchDateList.list.map((e) => (
+                            {futurePatchDateList.map((e) => (
                               <CommandItem
                                 key={e.version}
                                 onSelect={() => onSelectDatePreset(e.dateStart)}
@@ -282,12 +305,16 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
                         month={monthController}
                         onMonthChange={setMonthController}
                         modifiers={{
-                          patchStart: futurePatchDateList.list.map(
+                          patchStart: futurePatchDateList.map(
                             (e) => new Date(e.dateStart)
                           ),
-                          patchBanner: futurePatchBannerList.list.map(
-                            (e) => new Date(e.dateStart)
-                          ),
+                          patchBanner: futurePatchDateList
+                            .map((e) => new Date(e.dateStart))
+                            .concat(
+                              futurePatchDateList.map(
+                                (e) => new Date(e.date2ndBanner)
+                              )
+                            ),
                         }}
                         modifiersStyles={{
                           patchStart: {
