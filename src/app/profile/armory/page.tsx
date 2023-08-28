@@ -1,10 +1,10 @@
-import { ConfigController } from "./ConfigControllerDialog";
-import { CardConfigProvider } from "./ConfigControllerContext";
-import { CharacterCardWrapper } from "./_components/CharacterCard";
-import { Exporter } from "./_components/Exporter";
-import { LineupSelector } from "./_components/LineupSelector";
-import { Share } from "./_components/Share";
 import { LANGS } from "@/lib/constants";
+import { CharacterSelector } from "./_components/CharacterSelector";
+import { CardConfigProvider } from "../[uid]/ConfigControllerContext";
+import { Exporter } from "../[uid]/_components/Exporter";
+import { ConfigController } from "../[uid]/ConfigControllerDialog";
+import { CharacterCardWrapper } from "../[uid]/_components/CharacterCard";
+import { ArmoryEditor } from "./_components/Editor";
 
 interface Props {
   params: { uid: string };
@@ -18,13 +18,14 @@ export default async function ProfileCard({
     <CardConfigProvider>
       <main className="flex flex-col items-center justify-center">
         <div className="mt-2 flex items-center justify-center gap-2">
-          <LineupSelector />
+          <CharacterSelector />
           <Exporter />
-          <Share />
           <ConfigController />
         </div>
 
-        <CharacterCardWrapper uid={uid} lang={lang} mode="API" />
+        <ArmoryEditor />
+
+        <CharacterCardWrapper uid={uid} lang={lang} mode="ARMORY" />
       </main>
     </CardConfigProvider>
   );

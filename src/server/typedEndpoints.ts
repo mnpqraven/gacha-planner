@@ -18,6 +18,7 @@ import { env } from "@/envSchema.mjs";
 import { EquipmentPromotionConfig } from "@/bindings/EquipmentPromotionConfig";
 import { AvatarPromotionConfig } from "@/bindings/AvatarPromotionConfig";
 import { Banner } from "@/bindings/Banner";
+import { RelicSetConfig } from "@/bindings/RelicSetConfig";
 
 type CharId = { characterId: number };
 type LcId = { lcId: number };
@@ -59,6 +60,10 @@ const API = {
     ({ characterId }) => `/honkai/avatar/${characterId}/promotion`
   ),
   warpBanner: get<List<Banner>>("/honkai/warp_banners"),
+  relicSets: get<List<RelicSetConfig>>("/honkai/relic_set"),
+  relicSet: get<List<RelicSetConfig>, { relicSetId: number }>(
+    ({ relicSetId }) => `/honkai/relic_set/${relicSetId}`
+  ),
 };
 
 type Get<TRes, P> = { get: (params: P) => Promise<TRes> };

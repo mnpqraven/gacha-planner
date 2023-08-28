@@ -17,5 +17,5 @@ export function useCharacterMetadata(
     ...opt,
   });
 
-  return { character: query.data };
+  return query;
 }

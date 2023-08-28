@@ -20,7 +20,7 @@ const SkillOverview = ({ characterId }: Props) => {
   const [selectedSlv, setSelectedSlv] = useState(0);
 
   const { data: skills } = useCharacterSkill(characterId);
-  const { character } = useCharacterMetadata(characterId);
+  const { data: character } = useCharacterMetadata(characterId);
 
   const [selectedSkill, setSelectedSkill] = useState<
     AvatarSkillConfig | undefined

@@ -17,7 +17,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 export const EidolonInfo = forwardRef<HTMLDivElement, Props>(
   ({ className, characterId, characterData, ...props }, ref) => {
-    const { eidolons } = useCharacterEidolon(characterId);
+    const { data: eidolons } = useCharacterEidolon(characterId);
 
     if (!characterData) return null;
     const { rank, rank_icons } = characterData;

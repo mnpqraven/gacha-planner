@@ -25,7 +25,7 @@ export function useCharacterEidolon(
     enabled: !!characterId,
     ...opt,
   });
-  return { eidolons: query.data };
+  return query;
 }
 
 export function useSuspendedCharacterEidolon(

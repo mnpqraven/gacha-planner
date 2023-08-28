@@ -23,10 +23,16 @@ import { LANGS } from "@/lib/constants";
 interface CardConfigContextPayload {
   currentCharacter?: MihomoCharacter;
   setCurrentCharacter: (to: MihomoCharacter) => void;
+
+  currentCharacterId?: number; // for 'ARMORY'
+  setCurrentCharacterId: (toId: number) => void; // for 'ARMORY'
+
+  mode: "API" | "ARMORY";
+  setMode: (to: "API" | "ARMORY") => void;
+
   enkaRef: RefObject<HTMLDivElement> | null;
   config: CardConfig;
   changeConfig: Dispatch<CardConfigAction>;
-  // initResponse: (to: MihomoResponse) => void;
   mihomoResponse?: MihomoResponse;
   updateParam: (toUid?: string, toLang?: (typeof LANGS)[number]) => void;
 }
@@ -34,10 +40,16 @@ interface CardConfigContextPayload {
 export const defaultCardConfig: CardConfigContextPayload = {
   currentCharacter: undefined,
   setCurrentCharacter: () => {},
+
+  currentCharacterId: undefined,
+  setCurrentCharacterId: () => {},
+
+  mode: "API",
+  setMode: () => {},
+
   enkaRef: null,
   config: initialConfig,
   changeConfig: () => {},
-  // initResponse: () => {},
   mihomoResponse: undefined,
   updateParam: () => {},
 };
@@ -65,6 +77,10 @@ function useCardConfigProvider(): CardConfigContextPayload {
 
   const [uid, setUid] = useState<string | undefined>(undefined);
   const [lang, setLang] = useState<(typeof LANGS)[number]>("en");
+  const [currentCharId, setCurrentCharId] = useState<number | undefined>(
+    undefined
+  );
+  const [currentMode, setCurrentMode] = useState<"API" | "ARMORY">("API");
 
   const { query } = useMihomoInfo({ uid, lang });
 
@@ -78,6 +94,13 @@ function useCardConfigProvider(): CardConfigContextPayload {
   return {
     currentCharacter,
     setCurrentCharacter,
+
+    currentCharacterId: currentCharId,
+    setCurrentCharacterId: setCurrentCharId,
+
+    mode: currentMode,
+    setMode: setCurrentMode,
+
     enkaRef,
     config,
     changeConfig,

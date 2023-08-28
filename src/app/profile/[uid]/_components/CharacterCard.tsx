@@ -15,6 +15,7 @@ type Lang = (typeof LANGS)[number];
 interface Props {
   uid: string;
   lang: Lang | undefined;
+  mode: "API" | "ARMORY";
 }
 function CharacterCardWrapper({ uid, lang }: Props) {
   const { currentCharacter, enkaRef, updateParam, mihomoResponse, config } =
