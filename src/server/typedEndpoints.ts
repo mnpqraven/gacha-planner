@@ -19,6 +19,7 @@ import { EquipmentPromotionConfig } from "@/bindings/EquipmentPromotionConfig";
 import { AvatarPromotionConfig } from "@/bindings/AvatarPromotionConfig";
 import { Banner } from "@/bindings/Banner";
 import { RelicSetConfig } from "@/bindings/RelicSetConfig";
+import { RelicSubAffixConfig } from "@/bindings/RelicSubAffixConfig";
 
 type CharId = { characterId: number };
 type LcId = { lcId: number };
@@ -63,6 +64,9 @@ const API = {
   relicSets: get<List<RelicSetConfig>>("/honkai/relic_set"),
   relicSet: get<List<RelicSetConfig>, { relicSetId: number }>(
     ({ relicSetId }) => `/honkai/relic_set/${relicSetId}`
+  ),
+  substatSpread: get<List<RelicSubAffixConfig>>(
+    "/honkai/relics/statspread/sub"
   ),
 };
 
