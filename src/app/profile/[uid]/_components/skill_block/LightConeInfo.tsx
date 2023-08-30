@@ -10,21 +10,28 @@ import {
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
 import { SkillDescription } from "@/app/components/Db/SkillDescription";
+import { MihomoCharacter } from "@/app/profile/types";
+import { CardConfig } from "../../configReducer";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   displayStat?: boolean;
+  lcId: number | string;
+  characterData: MihomoCharacter;
+  config: CardConfig;
 }
 export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
-  ({ displayStat = false, className, ...props }, ref) => {
+  (
+    { displayStat = false, lcId, characterData, config, className, ...props },
+    ref
+  ) => {
     const ratio = 902 / 1260;
-    const { currentCharacter, config } = useCardConfigController();
     const { skill } = useLightConeSkill(
-      currentCharacter ? Number(currentCharacter.light_cone.id) : undefined
+      characterData ? Number(lcId) : undefined
     );
 
-    if (!currentCharacter) return null;
+    if (!characterData) return null;
 
-    const { light_cone } = currentCharacter;
+    const { light_cone } = characterData;
     const { rank, name, level, portrait, attributes } = light_cone;
     const maxLevel = light_cone.promotion * 10 + 20;
 

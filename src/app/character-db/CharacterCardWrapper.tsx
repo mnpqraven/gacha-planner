@@ -51,7 +51,7 @@ const CharacterCard = forwardRef<HTMLDivElement, Props>(
         >
           <Image
             className={cn(
-              "rounded-tr-3xl bg-gradient-to-b",
+              "aspect-[374/512] rounded-tr-3xl bg-gradient-to-b",
               rarity === 5 ? "bg-[#d0aa6e]" : "bg-[#9c65d7]"
             )}
             src={imgUrl}

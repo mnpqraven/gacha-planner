@@ -9,7 +9,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
-import { MihomoSkillConfig } from "@/app/profile/types";
+import { MihomoCharacter, MihomoSkillConfig } from "@/app/profile/types";
 
 const DISPLAY_SKILL_TYPES: SkillType[] = [
   "Talent",
@@ -18,17 +18,17 @@ const DISPLAY_SKILL_TYPES: SkillType[] = [
   "Ultra",
 ];
 
-interface Props extends HTMLAttributes<HTMLDivElement> {}
+interface Props extends HTMLAttributes<HTMLDivElement> {
+  characterData: MihomoCharacter | undefined;
+}
 
 export const SkillInfo = forwardRef<HTMLDivElement, Props>(
-  ({ className, ...props }, ref) => {
-    const { currentCharacter } = useCardConfigController();
+  ({ className, characterData, ...props }, ref) => {
+    if (!characterData) return null;
 
-    if (!currentCharacter) return null;
+    const { rank: eidolon } = characterData;
 
-    const { rank: eidolon } = currentCharacter;
-
-    const skills = currentCharacter.skills
+    const skills = characterData.skills
       .filter((e) => DISPLAY_SKILL_TYPES.includes(e.type))
       .slice(0, 4);
 

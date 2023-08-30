@@ -1,13 +1,13 @@
 import { asPercentage, cn, img, range } from "@/lib/utils";
 import { HTMLAttributes, forwardRef } from "react";
 import {
+  MihomoCharacter,
   MihomoPropertyConfig,
   MihomoRelicConfig,
   MihomoRelicSetConfig,
   MihomoSubAffixInfo,
 } from "@/app/profile/types";
 import { Badge } from "@/app/components/ui/Badge";
-import { useCardConfigController } from "../../ConfigControllerContext";
 import SVG from "react-inlinesvg";
 import { cva } from "class-variance-authority";
 import {
@@ -15,14 +15,16 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
+import { CardConfig } from "../../configReducer";
 
-interface Props extends HTMLAttributes<HTMLDivElement> {}
+interface Props extends HTMLAttributes<HTMLDivElement> {
+  characterData: MihomoCharacter | undefined;
+  config: CardConfig;
+}
 export const RelicInfo = forwardRef<HTMLDivElement, Props>(
-  ({ className, ...props }, ref) => {
-    const { currentCharacter, config } = useCardConfigController();
-
-    if (!currentCharacter) return null;
-    const { relics, relic_sets } = currentCharacter;
+  ({ characterData, config, className, ...props }, ref) => {
+    if (!characterData) return null;
+    const { relics, relic_sets } = characterData;
 
     const uniqueSets = getHighestRelicSets(relic_sets);
     const isActive = (relic: MihomoRelicConfig) =>
@@ -53,7 +55,12 @@ export const RelicInfo = forwardRef<HTMLDivElement, Props>(
 
         <div className="gap-2 rounded-md border p-2 shadow-md shadow-border">
           {uniqueSets.map((relicSet, index) => (
-            <SetInfo relicSet={relicSet} key={index} />
+            <SetInfo
+              relicSet={relicSet}
+              key={index}
+              characterData={characterData}
+              config={config}
+            />
           ))}
         </div>
       </div>
@@ -64,14 +71,13 @@ RelicInfo.displayName = "RelicInfo";
 
 interface SetInfoProps extends HTMLAttributes<HTMLButtonElement> {
   relicSet: MihomoRelicSetConfig;
+  characterData: MihomoCharacter | undefined;
+  config: CardConfig;
 }
 const SetInfo = forwardRef<HTMLButtonElement, SetInfoProps>(
-  ({ relicSet, className, ...props }, ref) => {
-    const { config, currentCharacter } = useCardConfigController();
+  ({ relicSet, characterData, config, className, ...props }, ref) => {
     const { hoverVerbosity } = config;
-    const sets = currentCharacter?.relic_sets.filter(
-      (e) => e.id == relicSet.id
-    );
+    const sets = characterData?.relic_sets.filter((e) => e.id == relicSet.id);
 
     return (
       <Tooltip>
@@ -103,8 +109,8 @@ const SetInfo = forwardRef<HTMLButtonElement, SetInfoProps>(
 
                 {sets.map((set, index) => (
                   <div key={index}>
-                    <span className="text-green-600">{set.num}pc</span>
-                    : {set.desc}
+                    <span className="text-green-600">{set.num}pc</span>:{" "}
+                    {set.desc}
                   </div>
                 ))}
               </div>
@@ -235,7 +241,7 @@ function substatVariant({
   currentCount: number;
   rarity: 3 | 4 | 5;
 }) {
-  const variant = cva("border-skewed h-[2px] w-4", {
+  const variant = cva("h-[2px] w-4 border-skewed", {
     variants: {
       placement: {
         first: "",
