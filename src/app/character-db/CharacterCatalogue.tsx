@@ -9,14 +9,13 @@ import useCharacterFilter from "../components/Db/useCharacterFilter";
 import { useRouter } from "next/navigation";
 import { AvatarConfig } from "@/bindings/AvatarConfig";
 import { IMAGE_URL } from "@/lib/constants";
+import { useSuspendedCharacterList } from "@/hooks/queries/useCharacterList";
 
-type Props = {
-  data: AvatarConfig[];
-};
-
-const CharacterCatalogue = ({ data }: Props) => {
+const CharacterCatalogue = () => {
   const router = useRouter();
   const filter = useCharacterFilter();
+
+  const { characterList: data } = useSuspendedCharacterList();
   const [searchData, setSearchData] = useState(data);
   const processedData = searchData
     .filter(filter.byRarity)

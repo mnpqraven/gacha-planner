@@ -7,16 +7,13 @@ import { useState } from "react";
 import { LightConeCard } from "./LightConeCard";
 import useLightConeFilter from "../components/Db/useLightConeFilter";
 import { useRouter } from "next/navigation";
-import { EquipmentConfig } from "@/bindings/EquipmentConfig";
 import { IMAGE_URL } from "@/lib/constants";
+import { useLightConeList } from "@/hooks/queries/useLightConeList";
 
-type Props = {
-  data: EquipmentConfig[];
-};
-
-const LightConeCatalogue = ({ data }: Props) => {
+const LightConeCatalogue = () => {
   const router = useRouter();
   const filter = useLightConeFilter();
+  const { data } = useLightConeList();
   const [searchData, setSearchData] = useState(data);
   const processedData = searchData
     .filter(filter.byRarity)
