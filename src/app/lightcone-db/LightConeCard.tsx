@@ -39,10 +39,11 @@ const LightConeCard = forwardRef<HTMLDivElement, Props>(
             <div ref={glowRef} className={styles["glow"]} />
           </div>
           <Image
+            className="aspect-[256/300]"
             src={imgUrl}
             alt={name}
-            width={374}
-            height={512}
+            width={256}
+            height={300}
             priority={rarity === 5}
           />
           {element && (

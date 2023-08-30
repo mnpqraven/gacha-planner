@@ -56,12 +56,12 @@ const CharacterCatalogue = ({ data }: Props) => {
         onEnterKey={onEnter}
         {...filter}
       />
-      <div className="grid scroll-m-4 grid-cols-2 items-center justify-center gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
+      <div className="grid scroll-m-4 grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
         {processedData.map((chara) => (
           <div
             id="character-card"
             key={chara.avatar_id}
-            className="flex flex-col items-center justify-center gap-4"
+            className="flex flex-col gap-2"
           >
             <Link href={`/character-db/${chara.avatar_id}`}>
               <CharacterCard
@@ -75,7 +75,7 @@ const CharacterCatalogue = ({ data }: Props) => {
 
             <Link
               href={`/character-db/${chara.avatar_id}`}
-              className="font-semibold"
+              className="flex grow items-center justify-center text-center"
             >
               {chara.avatar_name}
             </Link>
