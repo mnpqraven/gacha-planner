@@ -1,5 +1,8 @@
 import API from "@/server/typedEndpoints";
 import LightConeCatalogue from "./LightConeCatalogue";
+import getQueryClient from "@/lib/queryClientHelper";
+import { optionsLightConeList } from "@/hooks/queries/useLightConeList";
+import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 
 export const metadata = {
   title: "Light Cone Database",
@@ -7,16 +10,15 @@ export const metadata = {
 };
 
 export default async function LightConeDb() {
-  let { list } = await API.lightConeMetadataMany.get();
-  let sortedDb = list.sort((a, b) => {
-    return (
-      b.rarity - a.rarity || a.equipment_name.localeCompare(b.equipment_name)
-    );
-  });
+  const queryClient = getQueryClient();
+  await queryClient.prefetchQuery(optionsLightConeList());
+  const dehydratedState = dehydrate(queryClient);
 
   return (
     <main className="px-2 py-4 md:container md:px-0">
-      <LightConeCatalogue data={sortedDb} />
+      <HydrationBoundary state={dehydratedState}>
+        <LightConeCatalogue />
+      </HydrationBoundary>
     </main>
   );
 }
