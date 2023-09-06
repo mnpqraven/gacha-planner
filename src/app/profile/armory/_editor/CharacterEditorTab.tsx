@@ -132,17 +132,13 @@ export function CharacterEditorTab({ characterId, form, skills }: Props) {
   );
 }
 
-function SkillEditor({
-  form,
-  eidolon,
-  skills,
-  characterId,
-}: {
+interface SkillEditorProps {
   form: UseFormReturn<ArmoryFormSchema>;
   eidolon: number;
   skills: AvatarSkillConfig[];
   characterId: number;
-}) {
+}
+function SkillEditor({ form, eidolon, skills, characterId }: SkillEditorProps) {
   return (
     <>
       {skills.map((skill) => (
@@ -158,7 +154,7 @@ function SkillEditor({
           <FormField
             control={form.control}
             // dummy number typecast
-            name={`skills.${skill.skill_id}` as "level"}
+            name={`player.skills.${skill.skill_id}`}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{skill.skill_name}</FormLabel>
