@@ -47,10 +47,17 @@ const lcSchema = z
   })
   .nullable();
 
+// TODO: update to required field
 const propertySchema = z.object({
-  setId: z.number().or(z.string()).pipe(z.coerce.string()),
-  mainStat: z.object({ key: z.string(), value: z.number() }),
-  subStats: z.array(z.object({ key: z.string(), value: z.number() })),
+  setId: z
+    .number()
+    .nullish()
+    .or(z.string().nullish())
+    .pipe(z.coerce.string().nullish()),
+  mainStat: z.object({ key: z.string(), value: z.number() }).nullish(),
+  subStats: z
+    .array(z.object({ key: z.string(), value: z.number() }))
+    .optional(),
 });
 
 export type RelicCategory =
@@ -69,7 +76,7 @@ export const relicCategories = [
   "NECK",
 ] as const;
 const relicSchema = z
-  .record(z.enum(relicCategories), propertySchema)
+  .record(z.enum(relicCategories), propertySchema.optional())
   .nullable();
 
 const formConfigSchema = z.object({ mounted: z.boolean() });

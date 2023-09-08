@@ -50,6 +50,12 @@ export function SingularRelicEditor({ category, imageUrl }: Props) {
     });
   }
 
+  function onSubstatWindowOpen(openState: boolean) {
+    if (openState) return;
+
+    console.log("should see onclose", selectedSubstats);
+  }
+
   if (!mainStatOptions) return null;
   const fixedMainstat = mainStatOptions.options.length == 1;
 
@@ -101,8 +107,8 @@ export function SingularRelicEditor({ category, imageUrl }: Props) {
               }
             />
 
-            <Popover>
-              <PopoverTrigger disabled={!selectedSubstats.at(line)}>
+            <Popover onOpenChange={onSubstatWindowOpen}>
+              <PopoverTrigger disabled={!selectedSubstats.at(line)} asChild>
                 <Button
                   className="cursor-pointer"
                   variant="outline"
@@ -149,7 +155,7 @@ function ValueDisplay({
   const sum = value.value.reduce((a, b) => a + b, 0);
 
   return propertyIsPercent(value.substat) ? (
-    <span>{asPercentage(sum)}</span>
+    <span>{asPercentage(sum / 100)}</span>
   ) : (
     <span>{sum.toFixed(2)}</span>
   );

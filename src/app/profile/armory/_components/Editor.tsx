@@ -83,7 +83,7 @@ export function ArmoryEditor() {
   console.log("formErrors", form.formState.errors);
 
   function onSubmit(values: ArmoryFormSchema) {
-    console.log(values);
+    console.log("onSubmit", values);
   }
 
   if (!currentCharacterId) return <span>no char id set</span>;

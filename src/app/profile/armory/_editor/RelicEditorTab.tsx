@@ -35,7 +35,7 @@ export function RelicEditorTab({ form }: Props) {
               <FormItem>
                 <FormLabel>{category}</FormLabel>
                 <Select
-                  defaultValue={field.value}
+                  defaultValue={field.value?.toString()}
                   onValueChange={field.onChange}
                 >
                   <FormControl>

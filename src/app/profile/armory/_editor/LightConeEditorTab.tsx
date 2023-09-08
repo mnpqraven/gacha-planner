@@ -54,7 +54,7 @@ export function LightConeEditorTab({ form, path }: Props) {
               .map((lc) => (
                 <Toggle
                   key={lc.equipment_id}
-                  className="flex h-fit flex-col py-2"
+                  className="flex h-fit justify-between py-2"
                   onPressedChange={() => {
                     form.setValue("lc", {
                       id: lc.equipment_id,
@@ -67,8 +67,9 @@ export function LightConeEditorTab({ form, path }: Props) {
                   <Image
                     src={`${IMAGE_URL}image/light_cone_preview/${lc.equipment_id}.png`}
                     alt={lc.equipment_name}
-                    width={64}
-                    height={64}
+                    width={256}
+                    height={300}
+                    className="aspect-[256/300] w-16"
                   />
                   <span>{lc.equipment_name}</span>
                 </Toggle>

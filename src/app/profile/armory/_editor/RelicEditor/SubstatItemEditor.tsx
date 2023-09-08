@@ -8,6 +8,7 @@ import {
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
 import { Toggle } from "@/app/components/ui/Toggle";
+import { propertyIsPercent } from "../relicConfig";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   spread: RelicSubAffixConfig;
@@ -29,7 +30,7 @@ const variant = cva("h-1.5 w-8 border-skewed", {
 
 export const SubstatItemEditor = forwardRef<HTMLDivElement, Props>(
   ({ spread, value, onValueChange, ...props }, ref) => {
-    const { base_value, step_num, step_value } = spread;
+    const { base_value, step_num, step_value, property } = spread;
 
     function roll(value: "HIGH" | "MID" | "LOW" | "NONE") {
       let val = 0;
@@ -47,7 +48,7 @@ export const SubstatItemEditor = forwardRef<HTMLDivElement, Props>(
           break;
       }
 
-      onValueChange(val);
+      onValueChange(propertyIsPercent(property) ? val * 100 : val);
     }
 
     return (
@@ -104,7 +105,8 @@ function judgeRollValue(
   if (upperBound <= lowerBound) {
     return "MID";
   }
-  const valueDiff = value - lowerBound;
+  const val = propertyIsPercent(spreadInfo.property) ? value / 100 : value;
+  const valueDiff = val - lowerBound;
   const ratio = valueDiff / diffPool;
   if (ratio < 0.33) return "LOW";
   if (ratio >= 0.33 && ratio < 0.66) return "MID";

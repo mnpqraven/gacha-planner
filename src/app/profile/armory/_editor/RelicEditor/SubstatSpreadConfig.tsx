@@ -1,11 +1,33 @@
 import { Toggle } from "@/app/components/ui/Toggle";
 import { Property, RelicSubAffixConfig } from "@/bindings/RelicSubAffixConfig";
-import { useState } from "react";
+import {
+  JSXElementConstructor,
+  ReactElement,
+  useEffect,
+  useState,
+} from "react";
 import { propertyIsPercent, propertyName } from "../relicConfig";
-import { Pencil } from "lucide-react";
+import { Check, Pencil, X } from "lucide-react";
 import { Input } from "@/app/components/ui/Input";
 import { asPercentage, range } from "@/lib/utils";
 import { SubstatItemEditor } from "./SubstatItemEditor";
+import {
+  ControllerFieldState,
+  ControllerRenderProps,
+  FieldValues,
+  UseFormStateReturn,
+  useForm,
+} from "react-hook-form";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/app/components/ui/Form";
+import { Button } from "@/app/components/ui/Button";
 
 interface Props {
   property: Property;
@@ -24,8 +46,75 @@ export function SubstatSpreadConfig({
   onDataUpdate,
 }: Props) {
   const [disabled, setDisabled] = useState(true);
-
   const totalSum = data.value.reduce((a, b) => a + b, 0);
+
+  const minValue = propertyIsPercent(property)
+    ? getSpreadValues(spread).minRoll.value * 100
+    : getSpreadValues(spread).minRoll.value;
+  const maxValue = propertyIsPercent(property)
+    ? getSpreadValues(spread).maxRoll.value * 6 * 100
+    : getSpreadValues(spread).maxRoll.value * 6;
+
+  const schema = z.object({
+    value: z
+      .number()
+      .min(minValue, {
+        message: `Value must be greater than ${minValue.toFixed(2)} %`,
+      })
+      .max(maxValue, {
+        message: `Value must be less than ${maxValue.toFixed(2)} %`,
+      })
+      .or(z.string())
+      .pipe(
+        z.coerce
+          .number()
+          .min(minValue, {
+            message: `Value must be greater than ${minValue.toFixed(2)} %`,
+          })
+          .max(maxValue, {
+            message: `Value must be less than ${maxValue.toFixed(2)} %`,
+          })
+      ),
+  });
+
+  const form = useForm({
+    defaultValues: { value: totalSum },
+    resolver: zodResolver(schema),
+  });
+
+  /**
+   * update the spread array in according to the updated value
+   * */
+  function onSubmitDirtyValue({ value }: { value: number }) {
+    // NOTE: values in data is sub 1 percent values (0-1)
+    // values for totalSum and form value is normal percentage (0-100 %)
+    console.log("onSubmitDirtyValue", value);
+    console.log("previous filled data", data, totalSum);
+    let nextArray: number[] = [];
+
+    let paste = value;
+    let i = 0;
+    // transform new array
+    while (paste >= 0) {
+      const maxRoll = propertyIsPercent(spread.property)
+        ? getSpreadValues(spread).maxRoll.value * 100
+        : getSpreadValues(spread).maxRoll.value;
+      nextArray[i] = paste >= maxRoll ? maxRoll : paste;
+      paste -= maxRoll;
+      i++;
+    }
+    Array.from(range(0, 5)).forEach((index) => {
+      onDataUpdate(nextArray.at(index) ?? 0, index);
+    });
+  }
+
+  function onFormReset() {}
+
+  // reactive form value
+  useEffect(() => {
+    form.setValue("value", totalSum);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totalSum]);
 
   return (
     <div>
@@ -35,25 +124,63 @@ export function SubstatSpreadConfig({
         {getSpreadValues(spread).midRoll.display} /{" "}
         {getSpreadValues(spread).maxRoll.display}
       </p>
-      <div className="flex items-center gap-2 py-2">
-        {false && (
+
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmitDirtyValue)}
+          className="flex items-center gap-2 py-2"
+        >
+          <FormField
+            control={form.control}
+            name="value"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    className="w-24"
+                    // type="number"
+                    // value={(dirtySum * 100).toFixed(2)}
+                    {...field}
+                    // onChange={(e) => {
+                    //   if (isNaN(Number(e.target.value))) {
+                    //     // setDirtySum(Number(e.target.value) / 100);
+                    //   }
+                    // }}
+                    disabled={disabled}
+                  />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {propertyIsPercent(property) && <span>%</span>}
+
           <Toggle pressed={!disabled} className="px-2">
             <Pencil
               className="cursor-pointer"
               onClick={() => setDisabled(!disabled)}
             />
           </Toggle>
-        )}
 
-        <Input
-          className="w-24"
-          type="number"
-          value={(totalSum * 100).toFixed(2)}
-          disabled={disabled}
-        />
+          <Button
+            className="bg-green-700 px-2 hover:bg-green-700/90"
+            type="submit"
+            disabled={disabled}
+          >
+            <Check />
+          </Button>
 
-        {propertyIsPercent(property) && <span>%</span>}
-      </div>
+          <Button
+            className="bg-destructive px-2 hover:bg-destructive/90"
+            onClick={onFormReset}
+            disabled={disabled}
+          >
+            <X />
+          </Button>
+        </form>
+      </Form>
+
       <div id="bars" className="flex justify-center gap-1">
         {Array.from(range(0, 5)).map((index) => (
           <SubstatItemEditor
