@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { RelicCategory } from "../../schema";
+import { ArmoryFormSchema, RelicCategory } from "../../schema";
 import {
   propertyIsPercent,
   propertyName,
@@ -20,13 +20,23 @@ import { Input } from "@/app/components/ui/Input";
 import { asPercentage, range } from "@/lib/utils";
 import { SubstatSpreadConfig } from "./SubstatSpreadConfig";
 import { PropertySelect } from "./PropertySelect";
+import { UseFormReturn } from "react-hook-form";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/app/components/ui/Form";
+import { useMainStatSpread } from "@/hooks/queries/useMainStatSpread";
+import { Pencil } from "lucide-react";
 
 interface Props {
   category: RelicCategory;
   imageUrl: string;
+  form: UseFormReturn<ArmoryFormSchema>;
 }
 
-export function SingularRelicEditor({ category, imageUrl }: Props) {
+export function SingularRelicEditor({ category, imageUrl, form }: Props) {
   const mainStatOptions = relicMainstatOptions.find((e) => e.type == category);
   const [selectedMainstat, setSelectedMainstat] = useState<
     Property | undefined
@@ -39,6 +49,25 @@ export function SingularRelicEditor({ category, imageUrl }: Props) {
     { substat: Property; value: number[] }[]
   >([]);
   const { data } = useSubStatSpread();
+  const { data: mainstatConfigs } = useMainStatSpread();
+  const mainStatSubscriber = form.watch(`relic.${category}.mainStat`);
+
+  function getMainstatVal() {
+    if (!mainstatConfigs) return 0;
+
+    const config = mainstatConfigs[category].find(
+      (e) => e.property == mainStatSubscriber?.key
+    );
+
+    if (!!config) {
+      const { base_value, level_add, property } = config;
+      const val = base_value + (mainStatSubscriber?.step ?? 0) * level_add;
+
+      return propertyIsPercent(property) ? asPercentage(val) : val.toFixed(2);
+    }
+
+    return 0;
+  }
 
   function onDataUpdate(
     nextValue: number,
@@ -54,6 +83,27 @@ export function SingularRelicEditor({ category, imageUrl }: Props) {
     if (openState) return;
 
     console.log("should see onclose", selectedSubstats);
+
+    form.setValue(
+      `relic.${category}.subStats`,
+      selectedSubstats.map(({ substat, value }) => ({
+        key: substat,
+        value: value.reduce((a, b) => a + b, 0),
+        step: value.length,
+      }))
+    );
+  }
+
+  function getFirstMidroll(prop: Property): number[] {
+    const find = data?.find((e) => e.property == prop);
+    if (!find) return [];
+    let { base_value, step_value } = find;
+    if (propertyIsPercent(prop)) {
+      base_value *= 100;
+      step_value *= 100;
+    }
+
+    return [base_value + (find.step_num / 2) * step_value];
   }
 
   if (!mainStatOptions) return null;
@@ -76,13 +126,45 @@ export function SingularRelicEditor({ category, imageUrl }: Props) {
           {fixedMainstat ? (
             <span>{propertyName(mainStatOptions.options[0])}</span>
           ) : (
-            <PropertySelect
-              options={mainStatOptions.options}
-              onValueChange={(prop) => setSelectedMainstat(prop as Property)}
+            <FormField
+              control={form.control}
+              name={`relic.${category}.mainStat.key`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Main Stat</FormLabel>
+                  <FormControl>
+                    <PropertySelect
+                      options={mainStatOptions.options}
+                      onValueChange={(prop) => {
+                        setSelectedMainstat(prop as Property);
+                        field.onChange(prop);
+                      }}
+                      defaultValue={field.value}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
             />
           )}
-
-          <Input placeholder="+" />
+          <FormField
+            control={form.control}
+            name={`relic.${category}.mainStat.step`}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Main Stat Level</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="+0"
+                    type="number"
+                    min={0}
+                    max={15}
+                    {...field}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          value: {getMainstatVal()}
         </div>
       </div>
 
@@ -98,7 +180,7 @@ export function SingularRelicEditor({ category, imageUrl }: Props) {
                 setSelectedSubstats((draft) => {
                   draft[line] = {
                     substat: prop as Property,
-                    value: [],
+                    value: getFirstMidroll(prop as Property),
                   };
                 })
               }
@@ -110,11 +192,11 @@ export function SingularRelicEditor({ category, imageUrl }: Props) {
             <Popover onOpenChange={onSubstatWindowOpen}>
               <PopoverTrigger disabled={!selectedSubstats.at(line)} asChild>
                 <Button
-                  className="cursor-pointer"
+                  className="cursor-pointer px-2"
                   variant="outline"
                   disabled={!selectedSubstats.at(line)}
                 >
-                  Set Substat
+                  <Pencil />
                 </Button>
               </PopoverTrigger>
               <PopoverContent side="top">

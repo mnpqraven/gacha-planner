@@ -20,6 +20,8 @@ import { AvatarPromotionConfig } from "@/bindings/AvatarPromotionConfig";
 import { Banner } from "@/bindings/Banner";
 import { RelicSetConfig } from "@/bindings/RelicSetConfig";
 import { RelicSubAffixConfig } from "@/bindings/RelicSubAffixConfig";
+import { RelicMainAffixConfig } from "@/bindings/RelicMainAffixConfig";
+import { RelicCategory } from "@/app/profile/armory/schema";
 
 type CharId = { characterId: number };
 type LcId = { lcId: number };
@@ -67,6 +69,9 @@ const API = {
   ),
   substatSpread: get<List<RelicSubAffixConfig>>(
     "/honkai/relics/statspread/sub"
+  ),
+  mainstatSpread: get<Record<RelicCategory, RelicMainAffixConfig[]>>(
+    "/honkai/relics/statspread/main"
   ),
 };
 

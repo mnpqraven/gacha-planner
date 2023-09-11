@@ -54,9 +54,21 @@ const propertySchema = z.object({
     .nullish()
     .or(z.string().nullish())
     .pipe(z.coerce.string().nullish()),
-  mainStat: z.object({ key: z.string(), value: z.number() }).nullish(),
+  mainStat: z
+    .object({
+      key: z.string(),
+      value: z.number(),
+      step: z.number().min(0).max(15),
+    })
+    .nullish(),
   subStats: z
-    .array(z.object({ key: z.string(), value: z.number() }))
+    .array(
+      z.object({
+        key: z.string(),
+        value: z.number(),
+        step: z.number().min(1).max(6),
+      })
+    )
     .optional(),
 });
 
@@ -101,7 +113,10 @@ export const defaultValues: ArmoryFormSchema = {
     eidolon: 0,
     skills: {},
   },
-  relic: null,
+  relic: {
+    HEAD: { mainStat: { key: "HPDelta", value: 0, step: 0 } },
+    HAND: { mainStat: { key: "AttackDelta", value: 0, step: 1 } },
+  },
   lc: null,
   formConfig: {
     mounted: false,

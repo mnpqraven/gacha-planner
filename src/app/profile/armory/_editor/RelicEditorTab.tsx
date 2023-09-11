@@ -76,6 +76,7 @@ export function RelicEditorTab({ form }: Props) {
                 `relic.${category}.setId`
               )}_${index % 4}.png`}
               category={category}
+              form={form}
             />
           )}
         </div>

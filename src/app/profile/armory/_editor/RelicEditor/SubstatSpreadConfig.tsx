@@ -196,7 +196,7 @@ export function SubstatSpreadConfig({
   );
 }
 
-function getSpreadValues({
+export function getSpreadValues({
   step_value,
   step_num,
   base_value,
