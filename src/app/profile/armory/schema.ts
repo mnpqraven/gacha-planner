@@ -47,7 +47,6 @@ const lcSchema = z
   })
   .nullable();
 
-// TODO: update to required field
 const propertySchema = z.object({
   setId: z
     .number()
@@ -88,7 +87,7 @@ export const relicCategories = [
   "NECK",
 ] as const;
 const relicSchema = z
-  .record(z.enum(relicCategories), propertySchema.optional())
+  .record(z.enum(relicCategories), propertySchema)
   .nullable();
 
 const formConfigSchema = z.object({ mounted: z.boolean() });
