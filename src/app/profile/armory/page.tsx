@@ -4,7 +4,7 @@ import { CardConfigProvider } from "../[uid]/ConfigControllerContext";
 import { Exporter } from "../[uid]/_components/Exporter";
 import { ConfigController } from "../[uid]/ConfigControllerDialog";
 import { CharacterCardWrapper } from "../[uid]/_components/CharacterCard";
-import { ArmoryEditor } from "./_components/Editor";
+import { ArmoryEditor } from "./_components/ArmoryEditor";
 
 interface Props {
   params: { uid: string };

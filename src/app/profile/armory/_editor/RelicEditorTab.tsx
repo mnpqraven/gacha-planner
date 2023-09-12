@@ -37,6 +37,13 @@ export function RelicEditorTab({ form }: Props) {
       const find = fields.find(({ category: cat }) => cat == category)!;
       find.open = checked;
     });
+    if (category == "HEAD")
+      form.setValue("relic.HEAD", { mainStat: { key: "HPDelta", step: 0 } });
+
+    if (category == "HAND")
+      form.setValue("relic.HAND", {
+        mainStat: { key: "AttackDelta", step: 0 },
+      });
   }
 
   return (

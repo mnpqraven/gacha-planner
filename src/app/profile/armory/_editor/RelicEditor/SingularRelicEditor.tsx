@@ -49,25 +49,10 @@ export function SingularRelicEditor({ category, imageUrl, form }: Props) {
     { substat: Property; value: number[] }[]
   >([]);
   const { data } = useSubStatSpread();
-  const { data: mainstatConfigs } = useMainStatSpread();
-  const mainStatSubscriber = form.watch(`relic.${category}.mainStat`);
-
-  function getMainstatVal() {
-    if (!mainstatConfigs) return 0;
-
-    const config = mainstatConfigs[category].find(
-      (e) => e.property == mainStatSubscriber?.key
-    );
-
-    if (!!config) {
-      const { base_value, level_add, property } = config;
-      const val = base_value + (mainStatSubscriber?.step ?? 0) * level_add;
-
-      return propertyIsPercent(property) ? asPercentage(val) : val.toFixed(2);
-    }
-
-    return 0;
-  }
+  const mainStatValue = useMainStatValue({
+    category,
+    subscriber: form.watch(`relic.${category}.mainStat`),
+  });
 
   function onDataUpdate(
     nextValue: number,
@@ -153,18 +138,12 @@ export function SingularRelicEditor({ category, imageUrl, form }: Props) {
               <FormItem>
                 <FormLabel>Main Stat Level</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="+0"
-                    type="number"
-                    min={0}
-                    max={15}
-                    {...field}
-                  />
+                  <Input placeholder="+0" {...field} />
                 </FormControl>
               </FormItem>
             )}
           />
-          value: {getMainstatVal()}
+          value: {mainStatValue}
         </div>
       </div>
 
@@ -241,4 +220,27 @@ function ValueDisplay({
   ) : (
     <span>{sum.toFixed(2)}</span>
   );
+}
+
+function useMainStatValue({
+  category,
+  subscriber,
+}: {
+  category: RelicCategory;
+  subscriber: { key: string; step: number } | undefined | null;
+}) {
+  const { data } = useMainStatSpread();
+
+  if (!data) return 0;
+
+  const config = data[category].find((e) => e.property == subscriber?.key);
+
+  if (!!config) {
+    const { base_value, level_add, property } = config;
+    const val = base_value + (subscriber?.step ?? 0) * level_add;
+
+    return propertyIsPercent(property) ? asPercentage(val) : val.toFixed(2);
+  }
+
+  return 0;
 }

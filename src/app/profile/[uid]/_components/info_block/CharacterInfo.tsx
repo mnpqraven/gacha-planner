@@ -1,25 +1,41 @@
-import { DragEventHandler, HTMLAttributes, forwardRef } from "react";
+import { HTMLAttributes, forwardRef } from "react";
 import { RarityIcon } from "@/app/character-db/CharacterCardWrapper";
 import { Badge } from "@/app/components/ui/Badge";
 import { cn, img } from "@/lib/utils";
 import { PathIcon } from "@/app/character-db/PathIcon";
 import { ElementIcon } from "@/app/character-db/ElementIcon";
-import { useCardConfigController } from "../../ConfigControllerContext";
-import { Path } from "@/bindings/AvatarConfig";
-import { MihomoCharacter, MihomoPlayer } from "@/app/profile/types";
+import { MihomoPlayer } from "@/app/profile/types";
 import { CardConfig } from "../../configReducer";
+import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  characterData: MihomoCharacter;
-  playerData: MihomoPlayer | undefined;
+  playerData?: MihomoPlayer;
+  characterId: number;
   config: CardConfig;
+  level: number;
+  ascension: number;
+  eidolon: number;
 }
-export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
-  ({ className, characterData, playerData, config, ...props }: Props, ref) => {
-    if (!characterData) return null;
 
-    const { name, level, rarity, rank, path, element } = characterData;
-    const maxLevel = characterData.promotion * 10 + 20;
+export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
+  (
+    {
+      className,
+      characterId,
+      config,
+      level,
+      ascension,
+      eidolon,
+      playerData,
+      ...props
+    }: Props,
+    ref
+  ) => {
+    const { data } = useCharacterMetadata(characterId);
+    if (!data) return null;
+
+    // const { name, level, rarity, rank, path, element } = characterData;
+    const maxLevel = ascension * 10 + 20;
 
     // const onImageDrag: DragEventHandler<HTMLDivElement> = (event) => {
     //   event.stopPropagation();
@@ -47,7 +63,9 @@ export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
           // }}
           // onDragOver={onImageDrag}
           style={{
-            backgroundImage: `url(${img(characterData.preview)})`,
+            backgroundImage: `url(${img(
+              `image/character_preview/${characterId}.png`
+            )})`,
             // backgroundPositionX: "right 100px",
             // backgroundPositionY: "bottom 100px",
             backgroundRepeat: "no-repeat",
@@ -64,34 +82,31 @@ export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
           ) : (
             <div className="flex flex-col items-center justify-end">
               <PathIcon
-                path={path.name.replaceAll("The", "").trim() as Path}
+                path={data.avatar_base_type}
                 size="30px"
                 className="flex-1"
               />
-              <Badge>{path.name}</Badge>
+              <Badge>{data.avatar_base_type}</Badge>
             </div>
           )}
 
           <div className="flex flex-col place-self-center">
-            <div className="font-bold">{name}</div>
+            <div className="font-bold">{data.avatar_name}</div>
             <div>
               <span className="font-bold">Lv. {level}</span>/{maxLevel}
             </div>
 
             <div>
-              <Badge>Eidolon {rank}</Badge>
+              <Badge>Eidolon {eidolon}</Badge>
             </div>
           </div>
 
           {config.showPlayerInfo ? (
             <div className="relative flex justify-evenly">
               <div className="absolute bottom-0 h-full w-[1px] rotate-45 border"></div>
-              <PathIcon
-                path={path.name.replaceAll("The", "").trim() as Path}
-                size="30px"
-              />
+              <PathIcon path={data.avatar_base_type} size="30px" />
               <ElementIcon
-                element={element.name}
+                element={data.damage_type}
                 size="30px"
                 className="self-end"
               />
@@ -99,18 +114,18 @@ export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
           ) : (
             <div className="flex flex-col items-center justify-end">
               <ElementIcon
-                element={element.name}
+                element={data.damage_type}
                 size="30px"
                 className="flex-1"
               />
-              <Badge>{element.name}</Badge>
+              <Badge>{data.damage_type}</Badge>
             </div>
           )}
         </div>
 
         <RarityIcon
           id="rarity"
-          rarity={rarity}
+          rarity={data.rarity}
           className="static h-12 w-full"
         />
       </div>

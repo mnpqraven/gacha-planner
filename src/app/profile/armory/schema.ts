@@ -1,5 +1,8 @@
 import * as z from "zod";
 
+const ERR_RANGE = (from: number, to: number) =>
+  `Please enter a number between ${from} and ${to}`;
+
 const playerSchema = z
   .object({
     level: z
@@ -40,10 +43,15 @@ const lcSchema = z
       .pipe(z.coerce.number().min(0).max(80)),
     ascension: z
       .number()
-      .min(0)
-      .max(6)
+      .min(0, { message: ERR_RANGE(0, 6) })
+      .max(6, { message: ERR_RANGE(0, 6) })
       .or(z.string())
-      .pipe(z.coerce.number().min(0).max(6)),
+      .pipe(
+        z.coerce
+          .number()
+          .min(0, { message: ERR_RANGE(0, 6) })
+          .max(6, { message: ERR_RANGE(0, 6) })
+      ),
   })
   .nullable();
 
@@ -56,8 +64,19 @@ const propertySchema = z.object({
   mainStat: z
     .object({
       key: z.string(),
-      value: z.number(),
-      step: z.number().min(0).max(15),
+      // NOTE: likely not needing this
+      // value: z.number(),
+      step: z
+        .number()
+        .min(0, { message: ERR_RANGE(0, 15) })
+        .max(15, { message: ERR_RANGE(0, 15) })
+        .or(z.string())
+        .pipe(
+          z.coerce
+            .number()
+            .min(0, { message: ERR_RANGE(0, 15) })
+            .max(15, { message: ERR_RANGE(0, 15) })
+        ),
     })
     .nullish(),
   subStats: z
@@ -65,7 +84,17 @@ const propertySchema = z.object({
       z.object({
         key: z.string(),
         value: z.number(),
-        step: z.number().min(1).max(6),
+        step: z
+          .number()
+          .min(1, { message: ERR_RANGE(1, 6) })
+          .max(6, { message: ERR_RANGE(1, 6) })
+          .or(z.string())
+          .pipe(
+            z.coerce
+              .number()
+              .min(1, { message: ERR_RANGE(1, 6) })
+              .max(6, { message: ERR_RANGE(1, 6) })
+          ),
       })
     )
     .optional(),
@@ -105,17 +134,14 @@ export const characterMetadataSchema = z
 
 export type ArmoryFormSchema = z.infer<typeof characterMetadataSchema>;
 
-export const defaultValues: ArmoryFormSchema = {
+export const defaultArmoryFormSchema: ArmoryFormSchema = {
   player: {
     level: 1,
     ascension: 0,
     eidolon: 0,
     skills: {},
   },
-  relic: {
-    HEAD: { mainStat: { key: "HPDelta", value: 0, step: 0 } },
-    HAND: { mainStat: { key: "AttackDelta", value: 0, step: 1 } },
-  },
+  relic: {},
   lc: null,
   formConfig: {
     mounted: false,

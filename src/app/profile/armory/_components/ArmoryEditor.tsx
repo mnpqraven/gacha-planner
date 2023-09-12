@@ -27,7 +27,7 @@ import { useEffect } from "react";
 import {
   ArmoryFormSchema,
   characterMetadataSchema,
-  defaultValues,
+  defaultArmoryFormSchema,
 } from "../schema";
 import { RelicEditorTab } from "../_editor/RelicEditorTab";
 
@@ -51,6 +51,7 @@ export function ArmoryEditor() {
       };
       return toInt(a.attack_type) - toInt(b.attack_type);
     });
+  const { updateArmoryFormValue } = useCardConfigController();
 
   let filteredSkill: { [x: string]: number } = {};
   Object.values(sortedSkills).forEach((skill) => {
@@ -58,7 +59,7 @@ export function ArmoryEditor() {
   });
   const form = useForm<ArmoryFormSchema>({
     resolver: zodResolver(characterMetadataSchema),
-    defaultValues,
+    defaultValues: defaultArmoryFormSchema,
   });
 
   useEffect(() => {
@@ -68,9 +69,9 @@ export function ArmoryEditor() {
         filteredSkill[`${skill.skill_id}`] = 1;
       });
       form.reset({
-        ...defaultValues,
+        ...defaultArmoryFormSchema,
         player: {
-          ...defaultValues.player,
+          ...defaultArmoryFormSchema.player,
           skills: filteredSkill,
         },
         formConfig: {
@@ -84,6 +85,7 @@ export function ArmoryEditor() {
 
   function onSubmit(values: ArmoryFormSchema) {
     console.log("onSubmit", values);
+    updateArmoryFormValue(values);
   }
 
   if (!currentCharacterId) return <span>no char id set</span>;

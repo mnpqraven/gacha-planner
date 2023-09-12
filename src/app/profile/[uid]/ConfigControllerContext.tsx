@@ -4,6 +4,7 @@ import {
   Dispatch,
   ReactNode,
   RefObject,
+  SetStateAction,
   createContext,
   useContext,
   useReducer,
@@ -19,6 +20,7 @@ import {
 } from "./configReducer";
 import { useMihomoInfo } from "./useMihomoInfo";
 import { LANGS } from "@/lib/constants";
+import { ArmoryFormSchema, defaultArmoryFormSchema } from "../armory/schema";
 
 interface CardConfigContextPayload {
   currentCharacter?: MihomoCharacter;
@@ -26,6 +28,8 @@ interface CardConfigContextPayload {
 
   currentCharacterId?: number; // for 'ARMORY'
   setCurrentCharacterId: (toId: number) => void; // for 'ARMORY'
+  armoryFormValue: ArmoryFormSchema;
+  updateArmoryFormValue: Dispatch<SetStateAction<ArmoryFormSchema>>;
 
   mode: "API" | "ARMORY";
   setMode: (to: "API" | "ARMORY") => void;
@@ -43,6 +47,9 @@ export const defaultCardConfig: CardConfigContextPayload = {
 
   currentCharacterId: undefined,
   setCurrentCharacterId: () => {},
+
+  armoryFormValue: defaultArmoryFormSchema,
+  updateArmoryFormValue: () => {},
 
   mode: "API",
   setMode: () => {},
@@ -77,10 +84,10 @@ function useCardConfigProvider(): CardConfigContextPayload {
 
   const [uid, setUid] = useState<string | undefined>(undefined);
   const [lang, setLang] = useState<(typeof LANGS)[number]>("en");
-  const [currentCharId, setCurrentCharId] = useState<number | undefined>(
-    undefined
-  );
-  const [currentMode, setCurrentMode] = useState<"API" | "ARMORY">("API");
+  const [currentCharacterId, setCurrentCharacterId] = useState<
+    number | undefined
+  >(undefined);
+  const [mode, setMode] = useState<"API" | "ARMORY">("API");
 
   const { query } = useMihomoInfo({ uid, lang });
 
@@ -91,15 +98,22 @@ function useCardConfigProvider(): CardConfigContextPayload {
 
   const [config, changeConfig] = useReducer(configReducer, initialConfig);
 
+  const [armoryFormValue, updateArmoryFormValue] = useState(
+    defaultArmoryFormSchema
+  );
+
   return {
     currentCharacter,
     setCurrentCharacter,
 
-    currentCharacterId: currentCharId,
-    setCurrentCharacterId: setCurrentCharId,
+    currentCharacterId,
+    setCurrentCharacterId,
 
-    mode: currentMode,
-    setMode: setCurrentMode,
+    armoryFormValue,
+    updateArmoryFormValue,
+
+    mode,
+    setMode,
 
     enkaRef,
     config,
