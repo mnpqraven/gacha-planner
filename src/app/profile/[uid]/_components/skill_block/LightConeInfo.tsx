@@ -18,7 +18,6 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   level: number;
   ascension: number;
   imposition: number;
-  // characterData: MihomoCharacter;
   config: CardConfig;
 }
 export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
@@ -43,8 +42,6 @@ export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
 
     if (!lightCone) return null;
 
-    // const { light_cone } = characterData;
-    // const { rank, name, level, portrait, attributes } = light_cone;
     const { equipment_name: name } = lightCone;
     const maxLevel = ascension * 10 + 20;
 

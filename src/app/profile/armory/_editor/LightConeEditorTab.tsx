@@ -20,7 +20,6 @@ import {
 } from "@/app/components/ui/Form";
 import { Input } from "@/app/components/ui/Input";
 import { useLightConeMetadata } from "@/hooks/queries/useLightConeMetadata";
-import { useLightConeSkill } from "@/hooks/queries/useLightConeSkill";
 
 interface Props {
   form: UseFormReturn<ArmoryFormSchema>;

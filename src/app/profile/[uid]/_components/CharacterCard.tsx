@@ -78,7 +78,12 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
                   config={config}
                 />
               )}
-              <SkillInfo id="skill-2.2" characterData={currentCharacter} />
+              <SkillInfo
+                id="skill-2.2"
+                characterId={charMetadata.avatar_id}
+                characterData={currentCharacter}
+                skills={armoryFormValue.player.skills}
+              />
             </div>
           </div>
 

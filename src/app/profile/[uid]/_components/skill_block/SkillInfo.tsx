@@ -10,6 +10,7 @@ import {
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
 import { MihomoCharacter, MihomoSkillConfig } from "@/app/profile/types";
+import { useCharacterSkill } from "@/hooks/queries/useCharacterSkill";
 
 const DISPLAY_SKILL_TYPES: SkillType[] = [
   "Talent",
@@ -20,10 +21,20 @@ const DISPLAY_SKILL_TYPES: SkillType[] = [
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   characterData: MihomoCharacter | undefined;
+  characterId: number;
+  // skill id: slv
+  skills: Record<number, number>;
 }
 
 export const SkillInfo = forwardRef<HTMLDivElement, Props>(
-  ({ className, characterData, ...props }, ref) => {
+  (
+    { className, characterData, characterId, skills: skList, ...props },
+    ref
+  ) => {
+    // TODO:
+    const { data } = useCharacterSkill(characterId);
+    console.log("DEV", skList, data);
+
     if (!characterData) return null;
 
     const { rank: eidolon } = characterData;
