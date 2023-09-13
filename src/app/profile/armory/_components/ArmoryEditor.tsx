@@ -38,19 +38,24 @@ export function ArmoryEditor() {
   const { data: skills } = useCharacterSkill(currentCharacterId);
   const sortedSkills = skills
     .filter(
-      (skill) =>
-        skill.attack_type !== "Normal" && skill.attack_type !== "MazeNormal"
+      ({ attack_type }) =>
+        attack_type !== "MazeNormal" && attack_type !== "Maze"
     )
     .sort((a, b) => {
-      const toInt = (ttype: SkillType | null | undefined) => {
+      const toInt = (ttype: SkillType | null | undefined, typeDesc: string) => {
         if (ttype === "Maze") return 4;
         if (ttype === "Ultra") return 3;
         if (ttype === "BPSkill") return 2;
-        if (ttype === "Talent") return 1;
+        if (ttype === "Talent" || typeDesc === "Talent") return 1;
         return 0;
       };
-      return toInt(a.attack_type) - toInt(b.attack_type);
-    });
+      return (
+        toInt(a.attack_type, a.skill_type_desc) -
+        toInt(b.attack_type, b.skill_type_desc)
+      );
+    })
+    .slice(-4);
+
   const { updateArmoryFormValue } = useCardConfigController();
 
   let filteredSkill: { [x: string]: number } = {};

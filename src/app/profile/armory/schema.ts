@@ -18,7 +18,7 @@ const playerSchema = z
       .or(z.string())
       .pipe(z.coerce.number().min(0).max(6)),
     skills: z.record(
-      z.number().or(z.string()).pipe(z.coerce.number()),
+      z.string(),
       z.number().or(z.string()).pipe(z.coerce.number().min(1).max(15))
     ),
     eidolon: z

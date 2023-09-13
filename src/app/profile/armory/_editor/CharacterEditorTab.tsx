@@ -9,7 +9,7 @@ import {
 import { Input } from "@/app/components/ui/Input";
 import { AvatarSkillConfig } from "@/bindings/AvatarSkillConfig";
 import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
-import { img } from "@/lib/utils";
+import { getImagePath, img } from "@/lib/utils";
 import { UseFormReturn } from "react-hook-form";
 import Image from "next/image";
 import { ArmoryFormSchema } from "../schema";
@@ -99,7 +99,7 @@ export function CharacterEditorTab({ characterId, form, skills }: Props) {
             name="player.eidolon"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Ascension</FormLabel>
+                <FormLabel>Eidolon</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -181,50 +181,4 @@ function SkillEditor({ form, eidolon, skills, characterId }: SkillEditorProps) {
 
 function url(id: string | number): string {
   return img(`image/character_preview/${id}.png`);
-}
-
-function getImagePath(
-  characterId: number | null | undefined,
-  skill: AvatarSkillConfig
-): string | undefined {
-  let ttype = "";
-  if (skill.attack_type) {
-    switch (skill.attack_type) {
-      case "Normal":
-        ttype = "basic_attack";
-        break;
-      case "BPSkill":
-        ttype = "skill";
-        break;
-      case "Ultra":
-        ttype = "ultimate";
-        break;
-      case "Talent":
-        ttype = "talent";
-        break;
-      case "Maze":
-        ttype = "technique";
-        break;
-    }
-  } else {
-    switch (skill.skill_type_desc) {
-      case "Basic ATK":
-        ttype = "basic_atk";
-        break;
-      case "Skill":
-        ttype = "skill";
-        break;
-      case "Ultra":
-        ttype = "ultimate";
-        break;
-      case "Talent":
-        ttype = "talent";
-        break;
-      case "Technique":
-        ttype = "technique";
-        break;
-    }
-  }
-  if (!characterId) return undefined;
-  return `https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/icon/skill/${characterId}_${ttype}.png`;
 }

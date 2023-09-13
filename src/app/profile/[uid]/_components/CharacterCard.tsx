@@ -81,8 +81,8 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
               <SkillInfo
                 id="skill-2.2"
                 characterId={charMetadata.avatar_id}
-                characterData={currentCharacter}
                 skills={armoryFormValue.player.skills}
+                eidolon={formValues.eidolon}
               />
             </div>
           </div>
@@ -164,7 +164,12 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
               level={currentCharacter.light_cone.level}
               ascension={currentCharacter.light_cone.promotion}
             />
-            <SkillInfo id="skill-2.2" characterData={currentCharacter} />
+            <SkillInfo
+              id="skill-2.2"
+              characterId={currentCharacter.id}
+              eidolon={eidolon}
+              skills={Object.fromEntries(currentCharacter.skills.map(e => [e.id, e.level]))}
+            />
           </div>
         </div>
 

@@ -1,6 +1,6 @@
 import { HTMLAttributes, forwardRef } from "react";
-import { SkillType } from "@/bindings/AvatarSkillConfig";
-import { cn, img } from "@/lib/utils";
+import { AvatarSkillConfig, SkillType } from "@/bindings/AvatarSkillConfig";
+import { cn, getImagePath } from "@/lib/utils";
 import Image from "next/image";
 import { useCardConfigController } from "../../ConfigControllerContext";
 import { ChevronsUp } from "lucide-react";
@@ -9,8 +9,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
-import { MihomoCharacter, MihomoSkillConfig } from "@/app/profile/types";
 import { useCharacterSkill } from "@/hooks/queries/useCharacterSkill";
+import { SkillDescription } from "@/app/components/Db/SkillDescription";
 
 const DISPLAY_SKILL_TYPES: SkillType[] = [
   "Talent",
@@ -20,28 +20,39 @@ const DISPLAY_SKILL_TYPES: SkillType[] = [
 ];
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  characterData: MihomoCharacter | undefined;
   characterId: number;
+  eidolon: number;
   // skill id: slv
   skills: Record<number, number>;
 }
 
 export const SkillInfo = forwardRef<HTMLDivElement, Props>(
-  (
-    { className, characterData, characterId, skills: skList, ...props },
-    ref
-  ) => {
-    // TODO:
+  ({ className, characterId, eidolon, skills: skList, ...props }, ref) => {
     const { data } = useCharacterSkill(characterId);
     console.log("DEV", skList, data);
 
-    if (!characterData) return null;
-
-    const { rank: eidolon } = characterData;
-
-    const skills = characterData.skills
-      .filter((e) => DISPLAY_SKILL_TYPES.includes(e.type))
-      .slice(0, 4);
+    const skills = data
+      .filter(
+        ({ attack_type }) =>
+          attack_type !== "MazeNormal" && attack_type !== "Maze"
+      )
+      .sort((a, b) => {
+        const toInt = (
+          ttype: SkillType | null | undefined,
+          typeDesc: string
+        ) => {
+          if (ttype === "Maze") return 4;
+          if (ttype === "Ultra") return 3;
+          if (ttype === "BPSkill") return 2;
+          if (ttype === "Talent" || typeDesc === "Talent") return 1;
+          return 0;
+        };
+        return (
+          toInt(a.attack_type, a.skill_type_desc) -
+          toInt(b.attack_type, b.skill_type_desc)
+        );
+      })
+      .slice(-4);
 
     return (
       <div
@@ -53,26 +64,46 @@ export const SkillInfo = forwardRef<HTMLDivElement, Props>(
         {...props}
       >
         {skills.map((skillInfo) => (
-          <div key={skillInfo.id} className="flex flex-col items-center">
-            <span>{getLabel(skillInfo.type)}</span>
-            <SkillIcon src={img(skillInfo.icon)} skillInfo={skillInfo} />
+          <div key={skillInfo.skill_id} className="flex flex-col items-center">
+            <span>
+              {getLabel(
+                skillInfo.skill_type_desc == "Talent"
+                  ? skillInfo.skill_type_desc
+                  : skillInfo.attack_type
+              )}
+            </span>
+            <SkillIcon
+              src={`${getImagePath(characterId, skillInfo)}`}
+              skillInfo={skillInfo}
+              slv={skList[skillInfo.skill_id]}
+            />
+
             <span
               className={cn(
                 "w-full text-center font-bold",
-                isImprovedByEidolon(skillInfo.type, eidolon)
+                isImprovedByEidolon(skillInfo.attack_type, eidolon)
                   ? "text-[#6cfff7]"
                   : ""
               )}
             >
-              {skillInfo.level == getSkillMaxLevel(skillInfo.type, eidolon) ? (
+              {skList[skillInfo.skill_id] ==
+              getSkillMaxLevel(
+                skillInfo.attack_type,
+                skillInfo.skill_type_desc,
+                eidolon
+              ) ? (
                 <span className="flex items-center justify-end">
-                  {skillInfo.level}
+                  {skList[skillInfo.skill_id] ?? 1}
                   <ChevronsUp className="h-4 w-4 text-green-600" />
                 </span>
               ) : (
                 <span>
-                  {skillInfo.level} /{" "}
-                  {getSkillMaxLevel(skillInfo.type, eidolon)}
+                  {skList[skillInfo.skill_id] ?? 1} /{" "}
+                  {getSkillMaxLevel(
+                    skillInfo.attack_type,
+                    skillInfo.skill_type_desc,
+                    eidolon
+                  )}
                 </span>
               )}
             </span>
@@ -86,12 +117,16 @@ SkillInfo.displayName = "SkillInfo";
 
 interface IconProps extends HTMLAttributes<HTMLDivElement> {
   src: string;
-  skillInfo: MihomoSkillConfig;
+  skillInfo: AvatarSkillConfig;
+  slv: number;
   width?: number;
   height?: number;
 }
 const SkillIcon = forwardRef<HTMLDivElement, IconProps>(
-  ({ src, skillInfo, width = 48, height = 48, className, ...props }, ref) => {
+  (
+    { src, skillInfo, slv, width = 48, height = 48, className, ...props },
+    ref
+  ) => {
     const { config } = useCardConfigController();
     const { hoverVerbosity } = config;
 
@@ -100,20 +135,25 @@ const SkillIcon = forwardRef<HTMLDivElement, IconProps>(
         <TooltipTrigger disabled={hoverVerbosity === "none"}>
           <Image
             src={src}
-            alt={skillInfo.name}
+            alt={skillInfo.skill_name}
             width={width}
             height={height}
             className="invert dark:invert-0"
           />
         </TooltipTrigger>
         {hoverVerbosity === "simple" ? (
-          <TooltipContent>{skillInfo.name}</TooltipContent>
+          <TooltipContent>{skillInfo.skill_name}</TooltipContent>
         ) : hoverVerbosity === "detailed" ? (
           <TooltipContent className="w-96 py-2 text-justify text-base">
             <p className="mb-2 text-base font-bold text-accent-foreground">
-              {skillInfo.name}
+              {skillInfo.skill_name}
             </p>
-            {skillInfo.desc}
+
+            <SkillDescription
+              skillDesc={skillInfo.skill_desc}
+              paramList={skillInfo.param_list}
+              slv={slv}
+            />
           </TooltipContent>
         ) : null}
       </Tooltip>
@@ -122,7 +162,7 @@ const SkillIcon = forwardRef<HTMLDivElement, IconProps>(
 );
 SkillIcon.displayName = "SkillIcon ";
 
-function getLabel(skillType: SkillType): string {
+function getLabel(skillType: SkillType | null | undefined): string {
   switch (skillType) {
     case "Normal":
       return "Basic";
@@ -137,7 +177,12 @@ function getLabel(skillType: SkillType): string {
   }
 }
 
-function getSkillMaxLevel(skillType: SkillType, eidolon: number): number {
+function getSkillMaxLevel(
+  skillType: SkillType | null | undefined,
+  skillTypeDesc: string,
+  eidolon: number
+): number {
+  if (skillTypeDesc == "Talent") return eidolon >= 5 ? 15 : 10;
   switch (skillType) {
     case "Normal":
       return eidolon >= 3 ? 10 : 6;
@@ -151,7 +196,11 @@ function getSkillMaxLevel(skillType: SkillType, eidolon: number): number {
   }
 }
 
-function isImprovedByEidolon(type: SkillType, eidolon: number): boolean {
+function isImprovedByEidolon(
+  type: SkillType | null | undefined,
+  eidolon: number
+): boolean {
+  if (!type) return false;
   if (["Normal", "BPSkill"].includes(type) && eidolon >= 3) return true;
   if (["Ultra", "Talent"].includes(type) && eidolon >= 5) return true;
   return false;
