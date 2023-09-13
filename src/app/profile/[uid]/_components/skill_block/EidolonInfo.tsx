@@ -9,18 +9,14 @@ import {
 } from "@/app/components/ui/Tooltip";
 import { useCharacterEidolon } from "@/hooks/queries/useCharacterEidolon";
 import { AvatarRankConfig } from "@/bindings/AvatarRankConfig";
-import { MihomoCharacter } from "@/app/profile/types";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   characterId: number;
-  characterData: MihomoCharacter;
+  eidolon: number;
 }
 export const EidolonInfo = forwardRef<HTMLDivElement, Props>(
-  ({ className, characterId, characterData, ...props }, ref) => {
+  ({ className, characterId, eidolon, ...props }, ref) => {
     const { data: eidolons } = useCharacterEidolon(characterId);
-
-    if (!characterData) return null;
-    const { rank, rank_icons } = characterData;
 
     return (
       <div
@@ -34,10 +30,10 @@ export const EidolonInfo = forwardRef<HTMLDivElement, Props>(
         {Array.from(range(1, 6)).map((eid) => (
           <EidolonIcon
             key={eid}
-            src={img(rank_icons[eid - 1])}
+            src={img(getUrl(eid, characterId))}
             currentEidolon={eid}
             eidolonInfo={eidolons?.at(eid - 1)}
-            eidolon={rank}
+            eidolon={eidolon}
           />
         ))}
       </div>
@@ -114,3 +110,22 @@ const EidolonIcon = forwardRef<HTMLDivElement, IconProps>(
   }
 );
 EidolonIcon.displayName = "EidolonIcon ";
+
+function getUrl(rank: number, charId: number): string {
+  switch (rank) {
+    case 1:
+      return `icon/skill/${charId}_rank1.png`;
+    case 2:
+      return `icon/skill/${charId}_rank2.png`;
+    case 3:
+      return `icon/skill/${charId}_skill.png`;
+    case 4:
+      return `icon/skill/${charId}_rank4.png`;
+    case 5:
+      return `icon/skill/${charId}_ultimate.png`;
+    case 6:
+      return `icon/skill/${charId}_rank6.png`;
+    default:
+      return "";
+  }
+}

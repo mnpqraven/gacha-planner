@@ -11,7 +11,6 @@ import { useCardConfigController } from "../ConfigControllerContext";
 import { EidolonInfo } from "./skill_block/EidolonInfo";
 import { LANGS } from "@/lib/constants";
 import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
-import { Path } from "@/bindings/AvatarConfig";
 
 type Lang = (typeof LANGS)[number];
 interface Props {
@@ -24,7 +23,6 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
     currentCharacter,
     enkaRef,
     updateParam,
-    mihomoResponse,
     config,
     setMode,
     currentCharacterId,
@@ -42,7 +40,9 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
     updateParam(uid, lang);
   }, [uid, lang, updateParam]);
 
-  if (mode == "ARMORY" && !!charMetadata)
+  if (mode == "ARMORY" && !!charMetadata) {
+    const { skills, ...formValues } = armoryFormValue.player;
+
     return (
       <div className="h-fit w-fit p-4" ref={enkaRef}>
         <div
@@ -56,31 +56,33 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
             id="block-1"
             className="relative z-10"
             characterId={charMetadata.avatar_id}
-            level={armoryFormValue.player.level}
-            ascension={armoryFormValue.player.ascension}
-            eidolon={armoryFormValue.player.eidolon}
             config={config}
+            {...formValues}
           />
 
-          {/*
           <div id="block-2" className="flex justify-evenly">
             <EidolonInfo
               className="w-14"
-              characterId={currentCharacter.id}
-              characterData={currentCharacter}
+              characterId={charMetadata.avatar_id}
+              eidolon={formValues.eidolon}
             />
             <div className="flex flex-col pb-2">
-              <LightConeInfo
-                id="lightcone-2.1"
-                className="grow"
-                lcId={currentCharacter.light_cone.id}
-                characterData={currentCharacter}
-                config={config}
-              />
+              {!!armoryFormValue.lc && (
+                <LightConeInfo
+                  id="lightcone-2.1"
+                  className="grow"
+                  lcId={armoryFormValue.lc.id}
+                  level={armoryFormValue.lc.level}
+                  imposition={armoryFormValue.lc.imposition}
+                  ascension={armoryFormValue.lc.ascension}
+                  config={config}
+                />
+              )}
               <SkillInfo id="skill-2.2" characterData={currentCharacter} />
             </div>
           </div>
 
+          {/*
           <div id="block-3" className="col-span-2 flex gap-4">
             <div className="flex grow flex-col gap-2 place-self-end pb-2">
               <SpiderChartWrapper characterData={currentCharacter} />
@@ -107,6 +109,7 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
         </div>
       </div>
     );
+  }
 
   if (!currentCharacter) return null;
 
@@ -144,15 +147,17 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
           <EidolonInfo
             className="w-14"
             characterId={currentCharacter.id}
-            characterData={currentCharacter}
+            eidolon={eidolon}
           />
           <div className="flex flex-col pb-2">
             <LightConeInfo
               id="lightcone-2.1"
               className="grow"
               lcId={currentCharacter.light_cone.id}
-              characterData={currentCharacter}
               config={config}
+              imposition={currentCharacter.light_cone.rank}
+              level={currentCharacter.light_cone.level}
+              ascension={currentCharacter.light_cone.promotion}
             />
             <SkillInfo id="skill-2.2" characterData={currentCharacter} />
           </div>

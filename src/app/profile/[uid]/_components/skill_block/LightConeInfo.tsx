@@ -9,30 +9,46 @@ import {
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
 import { SkillDescription } from "@/app/components/Db/SkillDescription";
-import { MihomoCharacter } from "@/app/profile/types";
 import { CardConfig } from "../../configReducer";
+import { useLightConeMetadata } from "@/hooks/queries/useLightConeMetadata";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   displayStat?: boolean;
-  lcId: number | string;
-  characterData: MihomoCharacter;
+  lcId?: number | string;
+  level: number;
+  ascension: number;
+  imposition: number;
+  // characterData: MihomoCharacter;
   config: CardConfig;
 }
 export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
   (
-    { displayStat = false, lcId, characterData, config, className, ...props },
+    {
+      displayStat = false,
+      lcId,
+      level,
+      ascension,
+      imposition,
+      config,
+      className,
+      ...props
+    },
     ref
   ) => {
     const ratio = 902 / 1260;
-    const { skill } = useLightConeSkill(
-      characterData ? Number(lcId) : undefined
+    const { skill } = useLightConeSkill(!!lcId ? Number(lcId) : undefined);
+    const { lightCone } = useLightConeMetadata(
+      !!lcId ? Number(lcId) : undefined
     );
 
-    if (!characterData) return null;
+    if (!lightCone) return null;
 
-    const { light_cone } = characterData;
-    const { rank, name, level, portrait, attributes } = light_cone;
-    const maxLevel = light_cone.promotion * 10 + 20;
+    // const { light_cone } = characterData;
+    // const { rank, name, level, portrait, attributes } = light_cone;
+    const { equipment_name: name } = lightCone;
+    const maxLevel = ascension * 10 + 20;
+
+    if (!lcId) return null;
 
     return (
       <div
@@ -45,10 +61,10 @@ export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
 
           <span className="flex">
             <span className="font-bold">Lv. {level}</span> / {maxLevel}
-            <ImpositionIcon imposition={rank} className="ml-2.5" />
+            <ImpositionIcon imposition={imposition} className="ml-2.5" />
           </span>
 
-          {displayStat && (
+          {/*displayStat && (
             <div className="flex">
               {attributes.map((attr) => (
                 <div key={attr.field} className="flex items-center">
@@ -57,13 +73,13 @@ export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
                 </div>
               ))}
             </div>
-          )}
+          )*/}
         </div>
 
         <Tooltip>
           <TooltipTrigger disabled={config.hoverVerbosity === "none"}>
             <Image
-              src={img(portrait)}
+              src={img(`image/light_cone_portrait/${lcId}.png`)}
               alt=""
               width={350 * ratio}
               height={350}
@@ -79,7 +95,7 @@ export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
               <SkillDescription
                 skillDesc={skill.skill_desc}
                 paramList={skill.param_list}
-                slv={rank - 1}
+                slv={imposition - 1}
               />
             </TooltipContent>
           )}

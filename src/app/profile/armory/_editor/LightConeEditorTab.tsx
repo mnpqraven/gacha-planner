@@ -29,7 +29,6 @@ interface Props {
 export function LightConeEditorTab({ form, path }: Props) {
   const { lightConeList } = useLightConeList();
   const { lightCone } = useLightConeMetadata(form.watch("lc.id"));
-  const { skill } = useLightConeSkill(form.watch("lc.id"));
 
   const lcSelected = !!form.getValues("lc");
 
@@ -60,6 +59,7 @@ export function LightConeEditorTab({ form, path }: Props) {
                       id: lc.equipment_id,
                       level: form.getValues("lc.level") ?? 1,
                       ascension: form.getValues("lc.ascension") ?? 0,
+                      imposition: form.getValues("lc.imposition") ?? 1,
                     });
                     setOpen(false);
                   }}
@@ -87,14 +87,7 @@ export function LightConeEditorTab({ form, path }: Props) {
               <FormItem>
                 <FormLabel>Level</FormLabel>
                 <FormControl>
-                  <Input
-                    className="w-16"
-                    type="number"
-                    autoComplete="off"
-                    {...field}
-                    min={1}
-                    max={(form.getValues("lc.ascension") ?? 0) * 10 + 20}
-                  />
+                  <Input className="w-16" autoComplete="off" {...field} />
                 </FormControl>
               </FormItem>
             )}
@@ -107,14 +100,20 @@ export function LightConeEditorTab({ form, path }: Props) {
               <FormItem>
                 <FormLabel>Ascension</FormLabel>
                 <FormControl>
-                  <Input
-                    className="w-16"
-                    type="number"
-                    autoComplete="off"
-                    {...field}
-                    min={0}
-                    max={6}
-                  />
+                  <Input className="w-16" autoComplete="off" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="lc.imposition"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Imposition</FormLabel>
+                <FormControl>
+                  <Input className="w-16" autoComplete="off" {...field} />
                 </FormControl>
               </FormItem>
             )}

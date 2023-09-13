@@ -52,6 +52,17 @@ const lcSchema = z
           .min(0, { message: ERR_RANGE(0, 6) })
           .max(6, { message: ERR_RANGE(0, 6) })
       ),
+    imposition: z
+      .number()
+      .min(1, { message: ERR_RANGE(1, 5) })
+      .max(5, { message: ERR_RANGE(1, 5) })
+      .or(z.string())
+      .pipe(
+        z.coerce
+          .number()
+          .min(1, { message: ERR_RANGE(1, 5) })
+          .max(5, { message: ERR_RANGE(1, 5) })
+      ),
   })
   .nullable();
 
