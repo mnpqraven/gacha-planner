@@ -27,6 +27,7 @@ const playerSchema = z
       .max(6, { message: "Eidolon must be less than 6" })
       .or(z.string())
       .pipe(z.coerce.number().min(0).max(6)),
+    trace: z.record(z.string(), z.boolean()),
   })
   .refine((form) => form.level <= form.ascension * 10 + 20, {
     message: "Exceeded max level for given ascension",
@@ -151,6 +152,7 @@ export const defaultArmoryFormSchema: ArmoryFormSchema = {
     ascension: 0,
     eidolon: 0,
     skills: {},
+    trace: {},
   },
   relic: {},
   lc: null,

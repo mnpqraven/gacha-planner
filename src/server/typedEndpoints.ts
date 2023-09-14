@@ -22,6 +22,7 @@ import { RelicSetConfig } from "@/bindings/RelicSetConfig";
 import { RelicSubAffixConfig } from "@/bindings/RelicSubAffixConfig";
 import { RelicMainAffixConfig } from "@/bindings/RelicMainAffixConfig";
 import { RelicCategory } from "@/app/profile/armory/schema";
+import { RelicSetSkillConfig } from "@/bindings/RelicSetSkillConfig";
 
 type CharId = { characterId: number };
 type LcId = { lcId: number };
@@ -66,6 +67,10 @@ const API = {
   relicSets: get<List<RelicSetConfig>>("/honkai/relic_set"),
   relicSet: get<List<RelicSetConfig>, { relicSetId: number }>(
     ({ relicSetId }) => `/honkai/relic_set/${relicSetId}`
+  ),
+  relicSetBonuses: get<List<RelicSetSkillConfig>>("/honkai/relic_set/bonus"),
+  relicSetBonus: get<RelicSetSkillConfig, { relicSetId: number }>(
+    ({ relicSetId }) => `/honkai/relic_set/bonus/${relicSetId}`
   ),
   substatSpread: get<List<RelicSubAffixConfig>>(
     "/honkai/relics/statspread/sub"

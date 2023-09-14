@@ -8,5 +8,5 @@ export function useLightConePromotion(lightConeId: number | undefined) {
       await API.lightConePromotion.get({ lcId: lightConeId! }),
     enabled: !!lightConeId,
   });
-  return { promotion: query.data };
+  return query;
 }

@@ -67,10 +67,6 @@ export interface RelicSetSkillConfig {
 }
 
 export interface RelicParam {
-  param: Param;
   property: Property;
-}
-
-export interface Param {
   value: number;
 }

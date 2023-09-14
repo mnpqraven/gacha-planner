@@ -11,6 +11,9 @@ import { getLineTrips, traceVariants } from "./lineTrips";
 import { TraceDescription } from "./TraceDescription";
 import { useCharacterTrace } from "@/hooks/queries/useCharacterTrace";
 import { useCharacterSkill } from "@/hooks/queries/useCharacterSkill";
+import { Checkbox } from "../ui/Checkbox";
+import { useImmer } from "use-immer";
+import { useEffect } from "react";
 
 const DEBUG = false;
 
@@ -26,6 +29,8 @@ type Props = {
     | "Preservation"
     | "Harmony"
     | "Abundance";
+  editMode?: boolean;
+  onChange?: (data: Record<number, boolean>) => void;
 };
 
 const TraceTable = ({
@@ -33,7 +38,23 @@ const TraceTable = ({
   wrapperSize = 480,
   path,
   maxEnergy,
+  editMode = false,
+  onChange,
 }: Props) => {
+  const [editModeTable, setEditModeTable] = useImmer<Record<number, boolean>>(
+    {}
+  );
+
+  function onCheckedChange(checked: boolean, pointId: number) {
+    setEditModeTable((draft) => {
+      draft[pointId] = checked;
+    });
+  }
+
+  useEffect(() => {
+    if (!!onChange) onChange(editModeTable);
+  }, [editModeTable, onChange]);
+
   return (
     <div
       id="trace-wrapper"
@@ -53,6 +74,8 @@ const TraceTable = ({
         path={path}
         wrapperSize={wrapperSize}
         maxEnergy={maxEnergy}
+        editMode={editMode}
+        onCheckedChange={onCheckedChange}
       />
     </div>
   );
@@ -63,7 +86,11 @@ const TraceTableInner = ({
   wrapperSize = 480,
   path,
   maxEnergy,
-}: Props) => {
+  editMode,
+  onCheckedChange,
+}: Omit<Props, "onChange"> & {
+  onCheckedChange: (checked: boolean, pointId: number) => void;
+}) => {
   const updateLines = useXarrow();
   const { theme } = useTheme();
 
@@ -94,11 +121,26 @@ const TraceTableInner = ({
             <div
               id={traceNode.anchor}
               key={traceNode.point_id}
-              className={traceVariants(path)({ anchor: traceNode.anchor })}
+              className={cn(
+                traceVariants(path)({ anchor: traceNode.anchor }),
+                ""
+              )}
               style={{
                 marginLeft: `${wrapperSize / -16}px`,
               }}
             >
+              {editMode && getNodeType(traceNode) !== "CORE" && (
+                <Checkbox
+                  className="absolute -top-2.5 left-3"
+                  id={traceNode.point_id.toString()}
+                  onCheckedChange={(checked) =>
+                    onCheckedChange(
+                      checked == "indeterminate" ? false : checked,
+                      traceNode.point_id
+                    )
+                  }
+                />
+              )}
               <Popover>
                 <PopoverTrigger
                   className={iconWrapVariants({

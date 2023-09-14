@@ -7,6 +7,7 @@ import {
   SetStateAction,
   createContext,
   useContext,
+  useEffect,
   useReducer,
   useRef,
   useState,
@@ -21,6 +22,7 @@ import {
 import { useMihomoInfo } from "./useMihomoInfo";
 import { LANGS } from "@/lib/constants";
 import { ArmoryFormSchema, defaultArmoryFormSchema } from "../armory/schema";
+import { useStatParser } from "@/hooks/useStatParser";
 
 interface CardConfigContextPayload {
   currentCharacter?: MihomoCharacter;
@@ -101,6 +103,50 @@ function useCardConfigProvider(): CardConfigContextPayload {
   const [armoryFormValue, updateArmoryFormValue] = useState(
     defaultArmoryFormSchema
   );
+
+  const [characterStat, setCharacterStats] = useState<
+    Parameters<typeof useStatParser>[0] | undefined
+  >(undefined);
+  const parsedStats = useStatParser(characterStat);
+  // const { additions, base, properties } = parsedStats
+
+  useEffect(() => {}, [armoryFormValue]);
+
+  useEffect(() => {
+    if (!!currentCharacter) {
+      setCharacterStats({
+        character: {
+          id: currentCharacter.id,
+          ascension: currentCharacter.promotion,
+          level: currentCharacter.level,
+        },
+        lightCone: {
+          id: parseInt(currentCharacter.light_cone.id),
+          ascension: currentCharacter.light_cone.promotion,
+          level: currentCharacter.light_cone.level,
+        },
+        traceTable: Object.fromEntries(
+          currentCharacter.skill_trees.map((skill) => [
+            skill.id,
+            skill.level > 0,
+          ])
+        ),
+        relic: currentCharacter.relics.map(
+          ({ id, set_id, level, main_affix, sub_affix }) => ({
+            id: parseInt(id),
+            setId: parseInt(set_id),
+            level: level,
+            mainStat: { property: main_affix.type, value: main_affix.value },
+            subStat: sub_affix.map(({ type: property, step, value }) => ({
+              property,
+              step,
+              value,
+            })),
+          })
+        ),
+      });
+    }
+  }, [currentCharacter]);
 
   return {
     currentCharacter,

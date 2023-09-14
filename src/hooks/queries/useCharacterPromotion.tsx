@@ -17,5 +17,5 @@ export function useCharacterPromotion(
     enabled: !!characterId,
     ...opt,
   });
-  return { promotion: query.data };
+  return query;
 }

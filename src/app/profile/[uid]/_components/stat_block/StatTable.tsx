@@ -6,7 +6,6 @@ import { Element } from "@/bindings/AvatarConfig";
 import { asPercentage, cn } from "@/lib/utils";
 import { HTMLAttributes, forwardRef } from "react";
 import SVG from "react-inlinesvg";
-import { useCardConfigController } from "../../ConfigControllerContext";
 import {
   Tooltip,
   TooltipContent,

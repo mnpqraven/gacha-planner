@@ -13,6 +13,7 @@ import { getImagePath, img } from "@/lib/utils";
 import { UseFormReturn } from "react-hook-form";
 import Image from "next/image";
 import { ArmoryFormSchema } from "../schema";
+import { TraceTable } from "@/app/components/Character/TraceTable";
 
 interface Props {
   characterId: number;
@@ -24,6 +25,10 @@ export function CharacterEditorTab({ characterId, form, skills }: Props) {
   const { data: chara } = useCharacterMetadata(characterId);
 
   if (!chara || skills.length === 0) return null;
+
+  function onTraceTableUpdate(data: Record<number, boolean>) {
+    form.setValue("player.trace", data);
+  }
 
   return (
     <div className="flex gap-2">
@@ -128,6 +133,13 @@ export function CharacterEditorTab({ characterId, form, skills }: Props) {
           characterId={characterId}
         />
       </div>
+      <TraceTable
+        characterId={characterId}
+        maxEnergy={chara.spneed}
+        path={chara.avatar_base_type}
+        onChange={onTraceTableUpdate}
+        editMode
+      />
     </div>
   );
 }

@@ -11,6 +11,7 @@ import { useCardConfigController } from "../ConfigControllerContext";
 import { EidolonInfo } from "./skill_block/EidolonInfo";
 import { LANGS } from "@/lib/constants";
 import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
+import { useStatParser } from "@/hooks/useStatParser";
 
 type Lang = (typeof LANGS)[number];
 interface Props {
@@ -168,7 +169,9 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
               id="skill-2.2"
               characterId={currentCharacter.id}
               eidolon={eidolon}
-              skills={Object.fromEntries(currentCharacter.skills.map(e => [e.id, e.level]))}
+              skills={Object.fromEntries(
+                currentCharacter.skills.map((e) => [e.id, e.level])
+              )}
             />
           </div>
         </div>

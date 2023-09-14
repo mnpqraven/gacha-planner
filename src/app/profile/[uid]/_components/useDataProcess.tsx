@@ -62,8 +62,8 @@ export function useDataProcess({ character }: Props): {
   // main stat's impact from relic on stats (flat + %)
   // sub stat's impact from relic on stats (flat + %)
   // normalize summed data
-  const { promotion: charPromo } = useCharacterPromotion(character?.id);
-  const { promotion: lcPromo } = useLightConePromotion(
+  const { data: charPromo } = useCharacterPromotion(character?.id);
+  const { data: lcPromo } = useLightConePromotion(
     Number(character?.light_cone.id)
   );
 

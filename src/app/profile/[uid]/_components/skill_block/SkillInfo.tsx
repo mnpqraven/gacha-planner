@@ -29,7 +29,6 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 export const SkillInfo = forwardRef<HTMLDivElement, Props>(
   ({ className, characterId, eidolon, skills: skList, ...props }, ref) => {
     const { data } = useCharacterSkill(characterId);
-    console.log("DEV", skList, data);
 
     const skills = data
       .filter(

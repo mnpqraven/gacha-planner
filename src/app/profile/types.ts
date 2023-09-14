@@ -142,7 +142,7 @@ export interface MihomoRelicConfig {
   rarity: number;
   level: number;
   icon: AssetPath;
-  main_affix?: MihomoPropertyConfig;
+  main_affix: MihomoPropertyConfig;
   sub_affix: MihomoSubAffixInfo[];
 }
 
