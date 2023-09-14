@@ -60,6 +60,8 @@ export function useStatParser(props?: Props) {
     critical_damage: charPromotionData.critical_damage,
   };
 
+  // TODO: PERCENT FROM LC
+
   // INFO: PERCENT FROM TRACES
   const tracePropList = traceData
     .filter((trace) =>
@@ -122,7 +124,10 @@ export function useStatParser(props?: Props) {
       else relicTotal[property]! += value;
     });
   });
-  console.log("props", traceTotal, relicTotal);
+
+  const summed = sumProps([traceTotal, relicTotal, setBonusTotal]);
+  console.log("props", traceTotal, relicTotal, setBonusTotal);
+  console.log("summed", summed);
 
   // TODO: parse relic data then multiply base with trace altogether
 
@@ -171,4 +176,18 @@ function baseLc(
     hp: base_hp[ascension] + (level - 1) * base_hpadd[ascension],
     def: base_defence[ascension] + (level - 1) * base_defence_add[ascension],
   };
+}
+
+function sumProps(
+  props: Partial<Record<Property, number>>[]
+): Partial<Record<Property, number>> {
+  let ret: Partial<Record<Property, number>> = {};
+  props.forEach((prop) => {
+    Object.entries(prop).forEach(([p, value]) => {
+      const property = p as Property;
+      if (!ret[property]) ret[property] = value;
+      else ret[property]! += value;
+    });
+  });
+  return ret;
 }
