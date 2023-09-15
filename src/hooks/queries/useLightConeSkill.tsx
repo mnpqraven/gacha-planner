@@ -16,5 +16,5 @@ export function useLightConeSkill(
     enabled: !!lightConeId,
     ...opt,
   });
-  return { skill: query.data };
+  return query;
 }

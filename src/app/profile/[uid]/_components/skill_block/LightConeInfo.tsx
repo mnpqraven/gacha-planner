@@ -35,7 +35,9 @@ export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
     ref
   ) => {
     const ratio = 902 / 1260;
-    const { skill } = useLightConeSkill(!!lcId ? Number(lcId) : undefined);
+    const { data: skill } = useLightConeSkill(
+      !!lcId ? Number(lcId) : undefined
+    );
     const { lightCone } = useLightConeMetadata(
       !!lcId ? Number(lcId) : undefined
     );

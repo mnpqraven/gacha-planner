@@ -4,8 +4,8 @@ import { useCharacterTrace } from "./queries/useCharacterTrace";
 import { useLightConePromotion } from "./queries/useLightConePromotion";
 import { EquipmentPromotionConfig } from "@/bindings/EquipmentPromotionConfig";
 import { Property } from "@/bindings/RelicSubAffixConfig";
-import { RelicCategory } from "@/app/profile/armory/schema";
 import { useRelicSetBonuses } from "./queries/useRelicSetBonus";
+import { useLightConeSkill } from "./queries/useLightConeSkill";
 
 type BasicMetadata = { id: number; level: number; ascension: number };
 type RelicSchema = {
@@ -21,10 +21,19 @@ type RelicSchema = {
   subStat: { property: Property; step: number; value: number }[];
 };
 
+export type BaseValueSchema = {
+  atk: number;
+  hp: number;
+  def: number;
+  speed: number;
+  critical_chance: number;
+  critical_damage: number;
+};
+
 interface Props {
   character: BasicMetadata;
   traceTable: Record<string | number, boolean>;
-  lightCone: BasicMetadata;
+  lightCone: BasicMetadata & { imposition: number };
   relic: RelicSchema[];
 }
 
@@ -34,12 +43,14 @@ export function useStatParser(props?: Props) {
     props?.character.id
   );
   const { data: lcPromotionData } = useLightConePromotion(props?.lightCone.id);
+  const { data: lcSkillData } = useLightConeSkill(props?.lightCone.id);
   const { data: relicBonuses } = useRelicSetBonuses();
 
   if (
     !traceData ||
     !charPromotionData ||
     !lcPromotionData ||
+    !lcSkillData ||
     !props ||
     !relicBonuses
   )
@@ -60,7 +71,15 @@ export function useStatParser(props?: Props) {
     critical_damage: charPromotionData.critical_damage,
   };
 
-  // TODO: PERCENT FROM LC
+  // INFO: PERCENT FROM LC
+  let lcTotal: Partial<Record<Property, number>> = {};
+  const lcProps = lcSkillData.ability_property.at(props.lightCone.imposition);
+  if (!!lcProps) {
+    lcProps.forEach(({ property_type, value }) => {
+      if (!lcTotal[property_type]) lcTotal[property_type] = value.value;
+      else lcTotal[property_type]! += value.value;
+    });
+  }
 
   // INFO: PERCENT FROM TRACES
   const tracePropList = traceData
@@ -76,11 +95,8 @@ export function useStatParser(props?: Props) {
   let traceTotal: Partial<Record<Property, number>> = {};
 
   tracePropList.forEach(({ property, value }) => {
-    if (!traceTotal[property]) {
-      traceTotal[property] = value;
-    } else {
-      traceTotal[property]! += value;
-    }
+    if (!traceTotal[property]) traceTotal[property] = value;
+    else traceTotal[property]! += value;
   });
 
   // INFO: PERCENT FROM RELIC SET BONUSES
@@ -125,15 +141,10 @@ export function useStatParser(props?: Props) {
     });
   });
 
-  const summed = sumProps([traceTotal, relicTotal, setBonusTotal]);
-  console.log("props", traceTotal, relicTotal, setBonusTotal);
+  const summed = sumProps([traceTotal, relicTotal, setBonusTotal, lcTotal]);
   console.log("summed", summed);
 
   // TODO: parse relic data then multiply base with trace altogether
-
-  const additions = {
-    // atk: baseValues.atk * traceTotal.atk * relicTotal.atkPercent + relicTotal.atk
-  };
 
   const result = {
     base: baseValues,

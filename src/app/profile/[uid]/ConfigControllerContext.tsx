@@ -114,6 +114,7 @@ function useCardConfigProvider(): CardConfigContextPayload {
 
   useEffect(() => {
     if (!!currentCharacter) {
+      const { light_cone, skill_trees } = currentCharacter;
       setCharacterStats({
         character: {
           id: currentCharacter.id,
@@ -121,15 +122,13 @@ function useCardConfigProvider(): CardConfigContextPayload {
           level: currentCharacter.level,
         },
         lightCone: {
-          id: parseInt(currentCharacter.light_cone.id),
-          ascension: currentCharacter.light_cone.promotion,
-          level: currentCharacter.light_cone.level,
+          id: parseInt(light_cone.id),
+          ascension: light_cone.promotion,
+          level: light_cone.level,
+          imposition: light_cone.rank - 1,
         },
         traceTable: Object.fromEntries(
-          currentCharacter.skill_trees.map((skill) => [
-            skill.id,
-            skill.level > 0,
-          ])
+          skill_trees.map((skill) => [skill.id, skill.level > 0])
         ),
         relic: currentCharacter.relics.map(
           ({ id, set_id, level, main_affix, sub_affix }) => ({

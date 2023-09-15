@@ -12,6 +12,8 @@ import {
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
 import { CardConfig } from "../../configReducer";
+import { Property } from "@/bindings/SkillTreeConfig";
+import { BaseValueSchema } from "@/hooks/useStatParser";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   element: Element;
@@ -160,4 +162,58 @@ export function mihomoPropertyList(
     },
   ];
   return [...fields, ele];
+}
+
+const ELE_KEYS: Property[] = [
+  "FireAddedRatio",
+  "IceAddedRatio",
+  "PhysicalAddedRatio",
+  "WindAddedRatio",
+  "ThunderAddedRatio",
+  "QuantumAddedRatio",
+  "ImaginaryAddedRatio",
+];
+const CUSTOM_KEYS: Property[] = [
+  "AttackAddedRatio",
+  "AttackDelta",
+  "HPAddedRatio",
+  "HPDelta",
+  "DefenceAddedRatio",
+  "DefenceDelta",
+  "SpeedDelta",
+  // specific ele += all damagetype
+  "AllDamageTypeAddedRatio",
+  ...ELE_KEYS,
+];
+
+function toStatTable(
+  baseValue: BaseValueSchema,
+  map: Partial<Record<Property, number>>
+) {
+  // automated keys inside map
+  // will be spreaded for autofill
+  const automatedKeys: Partial<Record<Property, number>> = Object.fromEntries(
+    Object.entries(map).filter(
+      ([key, _value]) => !CUSTOM_KEYS.includes(key as Property)
+    )
+  );
+  const eleKeys: Partial<Record<Property, number>> = Object.fromEntries(
+    ELE_KEYS.map((key) => [
+      key,
+      (map[key] ?? 0) + (map.AllDamageTypeAddedRatio ?? 0),
+    ])
+  );
+
+  // leave the trinity to generic keys
+  const ret: Partial<Record<Property, number>> = {
+    MaxHP: (map.HPAddedRatio ?? 1) * baseValue.hp + (map.HPDelta ?? 0),
+    Attack:
+      (map.AttackAddedRatio ?? 1) * baseValue.atk + (map.AttackDelta ?? 0),
+    Defence:
+      (map.DefenceAddedRatio ?? 1) * baseValue.def + (map.DefenceDelta ?? 0),
+    Speed: baseValue.speed + (map.SpeedDelta ?? 0),
+    ...eleKeys,
+    ...automatedKeys,
+  };
+  return ret;
 }
