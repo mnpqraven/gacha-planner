@@ -3,14 +3,7 @@ import { HTMLAttributes, forwardRef } from "react";
 import { ParentSize } from "@visx/responsive";
 import { SpiderChart } from "./SpiderChart";
 import * as z from "zod";
-import {
-  StatRadarData,
-  charAfterPromotion,
-  getNormalizedBoundProperty,
-  lcAfterPromotion,
-  useDataProcess,
-} from "./useDataProcess";
-import { MihomoCharacter } from "../../types";
+import { getNormalizedBoundProperty } from "./useDataProcess";
 import { useCardConfigController } from "../ConfigControllerContext";
 import { filterOtherElements } from "./stat_block/StatTable";
 import { Element } from "@/bindings/AvatarConfig";
@@ -20,16 +13,14 @@ import { useCharacterPromotion } from "@/hooks/queries/useCharacterPromotion";
 import { useLightConePromotion } from "@/hooks/queries/useLightConePromotion";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  // characterData: MihomoCharacter;
   element: Element;
 }
 export const SpiderChartWrapper = forwardRef<HTMLDivElement, Props>(
   ({ className, element, ...props }, ref) => {
-    // const { data } = useDataProcess({ character: characterData });
     const { parsedStats, currentCharacter } = useCardConfigController();
     const { data: charPromo } = useCharacterPromotion(currentCharacter?.id);
     const { data: lcPromo } = useLightConePromotion(
-      Number(currentCharacter?.light_cone.id)
+      Number(currentCharacter?.light_cone?.id)
     );
 
     if (!parsedStats || !charPromo || !lcPromo) return null;

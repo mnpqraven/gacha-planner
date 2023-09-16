@@ -1,12 +1,5 @@
-import { asPercentage, cn, img, range } from "@/lib/utils";
+import { cn, img, range } from "@/lib/utils";
 import { HTMLAttributes, forwardRef } from "react";
-import {
-  MihomoCharacter,
-  MihomoPropertyConfig,
-  MihomoRelicConfig,
-  MihomoRelicSetConfig,
-  MihomoSubAffixInfo,
-} from "@/app/profile/types";
 import { Badge } from "@/app/components/ui/Badge";
 import SVG from "react-inlinesvg";
 import { cva } from "class-variance-authority";
@@ -16,19 +9,18 @@ import {
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
 import { CardConfig } from "../../configReducer";
+import { useCardConfigController } from "../../ConfigControllerContext";
+import { ParsedRelicSchema } from "@/hooks/useStatParser";
+import { RelicCategory } from "@/app/profile/armory/schema";
+import { prettyProperty, propertyIconUrl } from "@/lib/propertyHelper";
+import { useRelicSetBonuses } from "@/hooks/queries/useRelicSetBonus";
+import { useRelicSets } from "@/hooks/queries/useRelicSetList";
+import { SkillDescription } from "@/app/components/Db/SkillDescription";
 
-interface Props extends HTMLAttributes<HTMLDivElement> {
-  characterData: MihomoCharacter | undefined;
-  config: CardConfig;
-}
+interface Props extends HTMLAttributes<HTMLDivElement> {}
 export const RelicInfo = forwardRef<HTMLDivElement, Props>(
-  ({ characterData, config, className, ...props }, ref) => {
-    if (!characterData) return null;
-    const { relics, relic_sets } = characterData;
-
-    const uniqueSets = getHighestRelicSets(relic_sets);
-    const isActive = (relic: MihomoRelicConfig) =>
-      uniqueSets.map((e) => e.id).includes(relic.set_id);
+  ({ className, ...props }, ref) => {
+    const { config, characterRelics } = useCardConfigController();
 
     return (
       <div
@@ -43,26 +35,16 @@ export const RelicInfo = forwardRef<HTMLDivElement, Props>(
         )}
 
         <div className={cn("grid grid-cols-2 gap-2 place-self-center")}>
-          {relics.map((relic, index) => (
+          {characterRelics.map((relic, index) => (
             <Relic
               data={relic}
               key={index}
-              setList={relic_sets}
-              active={isActive(relic)}
+              active={isActive(relic.setId, characterRelics)}
             />
           ))}
         </div>
 
-        <div className="gap-2 rounded-md border p-2 shadow-md shadow-border">
-          {uniqueSets.map((relicSet, index) => (
-            <SetInfo
-              relicSet={relicSet}
-              key={index}
-              characterData={characterData}
-              config={config}
-            />
-          ))}
-        </div>
+        <SetInfo relics={characterRelics} config={config} />
       </div>
     );
   }
@@ -70,67 +52,104 @@ export const RelicInfo = forwardRef<HTMLDivElement, Props>(
 RelicInfo.displayName = "RelicInfo";
 
 interface SetInfoProps extends HTMLAttributes<HTMLButtonElement> {
-  relicSet: MihomoRelicSetConfig;
-  characterData: MihomoCharacter | undefined;
+  relics: ParsedRelicSchema[];
   config: CardConfig;
 }
 const SetInfo = forwardRef<HTMLButtonElement, SetInfoProps>(
-  ({ relicSet, characterData, config, className, ...props }, ref) => {
+  ({ relics, config, className, ...props }, ref) => {
     const { hoverVerbosity } = config;
-    const sets = characterData?.relic_sets.filter((e) => e.id == relicSet.id);
+    const { data: relicBonuses } = useRelicSetBonuses();
+    const { data: relicSets } = useRelicSets();
+
+    if (!relicBonuses || !relicSets) return null;
+
+    const activeSets = relicBonuses.filter((e) =>
+      relics.map((a) => a.setId).includes(e.set_id)
+    );
+
+    let setSummary: { setId: number; num: number; name: string | undefined }[] =
+      [];
+    activeSets.forEach(({ set_id }) => {
+      const currentNum = relics.filter((e) => e.setId == set_id).length;
+      const find = relicBonuses.find((e) => e.set_id == set_id);
+      if (!!find) {
+        const validIndexed = find.require_num.filter(
+          (num) => num <= currentNum
+        );
+        if (validIndexed.length) {
+          setSummary.push({
+            setId: set_id,
+            num: Math.max(...validIndexed),
+            name: relicSets.find((e) => e.set_id == set_id)?.set_name,
+          });
+        }
+      }
+    });
 
     return (
-      <Tooltip>
-        <TooltipTrigger
-          className={cn("flex items-center", className)}
-          ref={ref}
-          disabled={hoverVerbosity === "none"}
-          {...props}
-        >
-          <MarkerIcon className="inline-block align-middle" />
-
-          <span className="ml-2 font-semibold text-green-600">
-            {relicSet.num}pc
-          </span>
-
-          <span className="ml-4">{relicSet.name}</span>
-        </TooltipTrigger>
-        {hoverVerbosity !== "none" && (
-          <TooltipContent
-            side="left"
-            sideOffset={25}
-            className="w-96 py-2 text-justify text-base"
+      <div className="gap-2 rounded-md border p-2 shadow-md shadow-border">
+        <Tooltip>
+          <TooltipTrigger
+            className={cn("flex flex-col", className)}
+            ref={ref}
+            disabled={hoverVerbosity === "none"}
+            {...props}
           >
-            {!!sets ? (
-              <div className="flex flex-col">
-                <p className="mb-2 text-base font-bold text-accent-foreground">
-                  {sets[0].name}
-                </p>
+            {setSummary.sort(bySetId).map(({ name, num }, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <MarkerIcon className="inline-block align-middle" />
 
-                {sets.map((set, index) => (
-                  <div key={index}>
-                    <span className="text-green-600">{set.num}pc</span>:{" "}
-                    {set.desc}
-                  </div>
-                ))}
+                <span className="font-semibold text-green-600">{num}pc</span>
+
+                <span className="ml-2">{name}</span>
               </div>
-            ) : null}
-          </TooltipContent>
-        )}
-      </Tooltip>
+            ))}
+          </TooltipTrigger>
+          {hoverVerbosity !== "none" && (
+            <TooltipContent
+              side="top"
+              sideOffset={25}
+              className="flex w-96 flex-col gap-3 py-2 text-justify text-base"
+            >
+              {activeSets.sort(bySetId).map((set, index) =>
+                canShow(set.set_id, relics) ? (
+                  <div className="flex flex-col" key={index}>
+                    <p className="text-base font-bold text-accent-foreground">
+                      {relicSets.find((e) => e.set_id == set.set_id)?.set_name}
+                    </p>
+
+                    {set.require_num.map((pc, index) =>
+                      canShow(set.set_id, relics, pc) ? (
+                        <div key={index}>
+                          <span className="text-green-600">{pc}pc</span>:
+                          <SkillDescription
+                            skillDesc={set.skill_desc[index]}
+                            paramList={set.ability_param_list}
+                            slv={0}
+                          />
+                        </div>
+                      ) : null
+                    )}
+                  </div>
+                ) : null
+              )}
+            </TooltipContent>
+          )}
+        </Tooltip>
+      </div>
     );
   }
 );
 SetInfo.displayName = "SetInfo ";
 
 interface RelicProps extends HTMLAttributes<HTMLDivElement> {
-  data: MihomoRelicConfig;
-  setList: MihomoRelicSetConfig[];
-  active: boolean;
+  data: ParsedRelicSchema;
+  active?: boolean;
 }
 const Relic = forwardRef<HTMLDivElement, RelicProps>(
-  ({ data, className, setList, active, ...props }, ref) => {
+  ({ data, className, active, ...props }, ref) => {
     // NOTED: upperbound = 6
+    const { mainStat } = data;
     return (
       <div
         className={cn(
@@ -144,7 +163,7 @@ const Relic = forwardRef<HTMLDivElement, RelicProps>(
           <div
             className="absolute top-0 z-0 h-24 w-24"
             style={{
-              backgroundImage: `url(${img(data.icon)})`,
+              backgroundImage: `url(${img(getUrl(data.setId, data.type))})`,
               backgroundSize: "cover",
             }}
           />
@@ -154,24 +173,22 @@ const Relic = forwardRef<HTMLDivElement, RelicProps>(
           {active && <MarkerIcon className="absolute right-1.5 top-1.5" />}
 
           <div className="z-10 flex w-full gap-1 font-bold">
-            <SVG src={getStatUrl(data.main_affix)} />
+            <SVG src={propertyIconUrl(mainStat.property)} />
 
-            {data.main_affix?.percent
-              ? asPercentage(data.main_affix.value)
-              : data.main_affix?.display}
+            {prettyProperty(mainStat.property, mainStat.value).prettyValue}
           </div>
         </div>
 
         <div id="sub" className="flex flex-col gap-1">
-          {data.sub_affix.map((sub, index) => (
+          {data.subStat.map((sub, index) => (
             <div key={index} className="flex flex-col">
               <div key={index} className="flex justify-between gap-1">
-                <SVG src={getStatUrl(sub)} />
-                {sub.percent ? asPercentage(sub.value) : sub.value.toFixed(1)}
+                <SVG src={propertyIconUrl(sub.property)} />
+                {prettyProperty(sub.property, sub.value).prettyValue}
               </div>
 
               <div id="substat-counter" className="flex gap-1">
-                {Array.from(range(1, data.rarity + 1, 1)).map((num) => (
+                {Array.from(range(1, data.rarity + 1)).map((num) => (
                   <div
                     key={num}
                     className={substatVariant({
@@ -205,33 +222,6 @@ const MarkerIcon = forwardRef<HTMLSpanElement, HTMLAttributes<HTMLSpanElement>>(
 );
 MarkerIcon.displayName = "MarkerIcon";
 
-function getHighestRelicSets(sets: MihomoRelicSetConfig[]) {
-  // const uniqueIds = new Set(sets.map((set) => set.id));
-  const res: { [setId: string]: MihomoRelicSetConfig } = {};
-
-  // let highCount: { setId: string; count: number }[] = [];
-  sets.forEach((set) => {
-    // not in res yet, direct append
-    if (!res[set.id]) {
-      res[set.id] = set;
-      // already in res, compare, only append if this count is higher
-    } else {
-      if (res[set.id].num < set.num) {
-        res[set.id] = set;
-      }
-    }
-  });
-  return Object.values(res);
-}
-
-function getStatUrl(
-  stat: MihomoPropertyConfig | MihomoSubAffixInfo | undefined
-): string {
-  if (!stat) return "";
-  const trimmed = stat.icon.replace("icon", "").replace("png", "svg");
-  return trimmed;
-}
-
 function substatVariant({
   substatCount,
   currentCount,
@@ -260,4 +250,51 @@ function substatVariant({
     placement: currentCount == 1 ? "first" : "notFirst",
     level: substatCount >= currentCount ? `reached${rarity}` : "notReached",
   });
+}
+
+function getUrl(setId: number, type: RelicCategory | undefined) {
+  let suffix: string | undefined = undefined;
+  switch (type) {
+    case "HEAD":
+      suffix = "_0";
+      break;
+    case "HAND":
+      suffix = "_1";
+      break;
+    case "BODY":
+      suffix = "_2";
+      break;
+    case "FOOT":
+      suffix = "_3";
+      break;
+    case "OBJECT":
+      suffix = "_0";
+      break;
+    case "NECK":
+      suffix = "_1";
+      break;
+    default:
+      break;
+  }
+  return `icon/relic/${setId}${suffix}.png`;
+}
+
+function isActive<T extends { setId: number }>(
+  currentSetId: number,
+  relics: T[]
+) {
+  const count = relics.filter((e) => e.setId == currentSetId).length;
+  return count >= 2;
+}
+
+function bySetId<T extends { setId?: number; set_id?: number }>(a: T, b: T) {
+  return (a.setId ?? a.set_id ?? 0) - (b.setId ?? b.set_id ?? 0);
+}
+
+function canShow(
+  setId: number,
+  relics: ParsedRelicSchema[],
+  requireNum: number = 2
+) {
+  return relics.filter((e) => e.setId == setId).length >= requireNum;
 }

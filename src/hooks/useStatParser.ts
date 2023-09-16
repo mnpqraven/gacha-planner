@@ -10,19 +10,21 @@ import {
   charAfterPromotion,
   lcAfterPromotion,
 } from "@/app/profile/[uid]/_components/useDataProcess";
+import { RelicCategory } from "@/app/profile/armory/schema";
 
 type BasicMetadata = { id: number; level: number; ascension: number };
-type RelicSchema = {
+export type ParsedRelicSchema = {
   id: number;
+  rarity: number;
   setId: number;
   // INFO: not yet needed
-  // type: RelicCategory;
+  type: RelicCategory;
   level: number;
   mainStat: {
     property: Property;
     value: number;
   };
-  subStat: { property: Property; step: number; value: number }[];
+  subStat: { property: Property; count: number; value: number }[];
 };
 
 export type BaseValueSchema = {
@@ -44,8 +46,8 @@ export interface ParsedStatRecord {
 interface Props {
   character: BasicMetadata;
   traceTable: Record<string | number, boolean>;
-  lightCone: BasicMetadata & { imposition: number };
-  relic: RelicSchema[];
+  lightCone: (BasicMetadata & { imposition: number }) | null;
+  relic: ParsedRelicSchema[];
 }
 
 export function useStatParser(props?: Props) {
@@ -53,22 +55,25 @@ export function useStatParser(props?: Props) {
   const { data: charPromotionData } = useCharacterPromotion(
     props?.character.id
   );
-  const { data: lcPromotionData } = useLightConePromotion(props?.lightCone.id);
-  const { data: lcSkillData } = useLightConeSkill(props?.lightCone.id);
+  const { data: lcPromotionData } = useLightConePromotion(props?.lightCone?.id);
+  const { data: lcSkillData } = useLightConeSkill(props?.lightCone?.id);
   const { data: relicBonuses } = useRelicSetBonuses();
 
   if (
     !traceData ||
     !charPromotionData ||
-    !lcPromotionData ||
-    !lcSkillData ||
+    // !lcPromotionData ||
+    // !lcSkillData ||
     !props ||
     !relicBonuses
   )
     return undefined;
 
   const { ascension: charAscension, level: charLevel } = props.character;
-  const { ascension: lcAscension, level: lcLevel } = props.lightCone;
+  const { ascension: lcAscension, level: lcLevel } = props.lightCone ?? {
+    ascension: 0,
+    level: 0,
+  };
 
   const baseCharValues = baseChar(charLevel, charAscension, charPromotionData);
   const baseLcValues = baseLc(lcLevel, lcAscension, lcPromotionData);
@@ -84,7 +89,9 @@ export function useStatParser(props?: Props) {
 
   // INFO: PERCENT FROM LC
   let lcTotal: Partial<Record<Property, number>> = {};
-  const lcProps = lcSkillData.ability_property.at(props.lightCone.imposition);
+  const lcProps = lcSkillData?.ability_property.at(
+    props.lightCone?.imposition ?? 0
+  );
   if (!!lcProps) {
     lcProps.forEach(({ property_type, value }) => {
       if (!lcTotal[property_type]) lcTotal[property_type] = value.value;
@@ -135,7 +142,7 @@ export function useStatParser(props?: Props) {
 
   // INFO: PERCENT FROM RELIC
   // this ignore substat step so we can map it out
-  const subStatNoStep = (relic: RelicSchema) =>
+  const subStatNoStep = (relic: ParsedRelicSchema) =>
     relic.subStat.map(({ property, value }) => ({ property, value }));
 
   const relicPropList = props.relic.map((relic) => [
@@ -193,7 +200,6 @@ export function useStatParser(props?: Props) {
     normalized,
   };
 
-  console.log("HOOK", result);
   return result;
 }
 
@@ -213,21 +219,24 @@ function baseChar(
 function baseLc(
   level: number,
   ascension: number,
-  promoteData: EquipmentPromotionConfig
+  promoteData: EquipmentPromotionConfig | undefined
 ) {
-  const {
-    base_attack,
-    base_attack_add,
-    base_defence,
-    base_defence_add,
-    base_hp,
-    base_hpadd,
-  } = promoteData;
-  return {
-    atk: base_attack[ascension] + (level - 1) * base_attack_add[ascension],
-    hp: base_hp[ascension] + (level - 1) * base_hpadd[ascension],
-    def: base_defence[ascension] + (level - 1) * base_defence_add[ascension],
-  };
+  if (!!promoteData) {
+    const {
+      base_attack,
+      base_attack_add,
+      base_defence,
+      base_defence_add,
+      base_hp,
+      base_hpadd,
+    } = promoteData;
+    return {
+      atk: base_attack[ascension] + (level - 1) * base_attack_add[ascension],
+      hp: base_hp[ascension] + (level - 1) * base_hpadd[ascension],
+      def: base_defence[ascension] + (level - 1) * base_defence_add[ascension],
+    };
+  }
+  return { atk: 0, hp: 0, def: 0 };
 }
 
 function sumProps(

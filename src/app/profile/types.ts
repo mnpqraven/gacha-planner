@@ -49,7 +49,7 @@ export interface MihomoCharacter {
   element: MihomoElementConfig;
   skills: MihomoSkillConfig[];
   skill_trees: MihomoSkillTreeConfig[];
-  light_cone: MihomoLightConeConfig;
+  light_cone: MihomoLightConeConfig | null;
   relics: MihomoRelicConfig[];
   relic_sets: MihomoRelicSetConfig[];
   attributes: MihomoAttributeConfig[];

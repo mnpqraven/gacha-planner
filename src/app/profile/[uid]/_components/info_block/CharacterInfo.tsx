@@ -9,7 +9,7 @@ import { CardConfig } from "../../configReducer";
 import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  playerData?: MihomoPlayer;
+  playerData?: Partial<{ uid: string | number; nickname: string }>;
   characterId: number;
   config: CardConfig;
   level: number;

@@ -28,6 +28,7 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
     setMode,
     currentCharacterId,
     armoryFormValue,
+    mihomoResponse,
     parsedStats,
   } = useCardConfigController();
 
@@ -104,14 +105,7 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
               />
             </div>
 
-            {/*
-            <RelicInfo
-              id="relic-4"
-              className="justify-end pb-2"
-              characterData={currentCharacter}
-              config={config}
-            />
-        */}
+            <RelicInfo id="relic-4" className="justify-end pb-2" />
           </div>
         </div>
       </div>
@@ -132,7 +126,6 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
     rarity,
     eidolon,
   };
-
   return (
     <div className="h-fit w-fit p-4" ref={enkaRef}>
       <div
@@ -147,6 +140,7 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
           className="relative z-10"
           config={config}
           characterId={currentCharacter.id}
+          playerData={{ uid, nickname: mihomoResponse?.player.nickname }}
           {...data}
         />
 
@@ -157,15 +151,17 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
             eidolon={eidolon}
           />
           <div className="flex flex-col pb-2">
-            <LightConeInfo
-              id="lightcone-2.1"
-              className="grow"
-              lcId={currentCharacter.light_cone.id}
-              config={config}
-              imposition={currentCharacter.light_cone.rank}
-              level={currentCharacter.light_cone.level}
-              ascension={currentCharacter.light_cone.promotion}
-            />
+            {!!currentCharacter.light_cone && (
+              <LightConeInfo
+                id="lightcone-2.1"
+                className="grow"
+                lcId={currentCharacter.light_cone.id}
+                config={config}
+                imposition={currentCharacter.light_cone.rank}
+                level={currentCharacter.light_cone.level}
+                ascension={currentCharacter.light_cone.promotion}
+              />
+            )}
             <SkillInfo
               id="skill-2.2"
               characterId={currentCharacter.id}
@@ -190,12 +186,7 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
             />
           </div>
 
-          <RelicInfo
-            id="relic-4"
-            className="justify-end pb-2"
-            characterData={currentCharacter}
-            config={config}
-          />
+          <RelicInfo id="relic-4" className="justify-end pb-2" />
         </div>
       </div>
     </div>

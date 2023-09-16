@@ -22,7 +22,12 @@ import {
 import { useMihomoInfo } from "./useMihomoInfo";
 import { LANGS } from "@/lib/constants";
 import { ArmoryFormSchema, defaultArmoryFormSchema } from "../armory/schema";
-import { ParsedStatRecord, useStatParser } from "@/hooks/useStatParser";
+import {
+  ParsedRelicSchema,
+  ParsedStatRecord,
+  useStatParser,
+} from "@/hooks/useStatParser";
+import { useRelicSlotType } from "@/hooks/queries/useRelicSlotType";
 
 interface CardConfigContextPayload {
   currentCharacter?: MihomoCharacter;
@@ -43,6 +48,7 @@ interface CardConfigContextPayload {
   updateParam: (toUid?: string, toLang?: (typeof LANGS)[number]) => void;
 
   parsedStats: ParsedStatRecord | undefined;
+  characterRelics: ParsedRelicSchema[];
 }
 
 export const defaultCardConfig: CardConfigContextPayload = {
@@ -65,6 +71,7 @@ export const defaultCardConfig: CardConfigContextPayload = {
   updateParam: () => {},
 
   parsedStats: undefined,
+  characterRelics: [],
 };
 
 export const CardConfigContext =
@@ -111,45 +118,64 @@ function useCardConfigProvider(): CardConfigContextPayload {
   const [characterStat, setCharacterStats] = useState<
     Parameters<typeof useStatParser>[0] | undefined
   >(undefined);
+  const [characterRelics, setCharacterRelics] = useState<ParsedRelicSchema[]>(
+    []
+  );
   const parsedStats = useStatParser(characterStat);
-  // const { additions, base, properties } = parsedStats
+  const [setIds, setSetIds] = useState<number[]>([]);
+  const { data: relicSlotMap } = useRelicSlotType(setIds);
 
   useEffect(() => {}, [armoryFormValue]);
 
   useEffect(() => {
-    if (!!currentCharacter) {
+    if (!!currentCharacter && relicSlotMap) {
       const { light_cone, skill_trees } = currentCharacter;
+      const relic: ParsedRelicSchema[] = currentCharacter.relics.map(
+        ({ id, set_id, level, main_affix, sub_affix, rarity }) => ({
+          id: parseInt(id),
+          setId: parseInt(set_id),
+          level,
+          rarity,
+          type: relicSlotMap[Number(id)],
+          mainStat: { property: main_affix.type, value: main_affix.value },
+          subStat: sub_affix.map(({ type: property, count, value }) => ({
+            property,
+            count,
+            value,
+          })),
+        })
+      );
+      const lightCone = light_cone
+        ? {
+            id: parseInt(light_cone.id),
+            ascension: light_cone.promotion,
+            level: light_cone.level,
+            imposition: light_cone.rank - 1,
+          }
+        : null;
+
+      setSetIds(
+        Array.from(
+          new Set(currentCharacter.relics.map((e) => Number(e.set_id)))
+        )
+      );
+
+      setCharacterRelics(relic);
+
       setCharacterStats({
         character: {
           id: currentCharacter.id,
           ascension: currentCharacter.promotion,
           level: currentCharacter.level,
         },
-        lightCone: {
-          id: parseInt(light_cone.id),
-          ascension: light_cone.promotion,
-          level: light_cone.level,
-          imposition: light_cone.rank - 1,
-        },
+        lightCone,
         traceTable: Object.fromEntries(
           skill_trees.map((skill) => [skill.id, skill.level > 0])
         ),
-        relic: currentCharacter.relics.map(
-          ({ id, set_id, level, main_affix, sub_affix }) => ({
-            id: parseInt(id),
-            setId: parseInt(set_id),
-            level: level,
-            mainStat: { property: main_affix.type, value: main_affix.value },
-            subStat: sub_affix.map(({ type: property, step, value }) => ({
-              property,
-              step,
-              value,
-            })),
-          })
-        ),
+        relic,
       });
     }
-  }, [currentCharacter]);
+  }, [currentCharacter, relicSlotMap]);
 
   return {
     currentCharacter,
@@ -172,6 +198,7 @@ function useCardConfigProvider(): CardConfigContextPayload {
     updateParam,
 
     parsedStats,
+    characterRelics,
   };
 }
 

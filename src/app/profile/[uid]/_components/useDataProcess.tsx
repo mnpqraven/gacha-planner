@@ -64,7 +64,7 @@ export function useDataProcess({ character }: Props): {
   // normalize summed data
   const { data: charPromo } = useCharacterPromotion(character?.id);
   const { data: lcPromo } = useLightConePromotion(
-    Number(character?.light_cone.id)
+    Number(character?.light_cone?.id)
   );
 
   if (!!charPromo && !!character && !!lcPromo) {
@@ -75,8 +75,8 @@ export function useDataProcess({ character }: Props): {
     });
     const currentGreyLc = lcAfterPromotion({
       promotionConfig: lcPromo,
-      ascension: character.light_cone.promotion,
-      level: character.light_cone.level,
+      ascension: character.light_cone?.promotion,
+      level: character.light_cone?.level,
     });
     const maxedGreyChar = charAfterPromotion({ promotionConfig: charPromo });
     const maxedGreyLc = lcAfterPromotion({ promotionConfig: lcPromo });
@@ -201,7 +201,7 @@ export function useDataProcess({ character }: Props): {
 }
 
 interface AfterPromotion<T> {
-  promotionConfig: T;
+  promotionConfig: T | undefined;
   level?: number;
   ascension?: number;
 }
@@ -211,6 +211,12 @@ export function charAfterPromotion({
   level = 80,
   ascension = 6,
 }: AfterPromotion<AvatarPromotionConfig>) {
+  if (!promotionConfig)
+    return {
+      atk: 0,
+      def: 0,
+      hp: 0,
+    };
   const atk_base = promotionConfig.attack_base[ascension];
   const atk_sum =
     atk_base + (level - 1) * promotionConfig.attack_add[ascension];
@@ -230,6 +236,12 @@ export function lcAfterPromotion({
   level = 80,
   ascension = 6,
 }: AfterPromotion<EquipmentPromotionConfig>) {
+  if (!promotionConfig)
+    return {
+      atk: 0,
+      def: 0,
+      hp: 0,
+    };
   const atk_base = promotionConfig.base_attack[ascension];
   const atk_sum =
     atk_base + (level - 1) * promotionConfig.base_attack_add[ascension];
