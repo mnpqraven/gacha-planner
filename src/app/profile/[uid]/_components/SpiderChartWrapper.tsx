@@ -1,17 +1,75 @@
-import { cn } from "@/lib/utils";
+import { cn, rotate } from "@/lib/utils";
 import { HTMLAttributes, forwardRef } from "react";
 import { ParentSize } from "@visx/responsive";
 import { SpiderChart } from "./SpiderChart";
 import * as z from "zod";
-import { StatRadarData, useDataProcess } from "./useDataProcess";
+import {
+  StatRadarData,
+  charAfterPromotion,
+  getNormalizedBoundProperty,
+  lcAfterPromotion,
+  useDataProcess,
+} from "./useDataProcess";
 import { MihomoCharacter } from "../../types";
+import { useCardConfigController } from "../ConfigControllerContext";
+import { filterOtherElements } from "./stat_block/StatTable";
+import { Element } from "@/bindings/AvatarConfig";
+import { prettyProperty, propertyIconUrl } from "@/lib/propertyHelper";
+import { Property } from "@/bindings/SkillTreeConfig";
+import { useCharacterPromotion } from "@/hooks/queries/useCharacterPromotion";
+import { useLightConePromotion } from "@/hooks/queries/useLightConePromotion";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  characterData: MihomoCharacter;
+  // characterData: MihomoCharacter;
+  element: Element;
 }
 export const SpiderChartWrapper = forwardRef<HTMLDivElement, Props>(
-  ({ className, characterData, ...props }, ref) => {
-    const { data } = useDataProcess({ character: characterData });
+  ({ className, element, ...props }, ref) => {
+    // const { data } = useDataProcess({ character: characterData });
+    const { parsedStats, currentCharacter } = useCardConfigController();
+    const { data: charPromo } = useCharacterPromotion(currentCharacter?.id);
+    const { data: lcPromo } = useLightConePromotion(
+      Number(currentCharacter?.light_cone.id)
+    );
+
+    if (!parsedStats || !charPromo || !lcPromo) return null;
+
+    const speed = parsedStats.baseValues.speed;
+
+    const binding = Object.entries(parsedStats.statTable)
+      .reverse()
+      .map(([property, value]) => {
+        let binding = value;
+        switch (property as Property) {
+          case "MaxHP":
+            binding = parsedStats.normalized.hp;
+            break;
+          case "Attack":
+            binding = parsedStats.normalized.atk;
+            break;
+          case "Defence":
+            binding = parsedStats.normalized.def;
+            break;
+          case "Speed":
+            binding = value - speed;
+            break;
+        }
+        const normalizedValue =
+          binding / getNormalizedBoundProperty(property as Property, speed);
+
+        return {
+          property: property,
+          value,
+          normalizedValue,
+        };
+      })
+      .filter(({ property }) => filterOtherElements(property, element)) as {
+      property: Property;
+      value: number;
+      normalizedValue: number;
+    }[];
+
+    const data = rotate(binding.length / 2 + 2, binding);
 
     return (
       <div
@@ -25,11 +83,14 @@ export const SpiderChartWrapper = forwardRef<HTMLDivElement, Props>(
               width={parent.width}
               height={parent.height}
               data={data}
-              valueAccessor={(e: (typeof data)[number]) => e.value}
-              iconAccessor={(e: (typeof data)[number]) => propertyPath(e.field)}
-              tooltipRender={({ label, tooltipValue }: StatRadarData) =>
-                `${label}: ${tooltipValue}`
+              valueAccessor={(e: (typeof data)[number]) => e.normalizedValue}
+              iconAccessor={(e: (typeof data)[number]) =>
+                propertyIconUrl(e.property)
               }
+              tooltipRender={({ property, value }: (typeof data)[number]) => {
+                const { label, prettyValue } = prettyProperty(property, value);
+                return `${label}: ${prettyValue}`;
+              }}
             />
           )}
         </ParentSize>

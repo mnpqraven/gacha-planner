@@ -206,7 +206,7 @@ interface AfterPromotion<T> {
   ascension?: number;
 }
 
-function charAfterPromotion({
+export function charAfterPromotion({
   promotionConfig,
   level = 80,
   ascension = 6,
@@ -225,7 +225,7 @@ function charAfterPromotion({
   return { atk: atk_sum, def: def_sum, hp: hp_sum };
 }
 
-function lcAfterPromotion({
+export function lcAfterPromotion({
   promotionConfig,
   level = 80,
   ascension = 6,
@@ -262,6 +262,41 @@ function getNormalizedBound(field: Field, charSpd: number) {
     case "sp_rate":
       return 0.5;
     case "spd":
+      return 161 - charSpd;
+    // element dmg
+    default:
+      return 1.0;
+  }
+}
+
+export function getNormalizedBoundProperty(
+  property: Property,
+  charSpd: number
+) {
+  switch (property) {
+    case "MaxHP":
+    case "Attack":
+      return 3;
+    case "Defence":
+      return 4;
+    case "CriticalDamage":
+    case "CriticalDamageBase":
+    case "BreakDamageAddedRatio":
+    case "BreakDamageAddedRatioBase":
+      return 2.0;
+    case "StatusProbability":
+    case "StatusProbabilityBase":
+    case "StatusResistance":
+    case "StatusResistanceBase":
+    case "CriticalChance":
+    case "CriticalChanceBase":
+    case "HealRatio":
+    case "HealRatioBase":
+      return 1.0;
+    case "SPRatio":
+    case "SPRatioBase":
+      return 0.5;
+    case "Speed":
       return 161 - charSpd;
     // element dmg
     default:

@@ -6,6 +6,10 @@ import { EquipmentPromotionConfig } from "@/bindings/EquipmentPromotionConfig";
 import { Property } from "@/bindings/RelicSubAffixConfig";
 import { useRelicSetBonuses } from "./queries/useRelicSetBonus";
 import { useLightConeSkill } from "./queries/useLightConeSkill";
+import {
+  charAfterPromotion,
+  lcAfterPromotion,
+} from "@/app/profile/[uid]/_components/useDataProcess";
 
 type BasicMetadata = { id: number; level: number; ascension: number };
 type RelicSchema = {
@@ -29,6 +33,13 @@ export type BaseValueSchema = {
   critical_chance: number;
   critical_damage: number;
 };
+
+export interface ParsedStatRecord {
+  baseValues: BaseValueSchema;
+  propertyList: Partial<Record<Property, number>>;
+  statTable: Partial<Record<Property, number>>;
+  normalized: Pick<BaseValueSchema, "hp" | "atk" | "def">;
+}
 
 interface Props {
   character: BasicMetadata;
@@ -62,7 +73,7 @@ export function useStatParser(props?: Props) {
   const baseCharValues = baseChar(charLevel, charAscension, charPromotionData);
   const baseLcValues = baseLc(lcLevel, lcAscension, lcPromotionData);
 
-  const baseValues = {
+  const baseValues: BaseValueSchema = {
     atk: baseCharValues.atk + baseLcValues.atk,
     hp: baseCharValues.hp + baseLcValues.hp,
     def: baseCharValues.def + baseLcValues.def,
@@ -142,14 +153,44 @@ export function useStatParser(props?: Props) {
   });
 
   const summed = sumProps([traceTotal, relicTotal, setBonusTotal, lcTotal]);
-  console.log("summed", summed);
 
   // TODO: parse relic data then multiply base with trace altogether
 
+  const {
+    atk: maxChAtk,
+    def: maxChDef,
+    hp: maxChHp,
+  } = charAfterPromotion({
+    promotionConfig: charPromotionData,
+  });
+  const {
+    atk: maxLcAtk,
+    def: maxLcDef,
+    hp: maxLcHp,
+  } = lcAfterPromotion({ promotionConfig: lcPromotionData });
+  const normalized = {
+    atk:
+      (baseValues.atk +
+        orZero(summed["AttackDelta"]) +
+        baseValues.atk * orZero(summed["AttackAddedRatio"])) /
+      (maxChAtk + maxLcAtk),
+    def:
+      (baseValues.def +
+        orZero(summed["DefenceDelta"]) +
+        baseValues.def * orZero(summed["DefenceAddedRatio"])) /
+      (maxChDef + maxLcDef),
+    hp:
+      (baseValues.hp +
+        orZero(summed["HPDelta"]) +
+        baseValues.hp * orZero(summed["HPAddedRatio"])) /
+      (maxChHp + maxLcHp),
+  };
+
   const result = {
-    base: baseValues,
-    additions: [0],
-    properties: [0],
+    baseValues,
+    propertyList: summed,
+    statTable: toStatTable(baseValues, summed),
+    normalized,
   };
 
   console.log("HOOK", result);
@@ -201,4 +242,69 @@ function sumProps(
     });
   });
   return ret;
+}
+
+const ELE_KEYS: Property[] = [
+  "FireAddedRatio",
+  "IceAddedRatio",
+  "PhysicalAddedRatio",
+  "WindAddedRatio",
+  "ThunderAddedRatio",
+  "QuantumAddedRatio",
+  "ImaginaryAddedRatio",
+];
+
+const CUSTOM_KEYS: Property[] = [
+  "AttackAddedRatio",
+  "AttackDelta",
+  "HPAddedRatio",
+  "HPDelta",
+  "DefenceAddedRatio",
+  "DefenceDelta",
+  "SpeedDelta",
+  "CriticalChanceBase",
+  "CriticalDamageBase",
+  // specific ele += all damagetype
+  "AllDamageTypeAddedRatio",
+  ...ELE_KEYS,
+];
+
+function toStatTable(
+  baseValue: BaseValueSchema,
+  map: Partial<Record<Property, number>>
+) {
+  const { atk, critical_chance, critical_damage, def, hp, speed } = baseValue;
+  // automated keys inside map
+  // will be spreaded for autofill
+  const automatedKeys: Partial<Record<Property, number>> = Object.fromEntries(
+    Object.entries(map).filter(
+      ([key, _value]) => !CUSTOM_KEYS.includes(key as Property)
+    )
+  );
+  const eleKeys: Partial<Record<Property, number>> = Object.fromEntries(
+    ELE_KEYS.map((key) => [
+      key,
+      orZero(map[key]) + orZero(map.AllDamageTypeAddedRatio),
+    ])
+  );
+
+  // leave the trinity to generic keys
+  const ret: Partial<Record<Property, number>> = {
+    Defence:
+      (orZero(map.DefenceAddedRatio, 1) + 1) * def + orZero(map.DefenceDelta),
+    MaxHP: (orZero(map.HPAddedRatio, 1) + 1) * hp + orZero(map.HPDelta),
+    Attack:
+      (orZero(map.AttackAddedRatio, 1) + 1) * atk + orZero(map.AttackDelta),
+    Speed: speed + orZero(map.SpeedDelta),
+    CriticalChanceBase: critical_chance + orZero(map.CriticalChanceBase),
+    CriticalDamageBase: critical_damage + orZero(map.CriticalDamageBase),
+    ...eleKeys,
+    ...automatedKeys,
+  };
+  return ret;
+}
+
+function orZero(n: number | null | undefined, def?: number): number {
+  if (!n) return !!def ? def : 0;
+  else return n;
 }

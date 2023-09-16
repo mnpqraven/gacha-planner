@@ -28,6 +28,7 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
     setMode,
     currentCharacterId,
     armoryFormValue,
+    parsedStats,
   } = useCardConfigController();
 
   const { data: charMetadata } = useCharacterMetadata(currentCharacterId);
@@ -40,6 +41,8 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
   useEffect(() => {
     updateParam(uid, lang);
   }, [uid, lang, updateParam]);
+
+  if (!parsedStats) return null;
 
   if (mode == "ARMORY" && !!charMetadata) {
     const { skills, ...formValues } = armoryFormValue.player;
@@ -88,36 +91,34 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
             </div>
           </div>
 
-          {/*
           <div id="block-3" className="col-span-2 flex gap-4">
             <div className="flex grow flex-col gap-2 place-self-end pb-2">
-              <SpiderChartWrapper characterData={currentCharacter} />
+              <SpiderChartWrapper element={charMetadata.damage_type} />
 
               <StatTable
                 id="stat-3"
                 className="grid grid-cols-2 gap-x-2"
-                element={currentCharacter.element.name}
-                attributes={currentCharacter.attributes}
-                properties={currentCharacter.properties}
-                additions={currentCharacter.additions}
+                element={charMetadata.damage_type}
+                data={parsedStats.statTable}
                 config={config}
               />
             </div>
 
+            {/*
             <RelicInfo
               id="relic-4"
               className="justify-end pb-2"
               characterData={currentCharacter}
               config={config}
             />
-          </div>
         */}
+          </div>
         </div>
       </div>
     );
   }
 
-  if (!currentCharacter) return null;
+  if (!currentCharacter || !parsedStats?.statTable) return null;
 
   const {
     level,
@@ -178,15 +179,13 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
 
         <div id="block-3" className="col-span-2 flex gap-4">
           <div className="flex grow flex-col gap-2 place-self-end pb-2">
-            <SpiderChartWrapper characterData={currentCharacter} />
+            <SpiderChartWrapper element={currentCharacter.element.name} />
 
             <StatTable
               id="stat-3"
               className="grid grid-cols-2 gap-x-2"
+              data={parsedStats.statTable}
               element={currentCharacter.element.name}
-              attributes={currentCharacter.attributes}
-              properties={currentCharacter.properties}
-              additions={currentCharacter.additions}
               config={config}
             />
           </div>

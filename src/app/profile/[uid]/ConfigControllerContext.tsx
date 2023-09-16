@@ -22,7 +22,7 @@ import {
 import { useMihomoInfo } from "./useMihomoInfo";
 import { LANGS } from "@/lib/constants";
 import { ArmoryFormSchema, defaultArmoryFormSchema } from "../armory/schema";
-import { useStatParser } from "@/hooks/useStatParser";
+import { ParsedStatRecord, useStatParser } from "@/hooks/useStatParser";
 
 interface CardConfigContextPayload {
   currentCharacter?: MihomoCharacter;
@@ -41,6 +41,8 @@ interface CardConfigContextPayload {
   changeConfig: Dispatch<CardConfigAction>;
   mihomoResponse?: MihomoResponse;
   updateParam: (toUid?: string, toLang?: (typeof LANGS)[number]) => void;
+
+  parsedStats: ParsedStatRecord | undefined;
 }
 
 export const defaultCardConfig: CardConfigContextPayload = {
@@ -61,6 +63,8 @@ export const defaultCardConfig: CardConfigContextPayload = {
   changeConfig: () => {},
   mihomoResponse: undefined,
   updateParam: () => {},
+
+  parsedStats: undefined,
 };
 
 export const CardConfigContext =
@@ -166,6 +170,8 @@ function useCardConfigProvider(): CardConfigContextPayload {
     // initResponse: setMihomoResponse,
     mihomoResponse: query.data,
     updateParam,
+
+    parsedStats,
   };
 }
 
