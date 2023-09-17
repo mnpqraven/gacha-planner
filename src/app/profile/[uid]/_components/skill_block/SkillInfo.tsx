@@ -176,7 +176,7 @@ function getLabel(skillType: SkillType | null | undefined): string {
   }
 }
 
-function getSkillMaxLevel(
+export function getSkillMaxLevel(
   skillType: SkillType | null | undefined,
   skillTypeDesc: string,
   eidolon: number

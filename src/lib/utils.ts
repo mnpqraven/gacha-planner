@@ -121,7 +121,7 @@ export function getImagePath(
   skill: AvatarSkillConfig
 ): string | undefined {
   let ttype = "";
-  if (skill.attack_type) {
+  if (!!skill.attack_type) {
     switch (skill.attack_type) {
       case "Normal":
         ttype = "basic_atk";

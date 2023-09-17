@@ -10,22 +10,33 @@ import { ComponentPropsWithoutRef, forwardRef } from "react";
 import SVG from "react-inlinesvg";
 import { propertyIconUrl, propertyName } from "../relicConfig";
 
-type SelectProps = ComponentPropsWithoutRef<typeof Select>;
-
 interface Props extends ComponentPropsWithoutRef<typeof SelectContent> {
   options: Property[];
-  onValueChange: SelectProps["onValueChange"];
+  onValueChange: (value: Property) => void;
   itemDisabled?: (prop: Property) => boolean;
   defaultValue?: string;
+  value?: string;
 }
 
 export const PropertySelect = forwardRef<HTMLDivElement, Props>(
   (
-    { onValueChange, options, className, itemDisabled, defaultValue, ...props },
+    {
+      onValueChange,
+      options,
+      className,
+      itemDisabled,
+      defaultValue,
+      value,
+      ...props
+    },
     ref
   ) => {
     return (
-      <Select onValueChange={onValueChange} defaultValue={defaultValue}>
+      <Select
+        onValueChange={(e) => onValueChange(e as Property)}
+        defaultValue={defaultValue}
+        value={value ?? ""}
+      >
         <SelectTrigger className={className}>
           <SelectValue />
         </SelectTrigger>

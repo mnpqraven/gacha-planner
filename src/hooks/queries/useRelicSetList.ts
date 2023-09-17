@@ -13,7 +13,7 @@ export const optionsRelicSet = () =>
   queryOptions<List<RelicSetConfig>, unknown, RelicSetConfig[]>({
     queryKey: ["relic_set"],
     queryFn: async () => await API.relicSets.get(),
-    select: (data) => data.list,
+    select: (data) => data.list.sort((a,b) => a.set_id - b.set_id),
   });
 
 export function useRelicSets(opt: Options = {}) {
