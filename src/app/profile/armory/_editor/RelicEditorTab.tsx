@@ -1,5 +1,5 @@
 import { UseFormReturn } from "react-hook-form";
-import { ArmoryFormSchema, relicCategories } from "../schema";
+import { ArmoryFormSchema, RelicCategory, relicCategories } from "../schema";
 import { useRelicSets } from "@/hooks/queries/useRelicSetList";
 import {
   Select,
@@ -19,41 +19,38 @@ import { IMAGE_URL } from "@/lib/constants";
 import { SingularRelicEditor } from "./RelicEditor/SingularRelicEditor";
 import { Switch } from "@/app/components/ui/Switch";
 import { useImmer } from "use-immer";
+import { useCardConfigController } from "../../[uid]/ConfigControllerContext";
 
 interface Props {
   form: UseFormReturn<ArmoryFormSchema>;
 }
 export function RelicEditorTab({ form }: Props) {
   const { data: relicSets } = useRelicSets();
-  const [openStatus, setOpenStatus] = useImmer<
-    { category: (typeof relicCategories)[number]; open: boolean }[]
-  >(relicCategories.map((category) => ({ category, open: false })));
+  const { data: reducerData, changeData } = useCardConfigController();
+  const openState = reducerData.relicCfg.openState;
 
   function updateState(
     category: (typeof relicCategories)[number],
     checked: boolean
   ) {
-    setOpenStatus((fields) => {
-      const find = fields.find(({ category: cat }) => cat == category)!;
-      find.open = checked;
-    });
     if (category == "HEAD")
-      form.setValue("relic.HEAD", { mainStat: { key: "HPDelta", step: 0 } });
+      form.setValue("relic.HEAD.mainStat", { property: "HPDelta", value: 0 });
 
     if (category == "HAND")
-      form.setValue("relic.HAND", {
-        mainStat: { key: "AttackDelta", step: 0 },
+      form.setValue("relic.HAND.mainStat", {
+        property: "AttackDelta",
+        value: 0,
       });
   }
 
   return (
     <div className="grid grid-cols-2 gap-2">
-      {openStatus.map(({ open, category }, index) =>
+      {Object.entries(openState).map(([category, open], index) =>
         open ? (
           <div key={category} className="flex flex-col rounded-md border p-2">
             <FormField
               control={form.control}
-              name={`relic.${category}.setId`}
+              name={`relic.${category as RelicCategory}.setId`}
               render={({ field }) => (
                 <FormItem>
                   <div className="flex justify-between">
@@ -61,9 +58,16 @@ export function RelicEditorTab({ form }: Props) {
 
                     <Switch
                       checked={open}
-                      onCheckedChange={(checked) =>
-                        updateState(category, checked)
-                      }
+                      onCheckedChange={(checked) => {
+                        updateState(category as RelicCategory, checked);
+                        changeData({
+                          type: "changeRelicOpenState",
+                          payload: {
+                            type: category as RelicCategory,
+                            open: checked,
+                          },
+                        });
+                      }}
                     />
                   </div>
                   <Select
@@ -105,12 +109,12 @@ export function RelicEditorTab({ form }: Props) {
               )}
             />
 
-            {!!form.watch(`relic.${category}.setId`) && (
+            {!!form.watch(`relic.${category as RelicCategory}.setId`) && (
               <SingularRelicEditor
                 imageUrl={`${IMAGE_URL}icon/relic/${form.watch(
-                  `relic.${category}.setId`
+                  `relic.${category as RelicCategory}.setId`
                 )}_${index % 4}.png`}
-                category={category}
+                category={category as RelicCategory}
                 form={form}
               />
             )}
@@ -124,7 +128,13 @@ export function RelicEditorTab({ form }: Props) {
 
             <Switch
               checked={open}
-              onCheckedChange={(checked) => updateState(category, checked)}
+              onCheckedChange={(checked) => {
+                updateState(category as RelicCategory, checked);
+                changeData({
+                  type: "changeRelicOpenState",
+                  payload: { type: category as RelicCategory, open: checked },
+                });
+              }}
             />
           </div>
         )

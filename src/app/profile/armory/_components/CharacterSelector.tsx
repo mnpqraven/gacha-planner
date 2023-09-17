@@ -18,7 +18,7 @@ import { useState } from "react";
 
 export function CharacterSelector() {
   const { characterList } = useCharacterList();
-  const { setCurrentCharacterId } = useCardConfigController();
+  const { changeData } = useCardConfigController();
   const sorted = characterList.sort((a, b) => {
     return (
       b.rarity - a.rarity ||
@@ -31,7 +31,7 @@ export function CharacterSelector() {
   const filter = useCharacterFilter();
 
   function onCharacterSelect(to: AvatarConfig) {
-    setCurrentCharacterId(to.avatar_id);
+    changeData({ type: "changeCharacterId", payload: to.avatar_id });
     setOpen(false);
   }
 

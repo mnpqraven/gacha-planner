@@ -8,6 +8,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useReducer,
   useRef,
   useState,
@@ -21,20 +22,29 @@ import {
 } from "./configReducer";
 import { useMihomoInfo } from "./useMihomoInfo";
 import { LANGS } from "@/lib/constants";
-import { ArmoryFormSchema, defaultArmoryFormSchema } from "../armory/schema";
+import {
+  ArmoryFormSchema,
+  RelicCategory,
+  defaultArmoryFormSchema,
+} from "../armory/schema";
 import {
   ParsedRelicSchema,
   ParsedStatRecord,
+  StatParserConstructor,
   useStatParser,
 } from "@/hooks/useStatParser";
 import { useRelicSlotType } from "@/hooks/queries/useRelicSlotType";
+import {
+  CardData,
+  CardDataAction,
+  dataReducer,
+  initialCardData,
+} from "./dataReducer";
 
 interface CardConfigContextPayload {
   currentCharacter?: MihomoCharacter;
   setCurrentCharacter: (to: MihomoCharacter) => void;
 
-  currentCharacterId?: number; // for 'ARMORY'
-  setCurrentCharacterId: (toId: number) => void; // for 'ARMORY'
   armoryFormValue: ArmoryFormSchema;
   updateArmoryFormValue: Dispatch<SetStateAction<ArmoryFormSchema>>;
 
@@ -44,6 +54,8 @@ interface CardConfigContextPayload {
   enkaRef: RefObject<HTMLDivElement> | null;
   config: CardConfig;
   changeConfig: Dispatch<CardConfigAction>;
+  data: CardData;
+  changeData: Dispatch<CardDataAction>;
   mihomoResponse?: MihomoResponse;
   updateParam: (toUid?: string, toLang?: (typeof LANGS)[number]) => void;
 
@@ -55,9 +67,6 @@ export const defaultCardConfig: CardConfigContextPayload = {
   currentCharacter: undefined,
   setCurrentCharacter: () => {},
 
-  currentCharacterId: undefined,
-  setCurrentCharacterId: () => {},
-
   armoryFormValue: defaultArmoryFormSchema,
   updateArmoryFormValue: () => {},
 
@@ -67,6 +76,8 @@ export const defaultCardConfig: CardConfigContextPayload = {
   enkaRef: null,
   config: initialConfig,
   changeConfig: () => {},
+  data: initialCardData,
+  changeData: () => {},
   mihomoResponse: undefined,
   updateParam: () => {},
 
@@ -97,9 +108,6 @@ function useCardConfigProvider(): CardConfigContextPayload {
 
   const [uid, setUid] = useState<string | undefined>(undefined);
   const [lang, setLang] = useState<(typeof LANGS)[number]>("en");
-  const [currentCharacterId, setCurrentCharacterId] = useState<
-    number | undefined
-  >(undefined);
   const [mode, setMode] = useState<"API" | "ARMORY">("API");
 
   const { query } = useMihomoInfo({ uid, lang });
@@ -110,22 +118,60 @@ function useCardConfigProvider(): CardConfigContextPayload {
   }
 
   const [config, changeConfig] = useReducer(configReducer, initialConfig);
+  const [data, changeData] = useReducer(dataReducer, initialCardData);
 
   const [armoryFormValue, updateArmoryFormValue] = useState(
     defaultArmoryFormSchema
   );
 
-  const [characterStat, setCharacterStats] = useState<
-    Parameters<typeof useStatParser>[0] | undefined
+  const [parserConstructor, setParserConstructor] = useState<
+    StatParserConstructor | undefined
   >(undefined);
   const [characterRelics, setCharacterRelics] = useState<ParsedRelicSchema[]>(
     []
   );
-  const parsedStats = useStatParser(characterStat);
+  const parsedStats = useStatParser(parserConstructor);
   const [setIds, setSetIds] = useState<number[]>([]);
   const { data: relicSlotMap } = useRelicSlotType(setIds);
 
-  useEffect(() => {}, [armoryFormValue]);
+  useEffect(() => {
+    const { player, lc, relic } = armoryFormValue;
+    if (!!data.characterId && !!lc && !!lc.id) {
+      const relics: ParsedRelicSchema[] = !relic
+        ? []
+        : Object.entries(relic)
+            .map(([type, data]) => ({
+              id: Number(data.id),
+              rarity: data.rarity,
+              setId: data.setId,
+              type: type as RelicCategory,
+              level: data.level,
+              mainStat: {
+                property: data.mainStat.property,
+                value: data.mainStat.value,
+              },
+              subStat: data.subStats.map((subs) => ({
+                property: subs.property,
+                count: subs.step,
+                value: subs.value,
+              })),
+            }))
+            .sort((a, b) => byRelicType(a.type, b.type));
+
+      setCharacterRelics(relics);
+
+      setParserConstructor({
+        character: {
+          id: data.characterId,
+          ascension: player.ascension,
+          level: player.level,
+        },
+        traceTable: player.trace,
+        lightCone: lc,
+        relic: relics,
+      });
+    }
+  }, [armoryFormValue, data.characterId]);
 
   useEffect(() => {
     if (!!currentCharacter && relicSlotMap) {
@@ -162,7 +208,7 @@ function useCardConfigProvider(): CardConfigContextPayload {
 
       setCharacterRelics(relic);
 
-      setCharacterStats({
+      setParserConstructor({
         character: {
           id: currentCharacter.id,
           ascension: currentCharacter.promotion,
@@ -177,29 +223,34 @@ function useCardConfigProvider(): CardConfigContextPayload {
     }
   }, [currentCharacter, relicSlotMap]);
 
-  return {
-    currentCharacter,
-    setCurrentCharacter,
+  const returnData = useMemo(
+    () => ({
+      currentCharacter,
+      setCurrentCharacter,
 
-    currentCharacterId,
-    setCurrentCharacterId,
+      armoryFormValue,
+      updateArmoryFormValue,
 
-    armoryFormValue,
-    updateArmoryFormValue,
+      mode,
+      setMode,
 
-    mode,
-    setMode,
+      enkaRef,
 
-    enkaRef,
-    config,
-    changeConfig,
-    // initResponse: setMihomoResponse,
-    mihomoResponse: query.data,
-    updateParam,
+      config,
+      changeConfig,
 
-    parsedStats,
-    characterRelics,
-  };
+      data,
+      changeData,
+      // initResponse: setMihomoResponse,
+      mihomoResponse: query.data,
+      updateParam,
+
+      parsedStats,
+      characterRelics,
+    }),
+    [armoryFormValue, characterRelics, config, currentCharacter, data, mode, parsedStats, query.data]
+  );
+  return returnData;
 }
 
 export function useCardConfigController() {
@@ -210,4 +261,24 @@ export function useCardConfigController() {
     );
   }
   return context;
+}
+
+function byRelicType(a: RelicCategory, b: RelicCategory) {
+  const getValue = (x: RelicCategory) => {
+    switch (x) {
+      case "HEAD":
+        return 1;
+      case "HAND":
+        return 2;
+      case "BODY":
+        return 3;
+      case "FOOT":
+        return 4;
+      case "OBJECT":
+        return 5;
+      case "NECK":
+        return 6;
+    }
+  };
+  return getValue(a) - getValue(b);
 }

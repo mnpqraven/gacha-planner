@@ -4,7 +4,6 @@ import { Badge } from "@/app/components/ui/Badge";
 import { cn, img } from "@/lib/utils";
 import { PathIcon } from "@/app/character-db/PathIcon";
 import { ElementIcon } from "@/app/character-db/ElementIcon";
-import { MihomoPlayer } from "@/app/profile/types";
 import { CardConfig } from "../../configReducer";
 import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
 

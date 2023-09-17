@@ -1,3 +1,4 @@
+import { zodProperty } from "@/lib/propertyHelper";
 import * as z from "zod";
 
 const ERR_RANGE = (from: number, to: number) =>
@@ -68,48 +69,45 @@ const lcSchema = z
   .nullable();
 
 const propertySchema = z.object({
-  setId: z
+  id: z
     .number()
     .nullish()
     .or(z.string().nullish())
     .pipe(z.coerce.string().nullish()),
-  mainStat: z
-    .object({
-      key: z.string(),
-      // NOTE: likely not needing this
-      // value: z.number(),
-      step: z
+  rarity: z.number().or(z.string()).pipe(z.coerce.number()),
+  setId: z.number().nullish().or(z.string().nullish()).pipe(z.coerce.number()),
+  level: z
+    .number()
+    .min(0, { message: ERR_RANGE(0, 15) })
+    .max(15, { message: ERR_RANGE(0, 15) })
+    .or(z.string())
+    .pipe(
+      z.coerce
         .number()
         .min(0, { message: ERR_RANGE(0, 15) })
         .max(15, { message: ERR_RANGE(0, 15) })
+    ),
+  mainStat: z.object({
+    property: z.enum(zodProperty),
+    value: z.number(),
+  }),
+  subStats: z.array(
+    z.object({
+      property: z.enum(zodProperty),
+      value: z.number(),
+      step: z
+        .number()
+        .min(1, { message: ERR_RANGE(1, 6) })
+        .max(6, { message: ERR_RANGE(1, 6) })
         .or(z.string())
         .pipe(
           z.coerce
             .number()
-            .min(0, { message: ERR_RANGE(0, 15) })
-            .max(15, { message: ERR_RANGE(0, 15) })
+            .min(1, { message: ERR_RANGE(1, 6) })
+            .max(6, { message: ERR_RANGE(1, 6) })
         ),
     })
-    .nullish(),
-  subStats: z
-    .array(
-      z.object({
-        key: z.string(),
-        value: z.number(),
-        step: z
-          .number()
-          .min(1, { message: ERR_RANGE(1, 6) })
-          .max(6, { message: ERR_RANGE(1, 6) })
-          .or(z.string())
-          .pipe(
-            z.coerce
-              .number()
-              .min(1, { message: ERR_RANGE(1, 6) })
-              .max(6, { message: ERR_RANGE(1, 6) })
-          ),
-      })
-    )
-    .optional(),
+  ),
 });
 
 export type RelicCategory =

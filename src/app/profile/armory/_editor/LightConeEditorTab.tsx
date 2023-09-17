@@ -20,18 +20,32 @@ import {
 } from "@/app/components/ui/Form";
 import { Input } from "@/app/components/ui/Input";
 import { useLightConeMetadata } from "@/hooks/queries/useLightConeMetadata";
+import { EquipmentConfig } from "@/bindings/EquipmentConfig";
+import { useCardConfigController } from "../../[uid]/ConfigControllerContext";
 
 interface Props {
   form: UseFormReturn<ArmoryFormSchema>;
   path: Path | undefined;
 }
 export function LightConeEditorTab({ form, path }: Props) {
+  const { changeData } = useCardConfigController();
   const { lightConeList } = useLightConeList();
   const { lightCone } = useLightConeMetadata(form.watch("lc.id"));
 
   const lcSelected = !!form.getValues("lc");
 
   const [open, setOpen] = useState(false);
+
+  function onSelectLightCone(lc: EquipmentConfig) {
+    form.setValue("lc", {
+      id: lc.equipment_id,
+      level: form.getValues("lc.level") ?? 1,
+      ascension: form.getValues("lc.ascension") ?? 0,
+      imposition: form.getValues("lc.imposition") ?? 1,
+    });
+    changeData({ type: "changeLightConeId", payload: lc.equipment_id });
+    setOpen(false);
+  }
   return (
     <div>
       <span>{path}</span>
@@ -53,15 +67,7 @@ export function LightConeEditorTab({ form, path }: Props) {
                 <Toggle
                   key={lc.equipment_id}
                   className="flex h-fit justify-between py-2"
-                  onPressedChange={() => {
-                    form.setValue("lc", {
-                      id: lc.equipment_id,
-                      level: form.getValues("lc.level") ?? 1,
-                      ascension: form.getValues("lc.ascension") ?? 0,
-                      imposition: form.getValues("lc.imposition") ?? 1,
-                    });
-                    setOpen(false);
-                  }}
+                  onPressedChange={() => onSelectLightCone(lc)}
                 >
                   <Image
                     src={`${IMAGE_URL}image/light_cone_preview/${lc.equipment_id}.png`}
@@ -86,7 +92,19 @@ export function LightConeEditorTab({ form, path }: Props) {
               <FormItem>
                 <FormLabel>Level</FormLabel>
                 <FormControl>
-                  <Input className="w-16" autoComplete="off" {...field} />
+                  <Input
+                    className="w-16"
+                    autoComplete="off"
+                    type="number"
+                    {...field}
+                    min={1}
+                    max={form.getValues("lc.ascension") * 10 + 20}
+                    onChange={(e) => {
+                      if (!Number.isNaN(e.currentTarget.value)) {
+                        field.onChange(Number(e.currentTarget.value));
+                      } else e.preventDefault();
+                    }}
+                  />
                 </FormControl>
               </FormItem>
             )}
@@ -99,7 +117,19 @@ export function LightConeEditorTab({ form, path }: Props) {
               <FormItem>
                 <FormLabel>Ascension</FormLabel>
                 <FormControl>
-                  <Input className="w-16" autoComplete="off" {...field} />
+                  <Input
+                    className="w-16"
+                    autoComplete="off"
+                    type="number"
+                    {...field}
+                    min={0}
+                    max={6}
+                    onChange={(e) => {
+                      if (!Number.isNaN(e.currentTarget.value)) {
+                        field.onChange(Number(e.currentTarget.value));
+                      } else e.preventDefault();
+                    }}
+                  />
                 </FormControl>
               </FormItem>
             )}
@@ -112,7 +142,19 @@ export function LightConeEditorTab({ form, path }: Props) {
               <FormItem>
                 <FormLabel>Imposition</FormLabel>
                 <FormControl>
-                  <Input className="w-16" autoComplete="off" {...field} />
+                  <Input
+                    className="w-16"
+                    autoComplete="off"
+                    type="number"
+                    {...field}
+                    min={1}
+                    max={5}
+                    onChange={(e) => {
+                      if (!Number.isNaN(e.currentTarget.value)) {
+                        field.onChange(Number(e.currentTarget.value));
+                      } else e.preventDefault();
+                    }}
+                  />
                 </FormControl>
               </FormItem>
             )}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArmoryFormSchema, RelicCategory } from "../../schema";
 import {
   propertyIsPercent,
@@ -29,6 +29,13 @@ import {
 } from "@/app/components/ui/Form";
 import { useMainStatSpread } from "@/hooks/queries/useMainStatSpread";
 import { Pencil } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/app/components/ui/Select";
 
 interface Props {
   category: RelicCategory;
@@ -48,10 +55,12 @@ export function SingularRelicEditor({ category, imageUrl, form }: Props) {
   const [selectedSubstats, setSelectedSubstats] = useImmer<
     { substat: Property; value: number[] }[]
   >([]);
-  const { data } = useSubStatSpread();
+  const { data: subStatSpread } = useSubStatSpread();
+  const mainStatSubscriber = form.watch(`relic.${category}.mainStat`);
   const mainStatValue = useMainStatValue({
     category,
-    subscriber: form.watch(`relic.${category}.mainStat`),
+    property: mainStatSubscriber?.property,
+    level: form.watch(`relic.${category}.level`),
   });
 
   function onDataUpdate(
@@ -62,17 +71,25 @@ export function SingularRelicEditor({ category, imageUrl, form }: Props) {
     setSelectedSubstats((draft) => {
       draft[lineIndex].value[substatIndex] = nextValue;
     });
+    form.setValue(`relic.${category}.subStats.${lineIndex}.value`, nextValue);
+  }
+
+  function onDataReplace(values: number[], index: number) {
+    values.forEach((value, index) => {
+      form.setValue(`relic.${category}.subStats.${index}.value`, value);
+    });
+    setSelectedSubstats((draft) => {
+      draft[index].value = values;
+    });
   }
 
   function onSubstatWindowOpen(openState: boolean) {
     if (openState) return;
 
-    console.log("should see onclose", selectedSubstats);
-
     form.setValue(
       `relic.${category}.subStats`,
       selectedSubstats.map(({ substat, value }) => ({
-        key: substat,
+        property: substat,
         value: value.reduce((a, b) => a + b, 0),
         step: value.length,
       }))
@@ -80,20 +97,48 @@ export function SingularRelicEditor({ category, imageUrl, form }: Props) {
   }
 
   function getFirstMidroll(prop: Property): number[] {
-    const find = data?.find((e) => e.property == prop);
+    const find = subStatSpread?.find((e) => e.property == prop);
     if (!find) return [];
     let { base_value, step_value } = find;
-    if (propertyIsPercent(prop)) {
-      base_value *= 100;
-      step_value *= 100;
-    }
 
     return [base_value + (find.step_num / 2) * step_value];
   }
 
-  if (!mainStatOptions) return null;
+  function onMainStatSelect(property: Property) {
+    setSelectedMainstat(property);
+  }
+
+  function onSubStatSelect(prop: Property, index: number) {
+    const defaultValue = subStatSpread?.find((e) => e.property == prop);
+    let value = 0;
+    if (!!defaultValue) {
+      const { base_value, step_num, step_value } = defaultValue;
+      value = base_value + (step_value * step_num) / 2;
+    }
+    setSelectedSubstats((draft) => {
+      draft[index] = {
+        substat: prop,
+        value: getFirstMidroll(prop as Property),
+      };
+      form.setValue(`relic.${category}.subStats.${index}`, {
+        property: prop,
+        value,
+        step: 1,
+      });
+    });
+  }
+
+  useEffect(() => {
+    // set default value
+    form.setValue(`relic.${category}.subStats`, []);
+    form.setValue(`relic.${category}.rarity`, 5);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (!mainStatOptions || !subStatSpread) return null;
   const fixedMainstat = mainStatOptions.options.length == 1;
 
+  console.log('render')
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex gap-2">
@@ -113,16 +158,16 @@ export function SingularRelicEditor({ category, imageUrl, form }: Props) {
           ) : (
             <FormField
               control={form.control}
-              name={`relic.${category}.mainStat.key`}
+              name={`relic.${category}.mainStat.property`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Main Stat</FormLabel>
                   <FormControl>
                     <PropertySelect
                       options={mainStatOptions.options}
-                      onValueChange={(prop) => {
-                        setSelectedMainstat(prop as Property);
-                        field.onChange(prop);
+                      onValueChange={(property) => {
+                        onMainStatSelect(property as Property);
+                        field.onChange(property);
                       }}
                       defaultValue={field.value}
                     />
@@ -133,72 +178,120 @@ export function SingularRelicEditor({ category, imageUrl, form }: Props) {
           )}
           <FormField
             control={form.control}
-            name={`relic.${category}.mainStat.step`}
+            name={`relic.${category}.level`}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Main Stat Level</FormLabel>
                 <FormControl>
-                  <Input placeholder="+0" {...field} />
+                  <Input
+                    placeholder="+0"
+                    type="number"
+                    {...field}
+                    min={0}
+                    max={15}
+                    defaultValue="0"
+                    onChange={(e) => {
+                      if (!Number.isNaN(e.currentTarget.value)) {
+                        field.onChange(Number(e.currentTarget.value));
+                        form.setValue(
+                          `relic.${category}.mainStat.value`,
+                          mainStatValue.value
+                        );
+                      } else e.preventDefault();
+                    }}
+                  />
                 </FormControl>
               </FormItem>
             )}
           />
-          value: {mainStatValue}
+          value: {mainStatValue.prettyValue}
+          <FormField
+            control={form.control}
+            name={`relic.${category}.rarity`}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Rarity</FormLabel>
+                <Select
+                  defaultValue="5"
+                  onValueChange={(value) => field.onChange(Number(value))}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent position="popper">
+                    {[3, 4, 5].map((num) => (
+                      <SelectItem key={num} value={String(num)}>
+                        {num}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            )}
+          />
         </div>
       </div>
 
       <div className="flex flex-col gap-2">
-        {Array.from(range(0, 3)).map((line) => (
-          <div className="flex items-center gap-2" key={line}>
-            <PropertySelect
-              className="max-w-[12rem]"
-              options={subStatOptions
-                .filter((e) => e.option != selectedMainstat)
-                .map((e) => e.option)}
-              onValueChange={(prop) =>
-                setSelectedSubstats((draft) => {
-                  draft[line] = {
-                    substat: prop as Property,
-                    value: getFirstMidroll(prop as Property),
-                  };
-                })
-              }
-              itemDisabled={(prop) =>
-                selectedSubstats.map((e) => e.substat).includes(prop)
-              }
+        {Array.from(range(0, 3)).map((index) => (
+          <div className="flex items-center gap-2" key={index}>
+            <FormField
+              control={form.control}
+              name={`relic.${category}.subStats.${index}.property`}
+              render={({ field }) => (
+                <FormItem className="w-[12rem]">
+                  <FormControl>
+                    <PropertySelect
+                      options={subStatOptions
+                        .filter((e) => e.option != selectedMainstat)
+                        .map((e) => e.option)}
+                      onValueChange={(prop) =>
+                        onSubStatSelect(prop as Property, index)
+                      }
+                      defaultValue={field.value}
+                      itemDisabled={(prop) =>
+                        selectedSubstats.map((e) => e.substat).includes(prop)
+                      }
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
             />
 
             <Popover onOpenChange={onSubstatWindowOpen}>
-              <PopoverTrigger disabled={!selectedSubstats.at(line)} asChild>
+              <PopoverTrigger disabled={!selectedSubstats.at(index)} asChild>
                 <Button
                   className="cursor-pointer px-2"
                   variant="outline"
-                  disabled={!selectedSubstats.at(line)}
+                  disabled={!selectedSubstats.at(index)}
                 >
                   <Pencil />
                 </Button>
               </PopoverTrigger>
               <PopoverContent side="top">
-                {!!data?.find(
-                  (e) => e.property == selectedSubstats.at(line)?.substat
+                {!!subStatSpread.find(
+                  (e) => e.property == selectedSubstats.at(index)?.substat
                 ) && (
                   <SubstatSpreadConfig
-                    property={selectedSubstats.at(line)?.substat ?? "Attack"}
+                    property={selectedSubstats.at(index)?.substat ?? "Attack"}
                     spread={
-                      data.find(
-                        (e) => e.property == selectedSubstats.at(line)?.substat
+                      subStatSpread.find(
+                        (e) => e.property == selectedSubstats.at(index)?.substat
                       )!
                     }
-                    data={selectedSubstats[line]}
+                    data={selectedSubstats[index]}
                     onDataUpdate={(nextValue, substatIndex) =>
-                      onDataUpdate(nextValue, substatIndex, line)
+                      onDataUpdate(nextValue, substatIndex, index)
                     }
+                    onDataReplace={(values) => onDataReplace(values, index)}
                   />
                 )}
               </PopoverContent>
             </Popover>
 
-            <ValueDisplay value={selectedSubstats[line]} />
+            <ValueDisplay value={selectedSubstats[index]} />
           </div>
         ))}
       </div>
@@ -224,23 +317,30 @@ function ValueDisplay({
 
 function useMainStatValue({
   category,
-  subscriber,
+  property,
+  level,
 }: {
   category: RelicCategory;
-  subscriber: { key: string; step: number } | undefined | null;
+  property: Property | undefined;
+  level: number;
 }) {
   const { data } = useMainStatSpread();
 
-  if (!data) return 0;
+  if (!data) return { value: 0, prettyValue: 0 };
 
-  const config = data[category].find((e) => e.property == subscriber?.key);
+  const config = data[category].find((e) => e.property == property);
 
   if (!!config) {
     const { base_value, level_add, property } = config;
-    const val = base_value + (subscriber?.step ?? 0) * level_add;
+    const val = base_value + level * level_add;
 
-    return propertyIsPercent(property) ? asPercentage(val) : val.toFixed(2);
+    return {
+      value: val,
+      prettyValue: propertyIsPercent(property)
+        ? asPercentage(val)
+        : val.toFixed(2),
+    };
   }
 
-  return 0;
+  return { value: 0, prettyValue: 0 };
 }

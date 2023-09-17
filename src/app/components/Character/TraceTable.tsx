@@ -129,7 +129,7 @@ const TraceTableInner = ({
                 marginLeft: `${wrapperSize / -16}px`,
               }}
             >
-              {editMode && getNodeType(traceNode) !== "CORE" && (
+              {editMode && getNodeType(traceNode) == "SMALL" && (
                 <Checkbox
                   className="absolute -top-2.5 left-3"
                   id={traceNode.point_id.toString()}

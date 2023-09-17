@@ -21,7 +21,8 @@ const variant = cva("h-1.5 w-8 border-skewed", {
     status: {
       LOW: "bg-[#4f79b2]",
       MID: "bg-[#c199fd]",
-      HIGH: "bg-[#ffc870] ",
+      HIGH: "bg-[#ffc870]",
+      ERROR: "bg-red-500",
       default: "bg-gray-600",
     },
   },
@@ -48,7 +49,7 @@ export const SubstatItemEditor = forwardRef<HTMLDivElement, Props>(
           break;
       }
 
-      onValueChange(propertyIsPercent(property) ? val * 100 : val);
+      onValueChange(val);
     }
 
     return (
@@ -95,20 +96,20 @@ SubstatControlIcon.displayName = "SubstatControlIcon";
 function judgeRollValue(
   value: number,
   spreadInfo: RelicSubAffixConfig
-): "LOW" | "MID" | "HIGH" {
+): "LOW" | "MID" | "HIGH" | "ERROR" {
   const lowerBound = spreadInfo.base_value;
   const upperBound =
     spreadInfo.base_value + spreadInfo.step_num * spreadInfo.step_value;
 
   const diffPool = upperBound - lowerBound;
   // this is supposed to never happen
-  if (upperBound <= lowerBound) {
-    return "MID";
-  }
-  const val = propertyIsPercent(spreadInfo.property) ? value / 100 : value;
-  const valueDiff = val - lowerBound;
+  if (upperBound <= lowerBound) return "ERROR";
+
+  const valueDiff = value - lowerBound;
   const ratio = valueDiff / diffPool;
-  if (ratio < 0.33) return "LOW";
-  if (ratio >= 0.33 && ratio < 0.66) return "MID";
+
+  if (ratio < 0) return "ERROR";
+  if (0 <= ratio && ratio < 0.33) return "LOW";
+  if (0.33 <= ratio && ratio < 0.66) return "MID";
   return "HIGH";
 }

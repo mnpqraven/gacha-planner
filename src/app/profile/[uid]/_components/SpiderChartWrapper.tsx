@@ -17,11 +17,11 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 export const SpiderChartWrapper = forwardRef<HTMLDivElement, Props>(
   ({ className, element, ...props }, ref) => {
-    const { parsedStats, currentCharacter } = useCardConfigController();
-    const { data: charPromo } = useCharacterPromotion(currentCharacter?.id);
-    const { data: lcPromo } = useLightConePromotion(
-      Number(currentCharacter?.light_cone?.id)
-    );
+    const { parsedStats, data: reducerData } = useCardConfigController();
+    const { characterId, lightConeId } = reducerData;
+    const { data: charPromo } = useCharacterPromotion(characterId);
+    const { data: lcPromo } = useLightConePromotion(lightConeId);
+    console.log("nullcheck", characterId, lightConeId);
 
     if (!parsedStats || !charPromo || !lcPromo) return null;
 

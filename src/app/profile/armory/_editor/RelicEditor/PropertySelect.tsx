@@ -16,15 +16,16 @@ interface Props extends ComponentPropsWithoutRef<typeof SelectContent> {
   options: Property[];
   onValueChange: SelectProps["onValueChange"];
   itemDisabled?: (prop: Property) => boolean;
+  defaultValue?: string;
 }
 
 export const PropertySelect = forwardRef<HTMLDivElement, Props>(
   (
-    { onValueChange, options, className, itemDisabled, ...props },
+    { onValueChange, options, className, itemDisabled, defaultValue, ...props },
     ref
   ) => {
     return (
-      <Select onValueChange={onValueChange}>
+      <Select onValueChange={onValueChange} defaultValue={defaultValue}>
         <SelectTrigger className={className}>
           <SelectValue />
         </SelectTrigger>

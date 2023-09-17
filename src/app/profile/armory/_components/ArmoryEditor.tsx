@@ -32,10 +32,11 @@ import {
 import { RelicEditorTab } from "../_editor/RelicEditorTab";
 
 export function ArmoryEditor() {
-  const { currentCharacterId } = useCardConfigController();
-  const { data: eidolons } = useCharacterEidolon(currentCharacterId);
-  const { data: metadata } = useCharacterMetadata(currentCharacterId);
-  const { data: skills } = useCharacterSkill(currentCharacterId);
+  const { data } = useCardConfigController();
+  const { characterId } = data;
+  const { data: eidolons } = useCharacterEidolon(characterId);
+  const { data: metadata } = useCharacterMetadata(characterId);
+  const { data: skills } = useCharacterSkill(characterId);
   const sortedSkills = skills
     .filter(
       ({ attack_type }) =>
@@ -93,7 +94,7 @@ export function ArmoryEditor() {
     updateArmoryFormValue(values);
   }
 
-  if (!currentCharacterId) return <span>no char id set</span>;
+  if (!characterId) return <span>no char id set</span>;
 
   return (
     <Form {...form}>
@@ -111,7 +112,7 @@ export function ArmoryEditor() {
                 </TabsList>
                 <TabsContent value="chara">
                   <CharacterEditorTab
-                    characterId={currentCharacterId}
+                    characterId={characterId}
                     skills={sortedSkills}
                     form={form}
                   />

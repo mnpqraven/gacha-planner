@@ -26,13 +26,13 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
     updateParam,
     config,
     setMode,
-    currentCharacterId,
+    data: reducerData,
     armoryFormValue,
     mihomoResponse,
     parsedStats,
   } = useCardConfigController();
 
-  const { data: charMetadata } = useCharacterMetadata(currentCharacterId);
+  const { data: charMetadata } = useCharacterMetadata(reducerData.characterId);
 
   useEffect(() => {
     setMode(mode);
@@ -43,7 +43,7 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
     updateParam(uid, lang);
   }, [uid, lang, updateParam]);
 
-  if (!parsedStats) return null;
+  if (!parsedStats) return <div>parsed stats is null</div>;
 
   if (mode == "ARMORY" && !!charMetadata) {
     const { skills, ...formValues } = armoryFormValue.player;

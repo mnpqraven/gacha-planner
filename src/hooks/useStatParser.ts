@@ -43,14 +43,14 @@ export interface ParsedStatRecord {
   normalized: Pick<BaseValueSchema, "hp" | "atk" | "def">;
 }
 
-interface Props {
+export interface StatParserConstructor {
   character: BasicMetadata;
   traceTable: Record<string | number, boolean>;
   lightCone: (BasicMetadata & { imposition: number }) | null;
   relic: ParsedRelicSchema[];
 }
 
-export function useStatParser(props?: Props) {
+export function useStatParser(props?: StatParserConstructor) {
   const { data: traceData } = useCharacterTrace(props?.character.id);
   const { data: charPromotionData } = useCharacterPromotion(
     props?.character.id
@@ -59,15 +59,16 @@ export function useStatParser(props?: Props) {
   const { data: lcSkillData } = useLightConeSkill(props?.lightCone?.id);
   const { data: relicBonuses } = useRelicSetBonuses();
 
-  if (
-    !traceData ||
-    !charPromotionData ||
-    // !lcPromotionData ||
-    // !lcSkillData ||
-    !props ||
-    !relicBonuses
-  )
+  if (!traceData || !charPromotionData || !props || !relicBonuses) {
+    console.log(
+      "should not see this null",
+      traceData,
+      charPromotionData,
+      props,
+      relicBonuses
+    );
     return undefined;
+  }
 
   const { ascension: charAscension, level: charLevel } = props.character;
   const { ascension: lcAscension, level: lcLevel } = props.lightCone ?? {
@@ -199,6 +200,7 @@ export function useStatParser(props?: Props) {
     statTable: toStatTable(baseValues, summed),
     normalized,
   };
+  console.log("useStatParser ret", result);
 
   return result;
 }

@@ -1,33 +1,14 @@
 import { Toggle } from "@/app/components/ui/Toggle";
 import { Property, RelicSubAffixConfig } from "@/bindings/RelicSubAffixConfig";
-import {
-  JSXElementConstructor,
-  ReactElement,
-  useEffect,
-  useState,
-} from "react";
-import { propertyIsPercent, propertyName } from "../relicConfig";
+import { useEffect, useState } from "react";
+import { propertyName } from "../relicConfig";
 import { Check, Pencil, X } from "lucide-react";
 import { Input } from "@/app/components/ui/Input";
 import { asPercentage, range } from "@/lib/utils";
 import { SubstatItemEditor } from "./SubstatItemEditor";
-import {
-  ControllerFieldState,
-  ControllerRenderProps,
-  FieldValues,
-  UseFormStateReturn,
-  useForm,
-} from "react-hook-form";
 import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/app/components/ui/Form";
 import { Button } from "@/app/components/ui/Button";
+import { isPropertyPercent } from "@/lib/propertyHelper";
 
 interface Props {
   property: Property;
@@ -37,6 +18,7 @@ interface Props {
     value: number[];
   };
   onDataUpdate: (nextValue: number, substatIndex: number) => void;
+  onDataReplace: (values: number[]) => void;
 }
 
 export function SubstatSpreadConfig({
@@ -44,16 +26,17 @@ export function SubstatSpreadConfig({
   spread,
   data,
   onDataUpdate,
+  onDataReplace,
 }: Props) {
   const [disabled, setDisabled] = useState(true);
   const totalSum = data.value.reduce((a, b) => a + b, 0);
+  const [makeShiftValue, setMakeshiftValue] = useState<string>(`${totalSum}`);
+  const makeShiftValueI = isPropertyPercent(property)
+    ? Number(makeShiftValue)
+    : Number(makeShiftValue) * 100;
 
-  const minValue = propertyIsPercent(property)
-    ? getSpreadValues(spread).minRoll.value * 100
-    : getSpreadValues(spread).minRoll.value;
-  const maxValue = propertyIsPercent(property)
-    ? getSpreadValues(spread).maxRoll.value * 6 * 100
-    : getSpreadValues(spread).maxRoll.value * 6;
+  const minValue = getSpreadValues(spread).minRoll.value;
+  const maxValue = getSpreadValues(spread).maxRoll.value * 6;
 
   const schema = z.object({
     value: z
@@ -77,10 +60,33 @@ export function SubstatSpreadConfig({
       ),
   });
 
-  const form = useForm({
-    defaultValues: { value: totalSum },
-    resolver: zodResolver(schema),
-  });
+  /**
+   * take the user input value and automatically spread to rolls
+   */
+  function autoCalculateSpread(strategy: "EQUAL" | "TOPDOWN" = "TOPDOWN") {
+    let value = isPropertyPercent(property)
+      ? makeShiftValueI / 100
+      : makeShiftValueI;
+    let toUpdate: { value: number; index: number }[] = [];
+    if (strategy == "TOPDOWN") {
+      let index = 0;
+      while (value > 0) {
+        const maxRoll = getSpreadValues(spread).maxRoll.value;
+        toUpdate.push({ value: value >= maxRoll ? maxRoll : value, index });
+        value -= maxRoll;
+        index++;
+      }
+    } else {
+      let index = 0;
+      while (value > 0) {
+        const midRoll = getSpreadValues(spread).midRoll.value;
+        toUpdate.push({ value: value >= midRoll ? midRoll : value, index });
+        value -= midRoll;
+        index++;
+      }
+    }
+    onDataReplace(toUpdate.map((e) => e.value));
+  }
 
   /**
    * update the spread array in according to the updated value
@@ -96,9 +102,7 @@ export function SubstatSpreadConfig({
     let i = 0;
     // transform new array
     while (paste >= 0) {
-      const maxRoll = propertyIsPercent(spread.property)
-        ? getSpreadValues(spread).maxRoll.value * 100
-        : getSpreadValues(spread).maxRoll.value;
+      const maxRoll = getSpreadValues(spread).maxRoll.value;
       nextArray[i] = paste >= maxRoll ? maxRoll : paste;
       paste -= maxRoll;
       i++;
@@ -110,9 +114,14 @@ export function SubstatSpreadConfig({
 
   function onFormReset() {}
 
+  function onUpdateInput(value: string) {
+    setMakeshiftValue(value);
+  }
+
   // reactive form value
   useEffect(() => {
-    form.setValue("value", totalSum);
+    let denom = isPropertyPercent(property) ? 100 : 1;
+    setMakeshiftValue((totalSum * denom).toFixed(2));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalSum]);
 
@@ -125,61 +134,38 @@ export function SubstatSpreadConfig({
         {getSpreadValues(spread).maxRoll.display}
       </p>
 
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmitDirtyValue)}
-          className="flex items-center gap-2 py-2"
-        >
-          <FormField
-            control={form.control}
-            name="value"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    className="w-24"
-                    // type="number"
-                    // value={(dirtySum * 100).toFixed(2)}
-                    {...field}
-                    // onChange={(e) => {
-                    //   if (isNaN(Number(e.target.value))) {
-                    //     // setDirtySum(Number(e.target.value) / 100);
-                    //   }
-                    // }}
-                    disabled={disabled}
-                  />
-                </FormControl>
+      <Input
+        className="w-24"
+        value={makeShiftValue}
+        onChange={(e) => onUpdateInput(e.currentTarget.value)}
+        disabled={disabled}
+      />
 
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {propertyIsPercent(property) && <span>%</span>}
+      {isPropertyPercent(property) && <span>%</span>}
 
-          <Toggle pressed={!disabled} className="px-2">
-            <Pencil
-              className="cursor-pointer"
-              onClick={() => setDisabled(!disabled)}
-            />
-          </Toggle>
+      <Toggle pressed={!disabled} className="px-2">
+        <Pencil
+          className="cursor-pointer"
+          onClick={() => setDisabled(!disabled)}
+        />
+      </Toggle>
 
-          <Button
-            className="bg-green-700 px-2 hover:bg-green-700/90"
-            type="submit"
-            disabled={disabled}
-          >
-            <Check />
-          </Button>
+      <Button
+        className="bg-green-700 px-2 hover:bg-green-700/90"
+        type="submit"
+        disabled={disabled}
+        onClick={() => autoCalculateSpread("TOPDOWN")}
+      >
+        <Check />
+      </Button>
 
-          <Button
-            className="bg-destructive px-2 hover:bg-destructive/90"
-            onClick={onFormReset}
-            disabled={disabled}
-          >
-            <X />
-          </Button>
-        </form>
-      </Form>
+      {/* <Button
+        className="bg-destructive px-2 hover:bg-destructive/90"
+        onClick={onFormReset}
+        disabled={disabled}
+      >
+        <X />
+      </Button> */}
 
       <div id="bars" className="flex justify-center gap-1">
         {Array.from(range(0, 5)).map((index) => (
@@ -202,24 +188,16 @@ export function getSpreadValues({
   base_value,
   property,
 }: RelicSubAffixConfig) {
-  const isPercent = propertyIsPercent(property);
-
   const minRoll = base_value;
   const midRoll = base_value + (step_value * step_num) / 2;
   const maxRoll = base_value + step_value * step_num;
 
+  const withPercent = (val: number) =>
+    isPropertyPercent(property) ? asPercentage(val) : val.toFixed(2);
+
   return {
-    minRoll: {
-      value: minRoll,
-      display: isPercent ? asPercentage(minRoll) : minRoll.toFixed(2),
-    },
-    midRoll: {
-      value: midRoll,
-      display: isPercent ? asPercentage(midRoll) : midRoll.toFixed(2),
-    },
-    maxRoll: {
-      value: maxRoll,
-      display: isPercent ? asPercentage(maxRoll) : maxRoll.toFixed(2),
-    },
+    minRoll: { value: minRoll, display: withPercent(minRoll) },
+    midRoll: { value: midRoll, display: withPercent(midRoll) },
+    maxRoll: { value: maxRoll, display: withPercent(maxRoll) },
   };
 }
