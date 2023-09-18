@@ -16,9 +16,9 @@ import { useAtom } from "jotai";
 import Image from "next/image";
 import { useState } from "react";
 import { charIdAtom } from "../_store/character";
-import { CharacterUpdater } from "../_components/CharacterUpdater";
 import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
 import { CharacterCard } from "@/app/character-db/CharacterCardWrapper";
+import { CharacterUpdater } from "../_editor/CharacterUpdater";
 
 export function CharacterEditorTab() {
   const [charId, updateId] = useAtom(charIdAtom);

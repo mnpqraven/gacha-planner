@@ -9,7 +9,7 @@ import {
 import { Toggle } from "@/app/components/ui/Toggle";
 import { useLightConeList } from "@/hooks/queries/useLightConeList";
 import { charIdAtom } from "../_store/character";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
 import Image from "next/image";
 import { IMAGE_URL } from "@/lib/constants";
@@ -19,7 +19,7 @@ import { lcIdAtom } from "../_store/lightcone";
 import { useLightConeMetadata } from "@/hooks/queries/useLightConeMetadata";
 import { LightConeCard } from "@/app/lightcone-db/LightConeCard";
 import { img } from "@/lib/utils";
-import { LightConeUpdater } from "../_components/LightConeUpdater";
+import { LightConeUpdater } from "../_editor/LightConeUpdater";
 
 export function LightConeEditorTab() {
   const { lightConeList } = useLightConeList();

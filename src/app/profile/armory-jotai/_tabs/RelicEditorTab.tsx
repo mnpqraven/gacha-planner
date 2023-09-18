@@ -14,7 +14,7 @@ import Image from "next/image";
 import { img } from "@/lib/utils";
 import { RelicCategory } from "../../armory/schema";
 import { RelicSetConfig } from "@/bindings/RelicSetConfig";
-import { RelicEditor } from "../_components/_relic/RelicEditor";
+import { RelicEditor } from "../_editor/_relic/RelicEditor";
 
 export function RelicEditorTab() {
   const [relicAtoms] = useAtom(splitRelicAtom);

@@ -146,15 +146,8 @@ function useCardConfigProvider(): CardConfigContextPayload {
               setId: data.setId,
               type: type as RelicCategory,
               level: data.level,
-              mainStat: {
-                property: data.mainStat.property,
-                value: data.mainStat.value,
-              },
-              subStat: data.subStats.map((subs) => ({
-                property: subs.property,
-                count: subs.step,
-                value: subs.value,
-              })),
+              property: data.mainStat.property,
+              subStats: data.subStats,
             }))
             .sort((a, b) => byRelicType(a.type, b.type));
 
@@ -183,10 +176,10 @@ function useCardConfigProvider(): CardConfigContextPayload {
           level,
           rarity,
           type: relicSlotMap[Number(id)],
-          mainStat: { property: main_affix.type, value: main_affix.value },
-          subStat: sub_affix.map(({ type: property, count, value }) => ({
+          property: main_affix.type,
+          subStats: sub_affix.map(({ type: property, count: step, value }) => ({
             property,
-            count,
+            step,
             value,
           })),
         })
@@ -248,7 +241,16 @@ function useCardConfigProvider(): CardConfigContextPayload {
       parsedStats,
       characterRelics,
     }),
-    [armoryFormValue, characterRelics, config, currentCharacter, data, mode, parsedStats, query.data]
+    [
+      armoryFormValue,
+      characterRelics,
+      config,
+      currentCharacter,
+      data,
+      mode,
+      parsedStats,
+      query.data,
+    ]
   );
   return returnData;
 }
