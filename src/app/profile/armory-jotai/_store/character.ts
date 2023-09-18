@@ -1,8 +1,5 @@
-import API from "@/server/typedEndpoints";
 import { atom } from "jotai";
 import { atomWithImmer } from "jotai-immer";
-import { atomsWithQuery } from "jotai-tanstack-query";
-import { selectAtom } from "jotai/utils";
 
 export const charIdAtom = atom<number | undefined>(undefined);
 
@@ -14,7 +11,7 @@ export const charEidAtom = atom(0);
 
 export const charSkillAtom = atomWithImmer<Record<string, number>>({});
 
-export const charTraceAtom = atom({});
+export const charTraceAtom = atom<Record<string | number, boolean>>({});
 
 export const maxLevelAtom = atom((get) => get(charPromotionAtom) * 10 + 20);
 
@@ -26,7 +23,6 @@ export const charStructAtom = atom((get) => ({
   trace: get(charTraceAtom),
   skills: get(charSkillAtom),
 }));
-
 
 charIdAtom.debugLabel = "charIdAtom";
 charLevelAtom.debugLabel = "charLevelAtom";

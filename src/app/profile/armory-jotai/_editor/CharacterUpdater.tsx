@@ -11,7 +11,7 @@ import { Input } from "@/app/components/ui/Input";
 import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
 import { useCharacterSkill } from "@/hooks/queries/useCharacterSkill";
 import { AvatarSkillConfig, SkillType } from "@/bindings/AvatarSkillConfig";
-import { getImagePath, img } from "@/lib/utils";
+import { getImagePath } from "@/lib/utils";
 import Image from "next/image";
 import { getSkillMaxLevel } from "../../[uid]/_components/skill_block/SkillInfo";
 import { useEffect, useMemo } from "react";

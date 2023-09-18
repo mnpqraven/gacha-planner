@@ -11,20 +11,23 @@ import {
   lcAfterPromotion,
 } from "@/app/profile/[uid]/_components/useDataProcess";
 import { RelicCategory } from "@/app/profile/armory/schema";
+import { useMainStatSpread } from "./queries/useMainStatSpread";
 
 type BasicMetadata = { id: number; level: number; ascension: number };
+interface SubStatSchema {
+  property: Property;
+  value: number;
+  step: number;
+}
 export type ParsedRelicSchema = {
-  id: number;
+  id?: number;
   rarity: number;
   setId: number;
   // INFO: not yet needed
   type: RelicCategory;
   level: number;
-  mainStat: {
-    property: Property;
-    value: number;
-  };
-  subStat: { property: Property; count: number; value: number }[];
+  property: Property;
+  subStats: (SubStatSchema | undefined)[];
 };
 
 export type BaseValueSchema = {
@@ -58,8 +61,15 @@ export function useStatParser(props?: StatParserConstructor) {
   const { data: lcPromotionData } = useLightConePromotion(props?.lightCone?.id);
   const { data: lcSkillData } = useLightConeSkill(props?.lightCone?.id);
   const { data: relicBonuses } = useRelicSetBonuses();
+  const { data: mainStatLevels } = useMainStatSpread();
 
-  if (!traceData || !charPromotionData || !props || !relicBonuses) {
+  if (
+    !traceData ||
+    !charPromotionData ||
+    !props ||
+    !relicBonuses ||
+    !mainStatLevels
+  ) {
     console.log(
       "should not see this null",
       traceData,
@@ -144,12 +154,25 @@ export function useStatParser(props?: StatParserConstructor) {
   // INFO: PERCENT FROM RELIC
   // this ignore substat step so we can map it out
   const subStatNoStep = (relic: ParsedRelicSchema) =>
-    relic.subStat.map(({ property, value }) => ({ property, value }));
+    relic.subStats
+      .filter(Boolean)
+      .map((ss) => ({ property: ss?.property!, value: ss?.value! }));
 
-  const relicPropList = props.relic.map((relic) => [
-    relic.mainStat,
-    ...subStatNoStep(relic),
-  ]);
+  const relicPropList: {
+    property: Property;
+    value: number;
+  }[][] = props.relic.map((relic) => {
+    const find = mainStatLevels[relic.type].find(
+      (e) => e.property == relic.property
+    );
+    if (!find) return [...subStatNoStep(relic)];
+    const value = find.base_value + find.level_add * relic.level;
+    const main = { property: relic.property, value };
+    return [
+      { property: main.property, value: main.value },
+      ...subStatNoStep(relic),
+    ];
+  });
 
   let relicTotal: Partial<Record<Property, number>> = {};
 

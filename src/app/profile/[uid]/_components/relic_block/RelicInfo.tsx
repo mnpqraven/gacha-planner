@@ -9,18 +9,24 @@ import {
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
 import { CardConfig } from "../../configReducer";
-import { useCardConfigController } from "../../ConfigControllerContext";
 import { ParsedRelicSchema } from "@/hooks/useStatParser";
 import { RelicCategory } from "@/app/profile/armory/schema";
 import { prettyProperty, propertyIconUrl } from "@/lib/propertyHelper";
 import { useRelicSetBonuses } from "@/hooks/queries/useRelicSetBonus";
 import { useRelicSets } from "@/hooks/queries/useRelicSetList";
 import { SkillDescription } from "@/app/components/Db/SkillDescription";
+import { useAtomValue } from "jotai";
+import { relicsStructAtom } from "@/app/profile/armory-jotai/_store/relic";
+import { configAtom } from "@/app/profile/armory-jotai/_store/main";
+import { RelicJotai } from "@/app/profile/armory-jotai/_viewer/_relic/Relic";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {}
 export const RelicInfo = forwardRef<HTMLDivElement, Props>(
   ({ className, ...props }, ref) => {
-    const { config, characterRelics } = useCardConfigController();
+    const config = useAtomValue(configAtom);
+    const characterRelics = useAtomValue(relicsStructAtom);
+    // TODO: resolve type conflict
+    // rendering null values for setIds, showing placeholder images
 
     return (
       <div
@@ -36,7 +42,7 @@ export const RelicInfo = forwardRef<HTMLDivElement, Props>(
 
         <div className={cn("grid grid-cols-2 gap-2 place-self-center")}>
           {characterRelics.map((relic, index) => (
-            <Relic
+            <RelicJotai
               data={relic}
               key={index}
               active={isActive(relic.setId, characterRelics)}
@@ -44,7 +50,7 @@ export const RelicInfo = forwardRef<HTMLDivElement, Props>(
           ))}
         </div>
 
-        <SetInfo relics={characterRelics} config={config} />
+        {/* <SetInfo relics={characterRelics} config={config} /> */}
       </div>
     );
   }
@@ -180,7 +186,7 @@ const Relic = forwardRef<HTMLDivElement, RelicProps>(
         </div>
 
         <div id="sub" className="flex flex-col gap-1">
-          {data.subStat.map((sub, index) => (
+          {data.subStats.map((sub, index) => (
             <div key={index} className="flex flex-col">
               <div key={index} className="flex justify-between gap-1">
                 <SVG src={propertyIconUrl(sub.property)} />
@@ -193,7 +199,7 @@ const Relic = forwardRef<HTMLDivElement, RelicProps>(
                     key={num}
                     className={substatVariant({
                       currentCount: num,
-                      substatCount: sub.count,
+                      substatCount: sub.step,
                       rarity: data.rarity as 3 | 4 | 5,
                     })}
                   />

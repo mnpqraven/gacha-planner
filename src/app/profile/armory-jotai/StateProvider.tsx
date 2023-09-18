@@ -5,13 +5,14 @@ import { ReactNode } from "react";
 import { DevTools } from "jotai-devtools";
 
 interface Props {
+  devTools?: boolean;
   children: ReactNode;
 }
-export function StateProvider({ children }: Props) {
+export function StateProvider({ children, devTools = false }: Props) {
   return (
     <Provider>
       {children}
-      <DevTools />
+      {devTools && <DevTools />}
     </Provider>
   );
 }

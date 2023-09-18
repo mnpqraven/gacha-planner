@@ -7,22 +7,22 @@ export const substatRollButtons: {
   key: "HIGH" | "MID" | "LOW" | "NONE";
 }[] = [
   {
-    label: "High key",
+    label: "High Roll",
     icon: <ChevronUp />,
     key: "HIGH",
   },
   {
-    label: "Normal key",
+    label: "Normal Roll",
     icon: <Minus />,
     key: "MID",
   },
   {
-    label: "Low key",
+    label: "Low Roll",
     icon: <ChevronDown />,
     key: "LOW",
   },
   {
-    label: "Remove key",
+    label: "Remove Roll",
     icon: <X />,
     key: "NONE",
   },

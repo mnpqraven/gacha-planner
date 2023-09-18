@@ -1,17 +1,16 @@
 import { atom } from "jotai";
 import { RelicCategory } from "../../armory/schema";
 import { splitAtom } from "jotai/utils";
-import { focusAtom } from "jotai-optics";
 import { Property } from "@/bindings/SkillTreeConfig";
 
 export interface RelicInput {
-  type: RelicCategory;
   id?: number;
+  rarity: number;
+  setId?: number; // diff ts
+  type: RelicCategory;
   level: number;
+  property?: Property; // diffts
   subStats: (SubStatSchema | undefined)[];
-  rarity?: number;
-  setId?: number;
-  property?: Property;
 }
 
 interface SubStatSchema {
@@ -34,8 +33,8 @@ const initialRelicStruct: RelicInput[] = [
   { type: "NECK", ...initialRelicData },
 ];
 
-export const relicsAtom = atom(initialRelicStruct);
-export const splitRelicAtom = splitAtom(relicsAtom);
+export const relicsStructAtom = atom(initialRelicStruct);
+export const splitRelicAtom = splitAtom(relicsStructAtom);
 
-relicsAtom.debugLabel = "relicsAtom";
+relicsStructAtom.debugLabel = "relicsAtom";
 // splitRelicAtom.debugLabel = "splitRelicAtom";

@@ -4,24 +4,29 @@ import { ParentSize } from "@visx/responsive";
 import { SpiderChart } from "./SpiderChart";
 import * as z from "zod";
 import { getNormalizedBoundProperty } from "./useDataProcess";
-import { useCardConfigController } from "../ConfigControllerContext";
 import { filterOtherElements } from "./stat_block/StatTable";
 import { Element } from "@/bindings/AvatarConfig";
 import { prettyProperty, propertyIconUrl } from "@/lib/propertyHelper";
 import { Property } from "@/bindings/SkillTreeConfig";
 import { useCharacterPromotion } from "@/hooks/queries/useCharacterPromotion";
 import { useLightConePromotion } from "@/hooks/queries/useLightConePromotion";
+import { useStatParser } from "@/hooks/useStatParser";
+import { useAtomValue } from "jotai";
+import { statParseParam } from "../../armory-jotai/_store/main";
+import { charIdAtom } from "../../armory-jotai/_store/character";
+import { lcIdAtom } from "../../armory-jotai/_store/lightcone";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   element: Element;
 }
 export const SpiderChartWrapper = forwardRef<HTMLDivElement, Props>(
   ({ className, element, ...props }, ref) => {
-    const { parsedStats, data: reducerData } = useCardConfigController();
-    const { characterId, lightConeId } = reducerData;
-    const { data: charPromo } = useCharacterPromotion(characterId);
-    const { data: lcPromo } = useLightConePromotion(lightConeId);
-    console.log("nullcheck", characterId, lightConeId);
+    const charId = useAtomValue(charIdAtom);
+    const lcId = useAtomValue(lcIdAtom);
+    const parseParams = useAtomValue(statParseParam);
+    const parsedStats = useStatParser(parseParams);
+    const { data: charPromo } = useCharacterPromotion(charId);
+    const { data: lcPromo } = useLightConePromotion(lcId);
 
     if (!parsedStats || !charPromo || !lcPromo) return null;
 
