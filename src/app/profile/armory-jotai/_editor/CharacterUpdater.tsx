@@ -1,4 +1,4 @@
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
   charEidAtom,
   charIdAtom,
@@ -69,7 +69,7 @@ export function CharacterUpdater() {
 
 function LevelInput() {
   const maxLevel = useAtomValue(maxLevelAtom);
-  const setLevel = useSetAtom(charLevelAtom);
+  const [level, setLevel] = useAtom(charLevelAtom);
 
   return (
     <div className="flex items-center gap-2">
@@ -80,7 +80,7 @@ function LevelInput() {
         autoComplete="off"
         min={1}
         max={maxLevel}
-        defaultValue={1}
+        value={level}
         onChange={(e) => setLevel(parseInt(e.target.value))}
       />
       <span>/{maxLevel}</span>
@@ -89,7 +89,7 @@ function LevelInput() {
 }
 
 function PromotionInput() {
-  const setAscension = useSetAtom(charPromotionAtom);
+  const [ascension, setAscension] = useAtom(charPromotionAtom);
   return (
     <div className="flex items-center gap-2">
       <span>Ascension</span>
@@ -99,7 +99,7 @@ function PromotionInput() {
         autoComplete="off"
         min={0}
         max={6}
-        defaultValue={0}
+        value={ascension}
         onChange={(e) => {
           const val = parseInt(e.currentTarget.value);
           if (val >= 0 || val <= 6) setAscension(val);
@@ -110,7 +110,7 @@ function PromotionInput() {
 }
 
 function EidolonInput() {
-  const setEidolon = useSetAtom(charEidAtom);
+  const [eidolon, setEidolon] = useAtom(charEidAtom);
   return (
     <div className="flex items-center gap-2">
       <span>Eidolon</span>
@@ -120,7 +120,7 @@ function EidolonInput() {
         autoComplete="off"
         min={0}
         max={6}
-        defaultValue={0}
+        value={eidolon}
         onChange={(e) => {
           const val = parseInt(e.currentTarget.value);
           if (val >= 0 || val <= 6) setEidolon(val);

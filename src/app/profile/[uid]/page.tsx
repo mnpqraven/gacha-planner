@@ -1,10 +1,11 @@
 import { ConfigController } from "./ConfigControllerDialog";
-import { CardConfigProvider } from "./ConfigControllerContext";
 import { CharacterCardWrapper } from "./_components/CharacterCard";
 import { Exporter } from "./_components/Exporter";
 import { LineupSelector } from "./_components/LineupSelector";
 import { Share } from "./_components/Share";
 import { LANGS } from "@/lib/constants";
+import { StateProvider } from "../armory-jotai/StateProvider";
+import { DisplayCard } from "../armory-jotai/_viewer/DisplayCard";
 
 interface Props {
   params: { uid: string };
@@ -15,17 +16,18 @@ export default async function ProfileCard({
   searchParams: { lang },
 }: Props) {
   return (
-    <CardConfigProvider>
+    <StateProvider>
+      {/* <CardConfigProvider></CardConfigProvider> */}
       <main className="flex flex-col items-center justify-center">
         <div className="mt-2 flex items-center justify-center gap-2">
-          <LineupSelector />
-          <Exporter />
-          <Share />
-          <ConfigController />
+          {/* <LineupSelector /> */}
+          {/* <Exporter /> */}
+          {/* <Share /> */}
+          {/* <ConfigController /> */}
         </div>
 
-        <CharacterCardWrapper uid={uid} lang={lang} mode="API" />
+        <DisplayCard uid={uid} lang={lang} mode="API" />
       </main>
-    </CardConfigProvider>
+    </StateProvider>
   );
 }

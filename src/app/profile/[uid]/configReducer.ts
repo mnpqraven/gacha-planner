@@ -27,6 +27,8 @@ export function configReducer(
       };
     case "updateWholeConfig":
       return { ...payload };
+    case "changeUid":
+      return { ...state, uid: payload };
     default:
       return state;
   }
@@ -44,6 +46,7 @@ export interface CardConfig {
     showEmptyStat: boolean;
   };
   showBaseUrl: boolean;
+  uid?: string;
 }
 
 /**
@@ -57,6 +60,7 @@ interface CardConfigActionSchema {
   changeHoverVerbosity: "none" | "simple" | "detailed";
   toggleEmptyStat: boolean;
   updateWholeConfig: CardConfig;
+  changeUid: string | undefined;
 }
 
 type TypePayloadPair<K extends keyof CardConfigActionSchema> = {

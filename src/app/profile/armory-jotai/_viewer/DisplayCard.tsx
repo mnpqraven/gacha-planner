@@ -1,7 +1,7 @@
 "use client";
 
 import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
-import { useAtomValue } from "jotai";
+import { atom, useAtomValue, useSetAtom } from "jotai";
 import { armoryStructAtom, configAtom, statParseParam } from "../_store/main";
 import { LANGS } from "@/lib/constants";
 import { useStatParser } from "@/hooks/useStatParser";
@@ -12,6 +12,13 @@ import { SkillInfo } from "../../[uid]/_components/skill_block/SkillInfo";
 import { StatTable } from "../../[uid]/_components/stat_block/StatTable";
 import { SpiderChartWrapper } from "../../[uid]/_components/SpiderChartWrapper";
 import { RelicInfo } from "../../[uid]/_components/relic_block/RelicInfo";
+import { useMihomoInfo } from "../../[uid]/useMihomoInfo";
+import { charIdAtom, charLevelAtom, charStructAtom } from "../_store/character";
+import { useEffect } from "react";
+import { lcStructAtom } from "../_store/lightcone";
+import { relicsStructAtom } from "../_store/relic";
+import { useRelicSlotType } from "@/hooks/queries/useRelicSlotType";
+import { useRelicSets } from "@/hooks/queries/useRelicSetList";
 
 type Lang = (typeof LANGS)[number];
 type Props =
@@ -21,11 +28,22 @@ type Props =
       lang: Lang | undefined;
     }
   | { mode: "ARMORY" };
+
+const selectedCharacterIndexAtom = atom(0);
+const setIdsAtom = atom(
+  (get) =>
+    get(relicsStructAtom)
+      .map((e) => e.setId)
+      .filter(Boolean) as number[]
+);
+
 export function DisplayCard(props: Props) {
   const armoryData = useAtomValue(armoryStructAtom);
   const parseParams = useAtomValue(statParseParam);
   const config = useAtomValue(configAtom);
   const parsedStats = useStatParser(parseParams);
+
+  useMihomoApiUpdate(props);
 
   const { data: charMetadata } = useCharacterMetadata(armoryData.player.id);
 
@@ -101,4 +119,54 @@ export function DisplayCard(props: Props) {
       </div>
     );
   }
+}
+
+/**
+ * @param props - if undefined then this is a noop
+ */
+function useMihomoApiUpdate(props: Props) {
+  const { mode } = props;
+  const { query } = useMihomoInfo(
+    mode == "API"
+      ? { uid: props.uid, lang: props.lang }
+      : { uid: undefined, lang: undefined }
+  );
+  const setCharStruct = useSetAtom(charStructAtom);
+  const setLcStruct = useSetAtom(lcStructAtom);
+  const setRelicStruct = useSetAtom(relicsStructAtom);
+  const charIndex = useAtomValue(selectedCharacterIndexAtom);
+  const setIds = useAtomValue(setIdsAtom);
+  const { data: relicSlot } = useRelicSet();
+
+  useEffect(() => {
+    if (!!query.data && props.mode == "API") {
+      // map everything here
+      const { player } = query.data;
+      const chara = query.data.characters[charIndex];
+      const relics = query.data.characters[charIndex].relics;
+      setCharStruct({
+        id: chara.id,
+        level: chara.level,
+        ascension: chara.promotion,
+        eidolon: chara.rank,
+        // TODO:
+        skills: {},
+        trace: {},
+      });
+      if (!!chara.light_cone) {
+        setLcStruct({
+          id: Number(chara.light_cone.id),
+          level: chara.light_cone.level,
+          ascension: chara.light_cone.promotion,
+          imposition: chara.light_cone.rank,
+        });
+      }
+      setRelicStruct(
+        relics.map((relic) => {
+          return {};
+        })
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query.data]);
 }

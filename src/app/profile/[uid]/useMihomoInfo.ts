@@ -20,7 +20,7 @@ interface ProfileParam {
 }
 
 export const optionsMihomoInfo = (
-  uid: string | undefined = "",
+  uid: string | undefined,
   lang: Lang = "en",
   isServer = false
 ) =>
@@ -28,10 +28,11 @@ export const optionsMihomoInfo = (
     queryKey: ["mihoyoInfo", uid, lang, isServer],
     queryFn: async () =>
       await getMihomoInfo(
-        uid,
+        uid!,
         lang,
         isServer ? env.NEXT_PUBLIC_BASE_URL : undefined
       ),
+    enabled: !!uid,
   });
 
 export function useMihomoInfo(
