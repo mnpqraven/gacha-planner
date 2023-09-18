@@ -23,6 +23,7 @@ import { RelicSubAffixConfig } from "@/bindings/RelicSubAffixConfig";
 import { RelicMainAffixConfig } from "@/bindings/RelicMainAffixConfig";
 import { RelicCategory } from "@/app/profile/armory/schema";
 import { RelicSetSkillConfig } from "@/bindings/RelicSetSkillConfig";
+import { RelicConfig } from "@/bindings/RelicConfig";
 
 type CharId = { characterId: number };
 type LcId = { lcId: number };
@@ -67,6 +68,7 @@ const API = {
   relicSlotType: post<Record<number, RelicCategory>, List<number>>(
     "/honkai/relics/slot_type"
   ),
+  relics: post<List<RelicConfig>, List<number>>("/honkai/relics"),
   relicSets: get<List<RelicSetConfig>>("/honkai/relic_set"),
   relicSet: get<List<RelicSetConfig>, { relicSetId: number }>(
     ({ relicSetId }) => `/honkai/relic_set/${relicSetId}`

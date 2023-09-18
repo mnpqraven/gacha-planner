@@ -73,12 +73,12 @@ const SubstatSpreadConfig = forwardRef<HTMLDivElement, Props>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [defaultValue, propertyType]);
 
-    if (!propertyType || !setId)
-      return (
-        <div ref={ref} {...props}>
-          Please select a substat with the selector on the left
-        </div>
-      );
+    if (!propertyType || !setId) return null
+      // return (
+      //   <div ref={ref} {...props}>
+      //     Please select a substat with the selector on the left
+      //   </div>
+      // );
 
     if (!spreadInfo) return "spreadinfo loading...";
 

@@ -6,16 +6,19 @@ import { RelicCategory } from "@/app/profile/armory/schema";
 import { Badge } from "@/app/components/ui/Badge";
 import { prettyProperty, propertyIconUrl } from "@/lib/propertyHelper";
 import { cva } from "class-variance-authority";
+import { useMainStatSpread } from "@/hooks/queries/useMainStatSpread";
 
 interface RelicProps extends HTMLAttributes<HTMLDivElement> {
   data: RelicInput;
   active?: boolean;
 }
-export const RelicJotai = forwardRef<HTMLDivElement, RelicProps>(
+export const RelicBox = forwardRef<HTMLDivElement, RelicProps>(
   ({ data, className, active, ...props }, ref) => {
     // NOTE: upperbound = 6
     // TODO: placeholder render for unknown setId
-    if (!data.setId || !data.property)
+    const { data: mainstatSpread } = useMainStatSpread();
+
+    if (!data.setId || !data.property || !mainstatSpread)
       return (
         <div
           className={cn(
@@ -28,6 +31,13 @@ export const RelicJotai = forwardRef<HTMLDivElement, RelicProps>(
           placeholder wrapper
         </div>
       );
+
+    const promotionConfig = mainstatSpread[data.type].find(
+      (e) => e.property == data.property
+    );
+    const mainStatValue =
+      (promotionConfig?.base_value ?? 0) +
+      (promotionConfig?.level_add ?? 0) * data.level;
 
     return (
       <div
@@ -54,7 +64,7 @@ export const RelicJotai = forwardRef<HTMLDivElement, RelicProps>(
           <div className="z-10 flex w-full gap-1 font-bold">
             <SVG src={propertyIconUrl(data.property)} />
 
-            {prettyProperty(data.property, 0).prettyValue}
+            {prettyProperty(data.property, mainStatValue).prettyValue}
           </div>
         </div>
 
@@ -89,7 +99,7 @@ export const RelicJotai = forwardRef<HTMLDivElement, RelicProps>(
     );
   }
 );
-RelicJotai.displayName = "Relic";
+RelicBox.displayName = "Relic";
 
 const MarkerIcon = forwardRef<HTMLSpanElement, HTMLAttributes<HTMLSpanElement>>(
   ({ className, ...props }, ref) => (

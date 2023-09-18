@@ -33,7 +33,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/app/components/ui/Select";
-import { useCardConfigController } from "./ConfigControllerContext";
 import {
   Sheet,
   SheetContent,
@@ -43,9 +42,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/app/components/ui/Sheet";
+import { useSetAtom } from "jotai";
+import { configAtom } from "../armory-jotai/_store/main";
 
 export const ConfigController = () => {
-  const { changeConfig } = useCardConfigController();
+  const changeConfig = useSetAtom(configAtom);
   const form = useForm({
     defaultValues: initialConfig,
   });
@@ -80,7 +81,7 @@ export const ConfigController = () => {
   );
 };
 
-interface ConfigIconProps extends ButtonProps { }
+interface ConfigIconProps extends ButtonProps {}
 const ConfigIcon = forwardRef<HTMLButtonElement, ConfigIconProps>(
   ({ className, ...props }, ref) => {
     return (

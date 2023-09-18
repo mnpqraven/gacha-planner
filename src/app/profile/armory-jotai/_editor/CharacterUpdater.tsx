@@ -174,9 +174,9 @@ function SkillSection({
 }
 
 function SkillInput({ id, maxLv }: { id: number; maxLv: number }) {
-  const setCharSkill = useSetAtom(charSkillAtom);
+  const [charSkill, setCharSkill] = useAtom(charSkillAtom);
   useEffect(() => {
-    updateSkill(1);
+    if (!charSkill[id]) updateSkill(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -193,7 +193,7 @@ function SkillInput({ id, maxLv }: { id: number; maxLv: number }) {
         type="number"
         min={1}
         max={maxLv}
-        defaultValue="1"
+        value={charSkill[id]}
         onChange={(e) => {
           if (parseInt(e.target.value)) {
             const asInt = parseInt(e.target.value);

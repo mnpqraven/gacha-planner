@@ -20,6 +20,7 @@ import {
 } from "@/app/components/ui/Popover";
 import { SubstatSpreadConfig } from "./SubstatSpreadConfig";
 import { useSubStatSpread } from "@/hooks/queries/useSubStatSpread";
+import { useToast } from "@/app/components/ui/Toast/useToast";
 
 export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
   const [relic, setRelic] = useAtom(atom);
@@ -27,6 +28,7 @@ export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
   const mainStatOptions =
     relicMainstatOptions.find((e) => e.type == type)?.options ?? [];
   const { data: spreadData } = useSubStatSpread();
+  const { toast } = useToast();
 
   const [substatsAtom] = useState(
     focusAtom(atom, (optic) => optic.prop("subStats"))
@@ -72,6 +74,15 @@ export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
         return substat;
       })
     );
+  }
+
+  function warnProperty(prop: Property | undefined) {
+    if (!prop) {
+      toast({
+        variant: "destructive",
+        description: "Please select a substat with the selector on the left",
+      });
+    }
   }
 
   return (
@@ -125,7 +136,12 @@ export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
             />
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline">Substats</Button>
+                <Button
+                  variant="outline"
+                  onClick={() => warnProperty(substats.at(index)?.property)}
+                >
+                  Substats
+                </Button>
               </PopoverTrigger>
 
               <PopoverContent side="top" asChild>

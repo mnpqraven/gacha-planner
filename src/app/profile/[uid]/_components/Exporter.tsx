@@ -11,12 +11,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
+import { useAtomValue } from "jotai";
+import { enkaRefAtom } from "../../armory-jotai/_viewer/atoms";
 
 export function Exporter() {
-  const { enkaRef } = useCardConfigController();
+  // const { enkaRef } = useCardConfigController();
   // we need a firefox check cause firefox can't directly copy image
   const [isFirefox, setIsFirefox] = useState(false);
   const { toast } = useToast();
+  const enkaRef = useAtomValue(enkaRefAtom)
 
   useEffect(() => {
     if (navigator.userAgent.indexOf("Firefox") > 0) setIsFirefox(true);

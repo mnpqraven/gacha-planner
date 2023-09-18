@@ -16,14 +16,13 @@ export default async function ProfileCard({
   searchParams: { lang },
 }: Props) {
   return (
-    <StateProvider>
-      {/* <CardConfigProvider></CardConfigProvider> */}
+    <StateProvider devTools>
       <main className="flex flex-col items-center justify-center">
         <div className="mt-2 flex items-center justify-center gap-2">
-          {/* <LineupSelector /> */}
-          {/* <Exporter /> */}
-          {/* <Share /> */}
-          {/* <ConfigController /> */}
+          <LineupSelector />
+          <Exporter />
+          <Share />
+          <ConfigController />
         </div>
 
         <DisplayCard uid={uid} lang={lang} mode="API" />

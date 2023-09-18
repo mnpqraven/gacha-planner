@@ -13,7 +13,11 @@ import {
 } from "@/app/components/ui/Tooltip";
 import { CardConfig } from "../../configReducer";
 import { Property } from "@/bindings/SkillTreeConfig";
-import { prettyProperty, propertyIconUrl } from "@/lib/propertyHelper";
+import {
+  prettyProperty,
+  propertyIconUrl,
+  sortByProperty,
+} from "@/lib/propertyHelper";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   data: Partial<Record<Property, number>>;
@@ -28,10 +32,14 @@ export const StatTable = forwardRef<HTMLDivElement, Props>(
         property,
         value,
       }))
-      .filter(({ property }) => filterOtherElements(property, element)) as {
+      .filter(({ property }) => filterOtherElements(property, element))
+      .sort((a, b) =>
+        sortByProperty(a.property as Property, b.property as Property)
+      ) as {
       property: Property;
       value: number;
     }[];
+    console.log("yo", asObject);
 
     return (
       <div

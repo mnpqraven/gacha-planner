@@ -6,11 +6,11 @@ import { PathIcon } from "@/app/character-db/PathIcon";
 import { ElementIcon } from "@/app/character-db/ElementIcon";
 import { CardConfig } from "../../configReducer";
 import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
+import { useAtomValue } from "jotai";
+import { configAtom } from "@/app/profile/armory-jotai/_store/main";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  playerData?: Partial<{ uid: string | number; nickname: string }>;
   characterId: number;
-  config: CardConfig;
   level: number;
   ascension: number;
   eidolon: number;
@@ -18,19 +18,11 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 
 export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
   (
-    {
-      className,
-      characterId,
-      config,
-      level,
-      ascension,
-      eidolon,
-      playerData,
-      ...props
-    }: Props,
+    { className, characterId, level, ascension, eidolon, ...props }: Props,
     ref
   ) => {
     const { data } = useCharacterMetadata(characterId);
+    const config = useAtomValue(configAtom);
     if (!data) return null;
 
     // const { name, level, rarity, rank, path, element } = characterData;
@@ -75,8 +67,8 @@ export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
         <div className="grid w-full grid-cols-3">
           {config.showPlayerInfo ? (
             <div className="flex flex-col">
-              <span className="font-bold">{playerData?.nickname}</span>
-              <span>{playerData?.uid}</span>
+              <span className="font-bold">{config.name}</span>
+              {/* <span>{config.uid}</span> */}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-end">

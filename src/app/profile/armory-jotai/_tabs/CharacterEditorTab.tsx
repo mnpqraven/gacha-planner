@@ -41,7 +41,7 @@ export function CharacterEditorTab() {
   }
 
   return (
-    <div className="flex">
+    <div className="flex items-center">
       <div className="flex flex-col gap-6 p-4">
         {!!chara && (
           <CharacterCard

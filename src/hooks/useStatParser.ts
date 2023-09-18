@@ -75,7 +75,8 @@ export function useStatParser(props?: StatParserConstructor) {
       traceData,
       charPromotionData,
       props,
-      relicBonuses
+      relicBonuses,
+      mainStatLevels
     );
     return undefined;
   }

@@ -46,7 +46,7 @@ type SuspendedOptions = Omit<
 
 export const optionRelicSet = (setId: number | undefined) =>
   queryOptions<List<RelicSetConfig>, unknown, RelicSetConfig[]>({
-    queryKey: ["relic_set"],
+    queryKey: ["relic_set", setId],
     queryFn: async () => await API.relicSet.get({ relicSetId: setId! }),
     select: (data) => data.list.sort((a, b) => a.set_id - b.set_id),
     enabled: !!setId,

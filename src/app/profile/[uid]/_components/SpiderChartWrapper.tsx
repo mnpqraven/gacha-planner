@@ -6,7 +6,11 @@ import * as z from "zod";
 import { getNormalizedBoundProperty } from "./useDataProcess";
 import { filterOtherElements } from "./stat_block/StatTable";
 import { Element } from "@/bindings/AvatarConfig";
-import { prettyProperty, propertyIconUrl } from "@/lib/propertyHelper";
+import {
+  prettyProperty,
+  propertyIconUrl,
+  sortByProperty,
+} from "@/lib/propertyHelper";
 import { Property } from "@/bindings/SkillTreeConfig";
 import { useCharacterPromotion } from "@/hooks/queries/useCharacterPromotion";
 import { useLightConePromotion } from "@/hooks/queries/useLightConePromotion";
@@ -33,7 +37,6 @@ export const SpiderChartWrapper = forwardRef<HTMLDivElement, Props>(
     const speed = parsedStats.baseValues.speed;
 
     const binding = Object.entries(parsedStats.statTable)
-      .reverse()
       .map(([property, value]) => {
         let binding = value;
         switch (property as Property) {
@@ -59,7 +62,11 @@ export const SpiderChartWrapper = forwardRef<HTMLDivElement, Props>(
           normalizedValue,
         };
       })
-      .filter(({ property }) => filterOtherElements(property, element)) as {
+      .sort((a, b) =>
+        sortByProperty(a.property as Property, b.property as Property)
+      )
+      .filter(({ property }) => filterOtherElements(property, element))
+      .reverse() as {
       property: Property;
       value: number;
       normalizedValue: number;

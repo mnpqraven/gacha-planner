@@ -260,3 +260,67 @@ export const zodProperty = [
   "SpeedAddedRatio",
   "AllDamageTypeAddedRatio",
 ] as const;
+
+export function sortByProperty(a: Property, b: Property) {
+  const val = (pr: Property) => {
+    switch (pr) {
+      case "Defence":
+      case "DefenceAddedRatio":
+      case "DefenceDelta":
+      case "BaseDefence":
+        return -2;
+      case "MaxHP":
+      case "HPAddedRatio":
+      case "HPDelta":
+      case "BaseHP":
+        return -1;
+      case "Attack":
+      case "AttackAddedRatio":
+      case "AttackDelta":
+      case "BaseAttack":
+        return 0;
+      case "Speed":
+      case "SpeedAddedRatio":
+      case "SpeedDelta":
+      case "BaseSpeed":
+        return 1;
+      case "CriticalChance":
+      case "CriticalChanceBase":
+        return 2;
+      case "CriticalDamage":
+      case "CriticalDamageBase":
+        return 3;
+      case "FireAddedRatio":
+        return 4;
+      case "IceAddedRatio":
+        return 5;
+      case "WindAddedRatio":
+        return 6;
+      case "ThunderAddedRatio":
+        return 7;
+      case "PhysicalAddedRatio":
+        return 8;
+      case "QuantumAddedRatio":
+        return 9;
+      case "ImaginaryAddedRatio":
+        return 10;
+      case "BreakDamageAddedRatio":
+      case "BreakDamageAddedRatioBase":
+        return 11;
+      case "SPRatio":
+        return 12;
+      case "StatusProbability":
+      case "StatusProbabilityBase":
+        return 13;
+      case "StatusResistance":
+      case "StatusResistanceBase":
+        return 14;
+      case "HealRatio":
+      case "HealRatioBase":
+        return 15;
+      default:
+        return 16;
+    }
+  };
+  return val(a) - val(b);
+}
