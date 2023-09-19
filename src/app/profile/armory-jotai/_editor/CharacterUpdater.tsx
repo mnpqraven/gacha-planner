@@ -41,8 +41,8 @@ export function CharacterUpdater() {
       );
     });
 
-  if (!metadata) return "Loading character metadata...";
-  if (!skills) return "Loading character skills...";
+  if (!metadata) return null;
+  if (!skills) return null;
 
   return (
     <div className="flex gap-2">

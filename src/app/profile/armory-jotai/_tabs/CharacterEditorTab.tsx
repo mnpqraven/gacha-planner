@@ -45,7 +45,7 @@ export function CharacterEditorTab() {
 
   return (
     <div className="flex items-center">
-      <div className="flex flex-col items-center gap-6 p-4">
+      <div className="flex flex-col items-center justify-center gap-6 p-4">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button variant="outline">Choose Character</Button>
