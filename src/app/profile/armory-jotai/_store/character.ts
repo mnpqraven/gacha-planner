@@ -19,7 +19,19 @@ export const charEidAtom = atom(0);
 
 export const charSkillAtom = atomWithImmer<Record<string, number>>({});
 
-export const charTraceAtom = atom<Record<string | number, boolean>>({});
+export const charTraceAtom = atomWithImmer<Record<string | number, boolean>>(
+  {}
+);
+
+export const updateCharTraceAtom = atom(
+  null,
+  (_, set, payload: { id: number | string; checked: boolean }) => {
+    set(charTraceAtom, (draft) => {
+      console.log("payload", payload);
+      draft[payload.id] = payload.checked;
+    });
+  }
+);
 
 export const maxLevelAtom = atom((get) => get(charPromotionAtom) * 10 + 20);
 

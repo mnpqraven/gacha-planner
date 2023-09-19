@@ -19,6 +19,8 @@ import { charIdAtom } from "../_store/character";
 import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
 import { CharacterCard } from "@/app/character-db/CharacterCardWrapper";
 import { CharacterUpdater } from "../_editor/CharacterUpdater";
+import { TraceTable } from "@/app/components/Character/TraceTable";
+import { TraceTableUpdater } from "../_editor/TraceTableUpdater";
 
 export function CharacterEditorTab() {
   const [charId, updateId] = useAtom(charIdAtom);
@@ -35,7 +37,6 @@ export function CharacterEditorTab() {
   const filter = useCharacterFilter();
 
   function onCharacterSelect(to: AvatarConfig) {
-    // TODO: update jotai state
     updateId(to.avatar_id);
     setOpen(false);
   }
@@ -45,7 +46,7 @@ export function CharacterEditorTab() {
       <div className="flex flex-col gap-6 p-4">
         {!!chara && (
           <CharacterCard
-            className="h-fit w-48"
+            className="h-fit w-48 p-4"
             imgUrl={url(chara.avatar_id)}
             avatar_base_type={chara.avatar_base_type}
             avatar_name={chara.avatar_name}
@@ -75,6 +76,13 @@ export function CharacterEditorTab() {
       </div>
 
       <CharacterUpdater />
+
+      {!!chara && (
+        <TraceTableUpdater
+          characterId={chara.avatar_id}
+          path={chara.avatar_base_type}
+        />
+      )}
     </div>
   );
 }

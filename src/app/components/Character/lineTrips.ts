@@ -1,7 +1,8 @@
 import { Path } from "@/bindings/AvatarConfig";
+import { Anchor } from "@/bindings/SkillTreeConfig";
 import { cva } from "class-variance-authority";
 
-export function getLineTrips(path: Path) {
+export function getLineTrips(path: Path): Anchor[][] {
   switch (path) {
     case "Erudition":
       return [
@@ -319,4 +320,79 @@ export function traceVariants(path: Path) {
         },
       });
   }
+}
+
+/**
+ * this functions returns the list of root anchors that leads to small traces, going from A0
+ * to A6
+ */
+export function rootSmallTraceAnchors(path: Path): Anchor[] {
+  const val = () => {
+    switch (path) {
+      case "Destruction":
+        return [9, 6, 8, 7];
+      case "Hunt":
+        return [6, 12, 8, 15, 7, 9];
+      case "Erudition":
+        return [9, 6, 8, 7, 18];
+      case "Harmony":
+        return [9, 6, 7, 8];
+      case "Nihility":
+        return [9, 6, 8, 7];
+      case "Preservation":
+        return [9, 12, 8, 15];
+      case "Abundance":
+        return [9, 6, 7, 8, 18];
+    }
+  };
+  return val().map((e) => `Point${String(e).padStart(2, "0")}`) as Anchor[];
+}
+
+export function groupTrips(path: Path): Anchor[][] {
+  const val = () => {
+    switch (path) {
+      case "Destruction":
+        return [[6, 10, 11, 12], [7, 13, 14, 15], [8, 16, 17, 18], [9]];
+      case "Hunt":
+        return [[6, 10, 11], [7, 13, 14], [8, 16, 17, 18], [9]];
+      case "Erudition":
+        return [
+          [6, 10, 11, 12],
+          [7, 13, 14, 15],
+          [8, 16, 17],
+          [9, 18],
+        ];
+      case "Harmony":
+        return [
+          [6, 10, 11],
+          [7, 13, 14],
+          [8, 16, 17, 18],
+          [9, 12, 15],
+        ];
+      case "Nihility":
+        return [
+          [6, 10, 11, 12],
+          [7, 13, 14, 15],
+          [8, 16, 17],
+          [9, 18],
+        ];
+      case "Preservation":
+        return [
+          [9, 12, 15],
+          [6, 10, 11],
+          [7, 13, 14],
+          [8, 16, 17, 18],
+        ];
+      case "Abundance":
+        return [
+          [6, 10, 11, 12],
+          [7, 13, 14, 15],
+          [8, 17, 18],
+          [9, 18],
+        ];
+    }
+  };
+  return val().map((e) =>
+    e.map((a) => `Point${String(a).padStart(2, "0")}`)
+  ) as Anchor[][];
 }

@@ -1,5 +1,7 @@
+"use client";
+
 import { useLightConeMetadata } from "@/hooks/queries/useLightConeMetadata";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import {
   lcIdAtom,
   lcImpositionAtom,
@@ -17,11 +19,14 @@ export function LightConeUpdater() {
     <div>
       <div>{lightCone?.equipment_name}</div>
 
-      <div className="flex flex-col gap-2">
+      <div className="grid grid-cols-2 gap-2">
+        <div>Level</div>
         <LevelInput />
 
+        <div>Ascension</div>
         <PromotionInput />
 
+        <div>Imposition</div>
         <ImpositionInput />
       </div>
     </div>
@@ -33,60 +38,50 @@ function LevelInput() {
   const [level, setLevel] = useAtom(lcLevelAtom);
 
   return (
-    <div className="flex items-center gap-2">
-      <span>Level:</span>
-      <Input
-        className="w-12"
-        type="number"
-        autoComplete="off"
-        min={1}
-        max={maxLevel}
-        value={level}
-        onChange={(e) => setLevel(parseInt(e.target.value))}
-      />
-      <span>/{maxLevel}</span>
-    </div>
+    <Input
+      className="w-12"
+      type="number"
+      autoComplete="off"
+      min={1}
+      max={maxLevel}
+      value={level}
+      onChange={(e) => setLevel(parseInt(e.target.value))}
+    />
   );
 }
 
 function PromotionInput() {
   const [ascension, setAscension] = useAtom(lcPromotionAtom);
   return (
-    <div className="flex items-center gap-2">
-      <span>Ascension</span>
-      <Input
-        className="w-12"
-        type="number"
-        autoComplete="off"
-        min={0}
-        max={6}
-        value={ascension}
-        onChange={(e) => {
-          const val = parseInt(e.currentTarget.value);
-          if (val >= 0 || val <= 6) setAscension(val);
-        }}
-      />
-    </div>
+    <Input
+      className="w-12"
+      type="number"
+      autoComplete="off"
+      min={0}
+      max={6}
+      value={ascension}
+      onChange={(e) => {
+        const val = parseInt(e.currentTarget.value);
+        if (val >= 0 || val <= 6) setAscension(val);
+      }}
+    />
   );
 }
 
 function ImpositionInput() {
   const [rank, setRank] = useAtom(lcImpositionAtom);
   return (
-    <div className="flex items-center gap-2">
-      <span>Imposition</span>
-      <Input
-        className="w-12"
-        type="number"
-        autoComplete="off"
-        min={1}
-        max={5}
-        value={rank}
-        onChange={(e) => {
-          const val = parseInt(e.currentTarget.value);
-          if (val >= 0 || val <= 6) setRank(val);
-        }}
-      />
-    </div>
+    <Input
+      className="w-12"
+      type="number"
+      autoComplete="off"
+      min={1}
+      max={5}
+      value={rank}
+      onChange={(e) => {
+        const val = parseInt(e.currentTarget.value);
+        if (val >= 0 || val <= 6) setRank(val);
+      }}
+    />
   );
 }

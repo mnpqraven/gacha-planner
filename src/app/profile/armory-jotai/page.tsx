@@ -31,9 +31,9 @@ export default async function ProfileCard() {
           type="single"
           collapsible
           className="w-10/12"
-          defaultValue="item-1"
+          defaultValue="config-accordion"
         >
-          <AccordionItem value="item-1">
+          <AccordionItem value="config-accordion">
             <AccordionTrigger>Configuration</AccordionTrigger>
             <AccordionContent>
               <Tabs defaultValue="character" className="w-full">
@@ -55,14 +55,10 @@ export default async function ProfileCard() {
                   <RelicEditorTab />
                 </TabsContent>
               </Tabs>
-              {/* <ArmoryEditor /> */}
-
-              <Debugger />
-              {/* <CharacterCardWrapper uid={uid} lang={lang} mode="ARMORY" /> */}
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="item-2">
+          <AccordionItem value="card-accordion">
             <AccordionTrigger>Card</AccordionTrigger>
             <AccordionContent className="flex justify-center">
               <DisplayCard mode="ARMORY" />

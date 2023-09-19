@@ -15,7 +15,7 @@ import { Checkbox } from "../ui/Checkbox";
 import { useImmer } from "use-immer";
 import { useEffect } from "react";
 
-const DEBUG = false;
+const DEBUG = true;
 
 type Props = {
   characterId: number;
@@ -220,7 +220,7 @@ export function getNodeType(node: SkillTreeConfig): "CORE" | "SMALL" | "BIG" {
   return "SMALL";
 }
 
-function traceIconUrl(node: SkillTreeConfig) {
+export function traceIconUrl(node: SkillTreeConfig) {
   const base = `https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/icon`;
   switch (getNodeType(node)) {
     case "CORE": {

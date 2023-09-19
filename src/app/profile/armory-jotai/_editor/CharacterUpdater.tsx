@@ -44,14 +44,19 @@ export function CharacterUpdater() {
   if (!skills) return "Loading character skills...";
 
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       <div>{metadata.avatar_name}</div>
       <div className="flex flex-col gap-2">
-        <LevelInput />
+        <div className="grid grid-cols-2 gap-2">
+          <div>Level</div>
+          <LevelInput />
 
-        <PromotionInput />
+          <div>Ascension</div>
+          <PromotionInput />
 
-        <EidolonInput />
+          <div>Eidolon</div>
+          <EidolonInput />
+        </div>
 
         {["Basic ATK", "Talent", "Skill", "Ultimate"].map((skillTypeDesc) => (
           <SkillSection
@@ -71,62 +76,55 @@ function LevelInput() {
   const maxLevel = useAtomValue(maxLevelAtom);
   const [level, setLevel] = useAtom(charLevelAtom);
 
+  {
+    /* <span>/{maxLevel}</span> */
+  }
   return (
-    <div className="flex items-center gap-2">
-      <span>Level:</span>
-      <Input
-        className="w-12"
-        type="number"
-        autoComplete="off"
-        min={1}
-        max={maxLevel}
-        value={level}
-        onChange={(e) => setLevel(parseInt(e.target.value))}
-      />
-      <span>/{maxLevel}</span>
-    </div>
+    <Input
+      className="w-12"
+      type="number"
+      autoComplete="off"
+      min={1}
+      max={maxLevel}
+      value={level}
+      onChange={(e) => setLevel(parseInt(e.target.value))}
+    />
   );
 }
 
 function PromotionInput() {
   const [ascension, setAscension] = useAtom(charPromotionAtom);
   return (
-    <div className="flex items-center gap-2">
-      <span>Ascension</span>
-      <Input
-        className="w-12"
-        type="number"
-        autoComplete="off"
-        min={0}
-        max={6}
-        value={ascension}
-        onChange={(e) => {
-          const val = parseInt(e.currentTarget.value);
-          if (val >= 0 || val <= 6) setAscension(val);
-        }}
-      />
-    </div>
+    <Input
+      className="w-12"
+      type="number"
+      autoComplete="off"
+      min={0}
+      max={6}
+      value={ascension}
+      onChange={(e) => {
+        const val = parseInt(e.currentTarget.value);
+        if (val >= 0 || val <= 6) setAscension(val);
+      }}
+    />
   );
 }
 
 function EidolonInput() {
   const [eidolon, setEidolon] = useAtom(charEidAtom);
   return (
-    <div className="flex items-center gap-2">
-      <span>Eidolon</span>
-      <Input
-        className="w-12"
-        type="number"
-        autoComplete="off"
-        min={0}
-        max={6}
-        value={eidolon}
-        onChange={(e) => {
-          const val = parseInt(e.currentTarget.value);
-          if (val >= 0 || val <= 6) setEidolon(val);
-        }}
-      />
-    </div>
+    <Input
+      className="w-12"
+      type="number"
+      autoComplete="off"
+      min={0}
+      max={6}
+      value={eidolon}
+      onChange={(e) => {
+        const val = parseInt(e.currentTarget.value);
+        if (val >= 0 || val <= 6) setEidolon(val);
+      }}
+    />
   );
 }
 
@@ -188,8 +186,9 @@ function SkillInput({ id, maxLv }: { id: number; maxLv: number }) {
   }
 
   return (
-    <div className="flex">
+    <div className="flex items-center gap-2">
       <Input
+        className="w-12"
         type="number"
         min={1}
         max={maxLv}
