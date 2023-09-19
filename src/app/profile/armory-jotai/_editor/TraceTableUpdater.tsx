@@ -2,37 +2,27 @@ import {
   getNodeType,
   traceIconUrl,
 } from "@/app/components/Character/TraceTable";
-import {
-  getLineTrips,
-  groupTrips,
-  rootSmallTraceAnchors,
-} from "@/app/components/Character/lineTrips";
-import { Checkbox } from "@/app/components/ui/Checkbox";
+import { groupTrips } from "@/app/components/Character/lineTrips";
 import { Skeleton } from "@/app/components/ui/Skeleton";
 import { Toggle } from "@/app/components/ui/Toggle";
 import { Path } from "@/bindings/AvatarConfig";
 import { Anchor, SkillTreeConfig } from "@/bindings/SkillTreeConfig";
-import { useCharacterSkill } from "@/hooks/queries/useCharacterSkill";
 import { useCharacterTrace } from "@/hooks/queries/useCharacterTrace";
-import { cn } from "@/lib/utils";
+import { asPercentage, cn } from "@/lib/utils";
 import { cva } from "class-variance-authority";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import Image from "next/image";
-import { HTMLAttributes, forwardRef, useEffect, useState } from "react";
-import {
-  charSkillAtom,
-  charTraceAtom,
-  updateCharTraceAtom,
-} from "../_store/character";
+import { HTMLAttributes, forwardRef, useState } from "react";
+import { charTraceAtom, updateManyCharTraceAtom } from "../_store/character";
 
 const iconWrapVariants = cva(
   "flex items-center justify-center rounded-full ring-offset-transparent transition duration-500 hover:ring-2 hover:ring-offset-2",
   {
     variants: {
       variant: {
-        SMALL: "scale-50 bg-zinc-300",
-        BIG: "scale-[.85] bg-zinc-300",
-        CORE: "scale-75 bg-zinc-700",
+        SMALL: "scale-75 bg-zinc-300",
+        BIG: "scale-100 bg-zinc-300",
+        CORE: "scale-100 bg-zinc-700",
       },
     },
     defaultVariants: {
@@ -48,20 +38,22 @@ interface Props {
 
 export function TraceTableUpdater({ characterId, path }: Props) {
   const { data: traces } = useCharacterTrace(characterId);
-  // const smallSkills = traces?.filter((trace) => getNodeType(trace) == "SMALL");
-  // console.log("traces", smallSkills);
   if (!traces) return "loading...";
   const splittedTraces = groupTrips(path);
 
   return (
     <>
-      <div className="flex flex-col">
+      <div className="flex flex-col gap-2">
         {splittedTraces.map((trip, index) => (
-          <TripRow key={index} anchors={trip} traceInfo={traces} path={path} />
+          <TripRow
+            key={index}
+            anchors={trip}
+            traceInfo={traces}
+            path={path}
+            ascension={(index + 1) * 2}
+          />
         ))}
       </div>
-      {/*
-       */}
     </>
   );
 }
@@ -70,92 +62,134 @@ interface TripRowProps extends HTMLAttributes<HTMLDivElement> {
   anchors: Anchor[];
   traceInfo: SkillTreeConfig[];
   path: Path;
+  ascension: number;
 }
 const TripRow = forwardRef<HTMLDivElement, TripRowProps>(
-  ({ anchors, traceInfo, path, className, ...props }, ref) => {
+  ({ anchors, traceInfo, path, ascension, className, ...props }, ref) => {
     const traces = anchors.map((anchor) =>
       traceInfo.find((e) => e.anchor == anchor)
     );
-    const [checkedMap, setCheckedMap] = useState(
-      Array.from({ length: traces.length }, () => false)
-    );
-    const [tracedebug, updater] = useAtom(charTraceAtom);
+    const traceDict = useAtomValue(charTraceAtom);
+    const updateMany = useSetAtom(updateManyCharTraceAtom);
 
     function updateCheckMap(checked: boolean, index: number) {
-      checkedMap.forEach((_, i) => {
-        const id = traces.at(i)?.point_id;
-        if (!!id) {
-          // console.log("data", data);
-          updater((draft) => {
-            draft[id] = i == index ? checked : false;
-          });
-        }
-      });
-      setCheckedMap(
-        checkedMap.map((e, i) => {
-          if (i == index) return checked;
-          if (i > index) return false;
-          return e;
-        })
-      );
+      const rightSideMap = traces
+        .filter((e, i) => i >= index && e !== undefined)
+        .map((trace, i) => ({
+          id: trace?.point_id!,
+          checked: i == 0 ? checked : false,
+        }));
+      updateMany(rightSideMap);
     }
 
     return (
-      <div className={cn(className, "flex gap-4")} {...props} ref={ref}>
-        {traces.map((trace, index) => (
-          <Toggle
-            key={index}
-            className="flex h-fit flex-col items-center gap-2 pb-2"
-            pressed={checkedMap[index]}
-            onPressedChange={(checked) => {
-              if (!!trace && getNodeType(trace) == "SMALL")
-                updateCheckMap(!!checked, index);
-            }}
-          >
-            {trace?.point_id}
-            {!!trace ? (
-              <div
-                key={index}
-                className={iconWrapVariants({
-                  variant: getNodeType(trace),
-                })}
-              >
-                <Image
-                  className={cn(
-                    "rounded-full",
-                    getNodeType(trace) !== "CORE" ? "scale-90 invert" : ""
-                  )}
-                  src={traceIconUrl(trace)}
-                  alt=""
-                  width={64}
-                  height={64}
-                />
-              </div>
-            ) : (
-              <Skeleton key={index} className="rounded-full">
-                should not happen
-              </Skeleton>
-            )}
-
-            <Checkbox
-              disabled={!!trace ? !isPreviousChecked(index, checkedMap) : true}
-              checked={checkedMap[index]}
+      <div className={cn(className, "flex gap-2")} {...props} ref={ref}>
+        {traces.map((trace, index) =>
+          !!trace ? (
+            <TraceItem
+              key={index}
+              index={index}
+              data={trace}
+              previousData={index > 0 ? traces.at(index - 1) : undefined}
+              atomData={traceDict}
+              onUpdateSlice={updateCheckMap}
+              ascension={ascension}
             />
-          </Toggle>
-        ))}
+          ) : (
+            <div key={index} className="flex flex-col items-center gap-1 p-1">
+              <span>...</span>
+              <Skeleton className="h-12 w-12 rounded-full" />
+            </div>
+          )
+        )}
       </div>
     );
   }
 );
 TripRow.displayName = "TripRow";
 
+interface ItemProps {
+  index: number;
+  data: SkillTreeConfig;
+  previousData: SkillTreeConfig | undefined;
+  atomData: Record<string | number, boolean>;
+  onUpdateSlice: (checked: boolean, index: number) => void;
+  ascension: number;
+}
+function TraceItem({
+  data,
+  previousData,
+  atomData,
+  index,
+  onUpdateSlice,
+  ascension,
+}: ItemProps) {
+  const disabled = !isPreviousChecked(previousData, atomData);
+  if (getNodeType(data) !== "SMALL")
+    return (
+      <div className="flex flex-col items-center gap-1 p-1">
+        <span>A{ascension}</span>
+        <div
+          className={iconWrapVariants({
+            variant: getNodeType(data),
+          })}
+        >
+          <Image
+            className={cn(
+              "rounded-full",
+              getNodeType(data) !== "CORE" ? "invert" : ""
+            )}
+            src={traceIconUrl(data)}
+            alt=""
+            width={48}
+            height={48}
+          />
+        </div>
+      </div>
+    );
+
+  return (
+    <Toggle
+      className="flex h-fit flex-col items-center gap-1 p-1"
+      pressed={atomData[data.point_id]}
+      onPressedChange={(checked) => {
+        if (getNodeType(data) == "SMALL") onUpdateSlice(checked, index);
+      }}
+      disabled={disabled}
+    >
+      {asPercentage(data.status_add_list.at(0)?.value.value)}
+
+      <div
+        className={iconWrapVariants({
+          variant: getNodeType(data),
+        })}
+      >
+        <Image
+          className={cn(
+            "rounded-full",
+            getNodeType(data) !== "CORE" ? "invert" : ""
+          )}
+          src={traceIconUrl(data)}
+          alt=""
+          width={48}
+          height={48}
+        />
+      </div>
+    </Toggle>
+  );
+}
+
 // TODO:
 function isPreviousChecked(
-  currentIndex: number,
-  checkedMap: boolean[]
-): boolean {
-  if (currentIndex == 0) return true;
-  return checkedMap[currentIndex - 1];
+  previousTrace: SkillTreeConfig | undefined,
+  dict: Record<number | string, boolean>
+) {
+  // ok for first node
+  if (!previousTrace) return true;
+  // ok for having big parent
+  if (getNodeType(previousTrace) !== "SMALL") return true;
+
+  return dict[previousTrace.point_id];
 }
 
 // function splitTraces(traces: SkillTreeConfig[], path: Path) {

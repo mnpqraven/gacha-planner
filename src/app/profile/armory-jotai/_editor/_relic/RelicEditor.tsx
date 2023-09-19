@@ -1,4 +1,4 @@
-import { PrimitiveAtom, useAtom } from "jotai";
+import { PrimitiveAtom, useAtom, useAtomValue } from "jotai";
 import { RelicInput } from "../../_store/relic";
 import {
   relicMainstatOptions,
@@ -21,6 +21,10 @@ import {
 import { SubstatSpreadConfig } from "./SubstatSpreadConfig";
 import { useSubStatSpread } from "@/hooks/queries/useSubStatSpread";
 import { useToast } from "@/app/components/ui/Toast/useToast";
+import { prettyProperty } from "@/lib/propertyHelper";
+import { Label } from "@/app/components/ui/Label";
+import { splitAtom } from "jotai/utils";
+import { SubStatSchema } from "@/hooks/useStatParser";
 
 export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
   const [relic, setRelic] = useAtom(atom);
@@ -35,8 +39,11 @@ export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
   );
 
   const [substats, setSubstats] = useAtom(substatsAtom);
+  const splittedSubstatAtom = useAtomValue(splitAtom(substatsAtom));
 
-  if (!setId) return null;
+  const [debugOpen, setDebugOpen] = useState(false);
+
+  if (!setId || !spreadData) return null;
 
   const occupiedProperties: Property[] = !!property
     ? [property, ...substats.filter(Boolean).map((e) => e!.property)]
@@ -76,6 +83,15 @@ export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
     );
   }
 
+  function onPopoverClose(property: Property, value: number, step: number) {
+    setSubstats((substats) =>
+      substats.map((substat) => {
+        if (substat?.property === property) return { property, value, step };
+        return substat;
+      })
+    );
+  }
+
   function warnProperty(prop: Property | undefined) {
     if (!prop) {
       toast({
@@ -87,19 +103,13 @@ export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
 
   return (
     <div className="flex flex-col">
-      <div className="flex">
-        <Image
-          src={getRelicIcon(relic.type, setId)}
-          alt=""
-          height={128}
-          width={128}
-          className="h-32 w-32"
-        />
-
-        <div className="flex flex-col">
-          <div>Main stat</div>
+      <div className="flex gap-2">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="ms">Main stat</Label>
           {isMainstatEditable(type) ? (
             <PropertySelect
+              id="ms"
+              className="w-48"
               options={mainStatOptions}
               onValueChange={updateMainstat}
               value={property}
@@ -109,9 +119,11 @@ export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
           )}
         </div>
 
-        <div>
-          <div>Level</div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="lv">Level</Label>
           <Input
+            id="lv"
+            className="w-36"
             value={relic.level}
             type="number"
             min={0}
@@ -124,39 +136,60 @@ export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
         </div>
       </div>
 
-      <div>
-        {Array.from(range(0, 3)).map((index) => (
-          <div key={index} className="flex">
-            <PropertySelect
-              className="w-48"
-              options={subStatOptions.map((e) => e.option)}
-              itemDisabled={(prop) => occupiedProperties.includes(prop)}
-              onValueChange={(prop) => onSubStatSelect(prop, index)}
-              value={substats.at(index)?.property}
-            />
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  onClick={() => warnProperty(substats.at(index)?.property)}
-                >
-                  Substats
-                </Button>
-              </PopoverTrigger>
+      <div className="flex gap-1">
+        <Image
+          src={getRelicIcon(relic.type, setId)}
+          alt=""
+          height={64}
+          width={64}
+          className="h-24 w-24"
+        />
+        <div className="grid grid-cols-2 gap-2">
+          {splittedSubstatAtom.map((atom, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <PropertySelect
+                className="w-44"
+                options={subStatOptions.map((e) => e.option)}
+                itemDisabled={(prop) => occupiedProperties.includes(prop)}
+                onValueChange={(prop) => onSubStatSelect(prop, index)}
+                value={substats.at(index)?.property}
+              />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="px-2"
+                    onClick={() => warnProperty(substats.at(index)?.property)}
+                  >
+                    Substats
+                  </Button>
+                </PopoverTrigger>
 
-              <PopoverContent side="top" asChild>
-                <SubstatSpreadConfig
-                  defaultValue={substats.at(index)?.value}
-                  propertyType={substats.at(index)?.property}
-                  setId={setId}
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-        ))}
+                <PopoverContent side="top" asChild>
+                  <SubstatSpreadConfig
+                    atom={atom}
+                    spreadData={spreadData}
+                    setId={setId}
+                  />
+                </PopoverContent>
+              </Popover>
+
+              <ValueLabel atom={atom} />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
+}
+function ValueLabel({
+  atom,
+}: {
+  atom: PrimitiveAtom<SubStatSchema | undefined>;
+}) {
+  const value = useAtomValue(atom);
+  if (!value) return null;
+  return prettyProperty(value.property, value.value).prettyValue;
 }
 
 function isMainstatEditable(type: RelicCategory) {

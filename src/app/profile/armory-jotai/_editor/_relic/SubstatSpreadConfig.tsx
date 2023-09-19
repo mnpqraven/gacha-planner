@@ -6,115 +6,138 @@ import { Property } from "@/bindings/RelicMainAffixConfig";
 import { useSubStatSpread } from "@/hooks/queries/useSubStatSpread";
 import { isPropertyPercent } from "@/lib/propertyHelper";
 import { cn, range } from "@/lib/utils";
-import { atom, useAtom, useAtomValue } from "jotai";
-import { splitAtom } from "jotai/utils";
+import { PrimitiveAtom, atom, useAtom, useAtomValue } from "jotai";
+import { selectAtom, splitAtom } from "jotai/utils";
 import { Check, Pencil } from "lucide-react";
-import { HTMLAttributes, forwardRef, useEffect, useState } from "react";
+import {
+  HTMLAttributes,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { SpreadConfigBar } from "./SpreadConfigBar";
+import { SubStatSchema } from "@/hooks/useStatParser";
+import { RelicSubAffixConfig } from "@/bindings/RelicSubAffixConfig";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  propertyType: Property | undefined;
+  atom: PrimitiveAtom<SubStatSchema | undefined>;
+  // propertyType: Property | undefined;
   setId: number | undefined;
-  defaultValue?: number;
+  spreadData: RelicSubAffixConfig[];
+  // defaultValue?: number;
 }
 
 /** Text representation of the substat's value */
-export const valueAsStringAtom = atom({ text: "0", percent: false });
-export const substatValueAtom = atom(
-  (get) =>
-    parseFloat(get(valueAsStringAtom).text) /
-    (get(valueAsStringAtom).percent ? 100 : 1),
-  (get, set, update: number) => {
-    set(valueAsStringAtom, {
-      text: update.toFixed(2),
-      percent: get(valueAsStringAtom).percent,
-    });
-  }
-);
+// const valueAsStringAtom = atom({ text: "0", percent: false });
+// const substatValueAtom = atom(
+//   (get) =>
+//     parseFloat(get(valueAsStringAtom).text) /
+//     (get(valueAsStringAtom).percent ? 100 : 1),
+//   (get, set, update: number) => {
+//     set(valueAsStringAtom, {
+//       text: update.toFixed(2),
+//       percent: get(valueAsStringAtom).percent,
+//     });
+//     set(substatValueAtom, update);
+//   }
+// );
 
-const spreadRollsAtoms = atom(
-  Array.from(range(0, 5)).fill(0),
-  (get, set, next: number[] | ((prev: number[]) => number[])) => {
-    const list = Array.isArray(next) ? next : next(get(spreadRollsAtoms));
-    set(spreadRollsAtoms, list);
-    // INFO: update the hidden input value when spread if changed from
-    // pressing roll buttons
-    const sum = list.reduce((a, b) => a + b, 0);
-    const { percent } = get(valueAsStringAtom);
-    set(valueAsStringAtom, {
-      text: (sum * (percent ? 100 : 1)).toFixed(2),
-      percent,
-    });
-  }
-);
-const spreadAtomList = splitAtom(spreadRollsAtoms);
+// const spreadRollsAtoms = atom(
+//   Array.from(range(0, 5)).fill(0),
+//   (get, set, next: number[] | ((prev: number[]) => number[])) => {
+//     const list = Array.isArray(next) ? next : next(get(spreadRollsAtoms));
+//     set(spreadRollsAtoms, list);
+//     // INFO: update the hidden input value when spread if changed from
+//     // pressing roll buttons
+//     const sum = list.reduce((a, b) => a + b, 0);
+//     const { percent } = get(valueAsStringAtom);
+//     set(valueAsStringAtom, {
+//       text: (sum * (percent ? 100 : 1)).toFixed(2),
+//       percent,
+//     });
+//   }
+// );
+
+// const spreadAtomList = splitAtom(spreadRollsAtoms);
 
 const SubstatSpreadConfig = forwardRef<HTMLDivElement, Props>(
-  ({ propertyType, setId, className, defaultValue, ...props }, ref) => {
-    const { data } = useSubStatSpread();
+  ({ atom: atomm, spreadData, setId, className, ...props }, ref) => {
+    // const spreadAtoms = useAtomValue(spreadAtomList);
+    // INFO: separate atom for every child item
+    // const [valueLocalAtom] = useState(substatValueAtom);
+    // const [valueAsStringLocalAtom] = useState(valueAsStringAtom)
+    // const [spreadLocalAtom] = useState(spreadRollsAtoms);
+
+    // should only set this in 2 spots, once on input checkbox, once on roll buttons
+    const [value, setValue] = useAtom(atomm);
+    const spreadInfo = spreadData?.find((e) => e.property == value?.property);
+    const expensiveCalc = useMemo(
+      () =>
+        calculateSpread({
+          strategy: "TOPDOWN",
+          spreadData: spreadInfo!,
+          value: value?.value,
+        }),
+      [spreadInfo, value?.value]
+    );
+    const [spreadLocalAtom] = useState(
+      atom(expensiveCalc, (get, set, next: number[]) => {
+        set(spreadLocalAtom, next);
+        const got = get(atomm);
+        if (!!got) {
+          set(atomm, {
+            property: got.property,
+            step: next.filter((e) => e > 0).length,
+            value: next.reduce((a, b) => a + b, 0),
+          });
+        }
+      })
+    );
+    const [spreadSplittedLocalAtom] = useState(splitAtom(spreadLocalAtom));
+    const readOnlySpread = useAtomValue(spreadLocalAtom);
+    const spreadAtoms = useAtomValue(spreadSplittedLocalAtom);
+    // const [valueAsString, setValueAsString] = useAtom(valueAsStringLocalAtom);
+    // const [spread, setSpread] = useAtom(spreadLocalAtom);
+    const [valueAsString, setValueAsString] = useState({
+      text: getDefaultTextValue(value?.value, value?.property),
+      percent: false,
+    });
+    console.log("render");
+
     const [disabled, setDisabled] = useState(true);
-    const spreadInfo = data?.find((e) => e.property == propertyType);
-    const value = useAtomValue(substatValueAtom);
-    const [valueAsString, setValueAsString] = useAtom(valueAsStringAtom);
-    const [spread, setSpread] = useAtom(spreadRollsAtoms);
-    const spreadAtoms = useAtomValue(spreadAtomList);
 
     // set initial data for the value input box
     useEffect(() => {
-      if (defaultValue !== undefined && propertyType) {
-        const percent = isPropertyPercent(propertyType);
+      if (!!value && value.property) {
+        console.log("firstrender");
+        const percent = isPropertyPercent(value.property);
         setValueAsString({
-          text: (defaultValue * (percent ? 100 : 1)).toFixed(2),
+          text: (value.value * (percent ? 100 : 1)).toFixed(2),
           percent,
         });
 
-        setSpread((draft) => draft.map((e, i) => (i == 0 ? defaultValue : e)));
+        // setSpread((draft) => draft.map((e, i) => (i == 0 ? defaultValue : e)));
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [defaultValue, propertyType]);
 
-    if (!propertyType || !setId) return null
-      // return (
-      //   <div ref={ref} {...props}>
-      //     Please select a substat with the selector on the left
-      //   </div>
-      // );
+      return () => {
+        // if (!!propertyType) {
+        //   const value = spread.reduce((a, b) => a + b, 0);
+        //   const step = spread.filter((e) => e > 0).length;
+        //   console.log("debug spread", spread, "value and step", value, step);
+        //   setParentA({
+        //     property: propertyType,
+        //     value: spread.reduce((a, b) => a + b, 0),
+        //     step: spread.filter((e) => e > 0).length,
+        //   });
+        // }
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [value]);
 
     if (!spreadInfo) return "spreadinfo loading...";
-
-    /**
-     * take the user input value and automatically spread to rolls
-     */
-    const autoCalculateSpread = (strategy: "EQUAL" | "TOPDOWN" = "TOPDOWN") => {
-      console.log("autoCalculateSpread");
-      let valTemp = value;
-      let toUpdate: { value: number; index: number }[] = [];
-      if (strategy == "TOPDOWN") {
-        let index = 0;
-        while (valTemp > 0) {
-          const maxRoll = getSpreadValues(spreadInfo).maxRoll.value;
-          toUpdate.push({
-            value: valTemp >= maxRoll ? maxRoll : valTemp,
-            index,
-          });
-          valTemp -= maxRoll;
-          index++;
-        }
-      } else {
-        let index = 0;
-        while (valTemp > 0) {
-          const midRoll = getSpreadValues(spreadInfo).midRoll.value;
-          toUpdate.push({
-            value: valTemp >= midRoll ? midRoll : valTemp,
-            index,
-          });
-          valTemp -= midRoll;
-          index++;
-        }
-      }
-      console.log(toUpdate);
-      setSpread(toUpdate.map((e) => e.value));
-    };
+    if (!value?.property || !setId || !value) return null;
 
     const { minRoll, midRoll, maxRoll } = getSpreadValues(spreadInfo);
 
@@ -133,7 +156,7 @@ const SubstatSpreadConfig = forwardRef<HTMLDivElement, Props>(
 
     return (
       <div ref={ref} className={cn(className, "flex w-96 flex-col")} {...props}>
-        <div>{propertyType}</div>
+        <div>{value.property}</div>
         <div id="table" className="flex gap-2 rounded-md border">
           {spreadTable.map(({ label, value }) => (
             <div className="flex grow flex-col items-center p-1" key={label}>
@@ -153,9 +176,11 @@ const SubstatSpreadConfig = forwardRef<HTMLDivElement, Props>(
               onChange={(e) => onUserInputChange(e.target.value)}
             />
           ) : (
-            <div>{getSumValue(spread, isPropertyPercent(propertyType))}</div>
+            <div>
+              {getSumValue(readOnlySpread, isPropertyPercent(value.property))}
+            </div>
           )}
-          {isPropertyPercent(propertyType) && "%"}
+          {isPropertyPercent(value.property) && "%"}
           <Toggle
             pressed={!disabled}
             className="px-2"
@@ -168,7 +193,7 @@ const SubstatSpreadConfig = forwardRef<HTMLDivElement, Props>(
             <Button
               className="bg-green-700 px-2 hover:bg-green-700/90"
               type="submit"
-              onClick={() => autoCalculateSpread("TOPDOWN")}
+              // onClick={() => calculateSpread("TOPDOWN")}
             >
               <Check />
             </Button>
@@ -193,6 +218,47 @@ function getSumValue(numbers: number[], isPercent: boolean) {
 
 export { SubstatSpreadConfig };
 
-substatValueAtom.debugLabel = "substatValueAtom";
-spreadRollsAtoms.debugLabel = "spreadRollsAtoms";
-spreadAtomList.debugLabel = "spreadAtomList";
+// substatValueAtom.debugLabel = "substatValueRelicAtom";
+// spreadRollsAtoms.debugLabel = "spreadRollsRelicAtoms";
+// spreadAtomList.debugLabel = "spreadRelicAtomList";
+
+function getDefaultTextValue(
+  value: number | undefined,
+  prop: Property | undefined
+) {
+  if (!value || !prop) return "";
+  if (isPropertyPercent(prop)) return (value * 100).toFixed(2);
+  return value.toFixed(2);
+}
+
+/**
+ * take the substat value and return the corresponding spread values
+ */
+function calculateSpread({
+  strategy,
+  value,
+  spreadData,
+}: {
+  strategy: "EQUAL" | "TOPDOWN";
+  value: number | undefined;
+  spreadData: RelicSubAffixConfig;
+}) {
+  console.log("autoCalculateSpread");
+  if (!value) return Array.from(range(0, 5)).fill(0);
+  let toUpdate: number[] = [];
+  if (strategy == "TOPDOWN") {
+    while (value > 0) {
+      const maxRoll = getSpreadValues(spreadData).maxRoll.value;
+      toUpdate.push(value >= maxRoll ? maxRoll : value);
+      value -= maxRoll;
+    }
+  } else {
+    while (value > 0) {
+      const midRoll = getSpreadValues(spreadData).midRoll.value;
+      toUpdate.push(value >= midRoll ? midRoll : value);
+      value -= midRoll;
+    }
+  }
+  console.log("toUpdate", toUpdate);
+  return Array.from(range(0, 5)).map((i) => toUpdate.at(i) ?? 0);
+}

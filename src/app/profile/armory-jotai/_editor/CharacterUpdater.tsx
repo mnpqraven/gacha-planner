@@ -11,10 +11,11 @@ import { Input } from "@/app/components/ui/Input";
 import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
 import { useCharacterSkill } from "@/hooks/queries/useCharacterSkill";
 import { AvatarSkillConfig, SkillType } from "@/bindings/AvatarSkillConfig";
-import { getImagePath } from "@/lib/utils";
+import { cn, getImagePath } from "@/lib/utils";
 import Image from "next/image";
 import { getSkillMaxLevel } from "../../[uid]/_components/skill_block/SkillInfo";
-import { useEffect, useMemo } from "react";
+import { HTMLAttributes, forwardRef, useEffect, useMemo } from "react";
+import { Label } from "@/app/components/ui/Label";
 
 export function CharacterUpdater() {
   const charId = useAtomValue(charIdAtom);
@@ -44,20 +45,25 @@ export function CharacterUpdater() {
   if (!skills) return "Loading character skills...";
 
   return (
-    <div className="flex flex-col gap-2">
-      <div>{metadata.avatar_name}</div>
+    <div className="flex gap-2">
       <div className="flex flex-col gap-2">
-        <div className="grid grid-cols-2 gap-2">
-          <div>Level</div>
-          <LevelInput />
-
-          <div>Ascension</div>
-          <PromotionInput />
-
-          <div>Eidolon</div>
-          <EidolonInput />
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor="level">Level</Label>
+          <LevelInput id="level" />
         </div>
 
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor="promotion">Ascension</Label>
+          <PromotionInput id="promotion" />
+        </div>
+
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor="eidolon">Eidolon</Label>
+          <EidolonInput id="eidolon" />
+        </div>
+      </div>
+
+      <div className="flex flex-col">
         {["Basic ATK", "Talent", "Skill", "Ultimate"].map((skillTypeDesc) => (
           <SkillSection
             charId={charId}
@@ -72,7 +78,10 @@ export function CharacterUpdater() {
   );
 }
 
-function LevelInput() {
+const LevelInput = forwardRef<
+  HTMLInputElement,
+  HTMLAttributes<HTMLInputElement>
+>(({ className, ...props }) => {
   const maxLevel = useAtomValue(maxLevelAtom);
   const [level, setLevel] = useAtom(charLevelAtom);
 
@@ -81,22 +90,27 @@ function LevelInput() {
   }
   return (
     <Input
-      className="w-12"
+      className={cn("w-12", className)}
       type="number"
       autoComplete="off"
       min={1}
       max={maxLevel}
       value={level}
       onChange={(e) => setLevel(parseInt(e.target.value))}
+      {...props}
     />
   );
-}
+});
+LevelInput.displayName = "LevelInput";
 
-function PromotionInput() {
+const PromotionInput = forwardRef<
+  HTMLInputElement,
+  HTMLAttributes<HTMLInputElement>
+>(({ className, ...props }) => {
   const [ascension, setAscension] = useAtom(charPromotionAtom);
   return (
     <Input
-      className="w-12"
+      className={cn("w-12", className)}
       type="number"
       autoComplete="off"
       min={0}
@@ -106,11 +120,16 @@ function PromotionInput() {
         const val = parseInt(e.currentTarget.value);
         if (val >= 0 || val <= 6) setAscension(val);
       }}
+      {...props}
     />
   );
-}
+});
+PromotionInput.displayName = "PromotionInput";
 
-function EidolonInput() {
+const EidolonInput = forwardRef<
+  HTMLInputElement,
+  HTMLAttributes<HTMLInputElement>
+>(() => {
   const [eidolon, setEidolon] = useAtom(charEidAtom);
   return (
     <Input
@@ -126,7 +145,8 @@ function EidolonInput() {
       }}
     />
   );
-}
+});
+EidolonInput.displayName = "EidolonInput";
 
 function SkillSection({
   charId,

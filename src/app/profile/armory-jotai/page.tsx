@@ -36,19 +36,16 @@ export default async function ProfileCard() {
           <AccordionItem value="config-accordion">
             <AccordionTrigger>Configuration</AccordionTrigger>
             <AccordionContent>
-              <Tabs defaultValue="character" className="w-full">
+              <Tabs defaultValue="charlc" className="w-full">
                 <TabsList>
-                  <TabsTrigger value="character">
-                    Character & Traces
+                  <TabsTrigger value="charlc">
+                    Character & Light Cone
                   </TabsTrigger>
-                  <TabsTrigger value="lightcone">Light Cone & User</TabsTrigger>
                   <TabsTrigger value="relic">Relics</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="character">
+                <TabsContent value="charlc" className="flex">
                   <CharacterEditorTab />
-                </TabsContent>
-                <TabsContent value="lightcone">
                   <LightConeEditorTab />
                 </TabsContent>
                 <TabsContent value="relic">

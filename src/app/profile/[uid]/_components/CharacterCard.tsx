@@ -61,7 +61,6 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
             id="block-1"
             className="relative z-10"
             characterId={charMetadata.avatar_id}
-            config={config}
             {...formValues}
           />
 
@@ -138,9 +137,7 @@ function CharacterCardWrapper({ uid, lang, mode }: Props) {
         <CharacterInfo
           id="block-1"
           className="relative z-10"
-          config={config}
           characterId={currentCharacter.id}
-          playerData={{ uid, nickname: mihomoResponse?.player.nickname }}
           {...data}
         />
 

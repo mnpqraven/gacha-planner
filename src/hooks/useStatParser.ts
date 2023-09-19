@@ -14,7 +14,7 @@ import { RelicCategory } from "@/app/profile/armory/schema";
 import { useMainStatSpread } from "./queries/useMainStatSpread";
 
 type BasicMetadata = { id: number; level: number; ascension: number };
-interface SubStatSchema {
+export interface SubStatSchema {
   property: Property;
   value: number;
   step: number;

@@ -37,4 +37,3 @@ export const relicsStructAtom = atom(initialRelicStruct);
 export const splitRelicAtom = splitAtom(relicsStructAtom);
 
 relicsStructAtom.debugLabel = "relicsAtom";
-// splitRelicAtom.debugLabel = "splitRelicAtom";

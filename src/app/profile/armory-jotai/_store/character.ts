@@ -23,12 +23,13 @@ export const charTraceAtom = atomWithImmer<Record<string | number, boolean>>(
   {}
 );
 
-export const updateCharTraceAtom = atom(
+export const updateManyCharTraceAtom = atom(
   null,
-  (_, set, payload: { id: number | string; checked: boolean }) => {
+  (_, set, payload: { id: number | string; checked: boolean }[]) => {
     set(charTraceAtom, (draft) => {
-      console.log("payload", payload);
-      draft[payload.id] = payload.checked;
+      payload.forEach(({ id, checked }) => {
+        draft[id] = checked;
+      });
     });
   }
 );

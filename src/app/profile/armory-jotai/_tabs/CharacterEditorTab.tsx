@@ -12,18 +12,19 @@ import { Toggle } from "@/app/components/ui/Toggle";
 import { AvatarConfig } from "@/bindings/AvatarConfig";
 import { useCharacterList } from "@/hooks/queries/useCharacterList";
 import { img } from "@/lib/utils";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import Image from "next/image";
 import { useState } from "react";
 import { charIdAtom } from "../_store/character";
 import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
 import { CharacterCard } from "@/app/character-db/CharacterCardWrapper";
 import { CharacterUpdater } from "../_editor/CharacterUpdater";
-import { TraceTable } from "@/app/components/Character/TraceTable";
 import { TraceTableUpdater } from "../_editor/TraceTableUpdater";
+import { lcIdAtom } from "../_store/lightcone";
 
 export function CharacterEditorTab() {
   const [charId, updateId] = useAtom(charIdAtom);
+  const updateLcId = useSetAtom(lcIdAtom)
   const { data: chara } = useCharacterMetadata(charId);
   const { characterList } = useCharacterList();
   const [open, setOpen] = useState(false);
@@ -38,22 +39,13 @@ export function CharacterEditorTab() {
 
   function onCharacterSelect(to: AvatarConfig) {
     updateId(to.avatar_id);
+    updateLcId(undefined)
     setOpen(false);
   }
 
   return (
     <div className="flex items-center">
-      <div className="flex flex-col gap-6 p-4">
-        {!!chara && (
-          <CharacterCard
-            className="h-fit w-48 p-4"
-            imgUrl={url(chara.avatar_id)}
-            avatar_base_type={chara.avatar_base_type}
-            avatar_name={chara.avatar_name}
-            rarity={chara.rarity}
-            damage_type={chara.damage_type}
-          />
-        )}
+      <div className="flex flex-col items-center gap-6 p-4">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button variant="outline">Choose Character</Button>
@@ -73,6 +65,19 @@ export function CharacterEditorTab() {
             </div>
           </DialogContent>
         </Dialog>
+
+        {!!chara && (
+          <CharacterCard
+            className="h-fit w-48 p-4"
+            imgUrl={url(chara.avatar_id)}
+            avatar_base_type={chara.avatar_base_type}
+            avatar_name={chara.avatar_name}
+            rarity={chara.rarity}
+            damage_type={chara.damage_type}
+          />
+        )}
+
+        {chara?.avatar_name}
       </div>
 
       <CharacterUpdater />

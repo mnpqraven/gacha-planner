@@ -21,7 +21,7 @@ export function RelicEditorTab() {
   return (
     <div className="grid grid-cols-2 gap-2">
       {relicAtoms.map((relicAtom) => (
-        <div key={`${relicAtom}`} className="flex flex-col">
+        <div key={`${relicAtom}`} className="flex flex-col gap-2 border rounded-md p-2">
           <RelicSelector atom={relicAtom} />
           <RelicEditor atom={relicAtom} />
         </div>
@@ -40,10 +40,11 @@ function RelicSelector({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
   }
 
   return (
-    <div className="flex flex-col">
-      <div>{relic.type}</div>
+    <div className="flex gap-3 items-center">
+      <div className="w-12">{relic.type}</div>
+
       <Select onValueChange={updateRelic} value={`${relic.setId}`}>
-        <SelectTrigger>
+        <SelectTrigger className="w-96">
           <SelectValue />
         </SelectTrigger>
         <SelectContent className="max-h-full overflow-y-auto">

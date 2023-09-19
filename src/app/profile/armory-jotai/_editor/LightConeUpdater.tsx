@@ -10,51 +10,61 @@ import {
   maxLevelAtom,
 } from "../_store/lightcone";
 import { Input } from "@/app/components/ui/Input";
+import { Label } from "@/app/components/ui/Label";
+import { HTMLAttributes, forwardRef } from "react";
+import { cn } from "@/lib/utils";
 
 export function LightConeUpdater() {
-  const lcId = useAtomValue(lcIdAtom);
-  const { lightCone } = useLightConeMetadata(lcId);
-
   return (
-    <div>
-      <div>{lightCone?.equipment_name}</div>
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between gap-2">
+        <Label htmlFor="level">Level</Label>
+        <LevelInput id="level" />
+      </div>
 
-      <div className="grid grid-cols-2 gap-2">
-        <div>Level</div>
-        <LevelInput />
+      <div className="flex items-center justify-between gap-2">
+        <Label htmlFor="promotion">Ascension</Label>
+        <PromotionInput id="promotion" />
+      </div>
 
-        <div>Ascension</div>
-        <PromotionInput />
-
-        <div>Imposition</div>
-        <ImpositionInput />
+      <div className="flex items-center justify-between gap-2">
+        <Label htmlFor="rank">Imposition</Label>
+        <ImpositionInput id="rank" />
       </div>
     </div>
   );
 }
 
-function LevelInput() {
+const LevelInput = forwardRef<
+  HTMLInputElement,
+  HTMLAttributes<HTMLInputElement>
+>(({ className, ...props }) => {
   const maxLevel = useAtomValue(maxLevelAtom);
   const [level, setLevel] = useAtom(lcLevelAtom);
 
   return (
     <Input
-      className="w-12"
+      className={cn("w-12", className)}
       type="number"
       autoComplete="off"
       min={1}
       max={maxLevel}
       value={level}
       onChange={(e) => setLevel(parseInt(e.target.value))}
+      {...props}
     />
   );
-}
+});
+LevelInput.displayName = "LevelInput";
 
-function PromotionInput() {
+const PromotionInput = forwardRef<
+  HTMLInputElement,
+  HTMLAttributes<HTMLInputElement>
+>(({ className, ...props }) => {
   const [ascension, setAscension] = useAtom(lcPromotionAtom);
   return (
     <Input
-      className="w-12"
+      className={cn("w-12", className)}
       type="number"
       autoComplete="off"
       min={0}
@@ -64,15 +74,20 @@ function PromotionInput() {
         const val = parseInt(e.currentTarget.value);
         if (val >= 0 || val <= 6) setAscension(val);
       }}
+      {...props}
     />
   );
-}
+});
+PromotionInput.displayName = "PromotionInput";
 
-function ImpositionInput() {
+const ImpositionInput = forwardRef<
+  HTMLInputElement,
+  HTMLAttributes<HTMLInputElement>
+>(({ className, ...props }) => {
   const [rank, setRank] = useAtom(lcImpositionAtom);
   return (
     <Input
-      className="w-12"
+      className={cn("w-12", className)}
       type="number"
       autoComplete="off"
       min={1}
@@ -82,6 +97,8 @@ function ImpositionInput() {
         const val = parseInt(e.currentTarget.value);
         if (val >= 0 || val <= 6) setRank(val);
       }}
+      {...props}
     />
   );
-}
+});
+ImpositionInput.displayName = "ImpositionInput";

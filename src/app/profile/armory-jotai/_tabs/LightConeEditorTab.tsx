@@ -38,16 +38,7 @@ export function LightConeEditorTab() {
 
   return (
     <div className="flex">
-      <div className="flex flex-col gap-6 p-4">
-        {!!lightCone && (
-          <LightConeCard
-            className="h-fit w-48"
-            name={lightCone.equipment_name}
-            imgUrl={img(
-              `image/light_cone_preview/${lightCone.equipment_id}.png`
-            )}
-          />
-        )}
+      <div className="flex flex-col items-center gap-6 p-4">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button variant="outline">Change Light Cone</Button>
@@ -80,6 +71,18 @@ export function LightConeEditorTab() {
             </div>
           </DialogContent>
         </Dialog>
+
+        {!!lightCone && (
+          <LightConeCard
+            className="h-fit w-48"
+            name={lightCone.equipment_name}
+            imgUrl={img(
+              `image/light_cone_preview/${lightCone.equipment_id}.png`
+            )}
+          />
+        )}
+
+        {lightCone?.equipment_name}
       </div>
 
       <LightConeUpdater />
