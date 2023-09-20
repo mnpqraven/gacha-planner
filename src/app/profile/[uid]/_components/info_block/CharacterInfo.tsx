@@ -68,7 +68,7 @@ export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
           {config.showPlayerInfo ? (
             <div className="flex flex-col">
               <span className="font-bold">{config.name}</span>
-              {/* <span>{config.uid}</span> */}
+              <span>{config.uid}</span>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-end">

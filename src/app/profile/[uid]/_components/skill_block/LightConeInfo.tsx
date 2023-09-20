@@ -14,7 +14,7 @@ import { useLightConeMetadata } from "@/hooks/queries/useLightConeMetadata";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   displayStat?: boolean;
-  lcId?: number | string;
+  lcId?: number;
   level: number;
   ascension: number;
   imposition: number;
@@ -35,12 +35,8 @@ export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
     ref
   ) => {
     const ratio = 902 / 1260;
-    const { data: skill } = useLightConeSkill(
-      !!lcId ? Number(lcId) : undefined
-    );
-    const { lightCone } = useLightConeMetadata(
-      !!lcId ? Number(lcId) : undefined
-    );
+    const { data: skill } = useLightConeSkill(lcId);
+    const { lightCone } = useLightConeMetadata(lcId);
 
     if (!lightCone) return null;
 
@@ -85,17 +81,32 @@ export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
               className="justify-self-end shadow-xl shadow-border"
             />
           </TooltipTrigger>
-          {config.hoverVerbosity !== "none" && !!skill && (
-            <TooltipContent className="w-96 text-base" side="left">
-              <p className="mb-2 font-bold text-accent-foreground">
+          {!!skill && (
+            <TooltipContent
+              className={cn(
+                "text-base",
+                config.hoverVerbosity === "detailed" ? "w-96" : ""
+              )}
+              side="left"
+            >
+              <p
+                className={cn(
+                  "font-bold",
+                  config.hoverVerbosity == "detailed"
+                    ? "mb-2 text-accent-foreground"
+                    : ""
+                )}
+              >
                 {skill.skill_name}
               </p>
 
-              <SkillDescription
-                skillDesc={skill.skill_desc}
-                paramList={skill.param_list}
-                slv={imposition - 1}
-              />
+              {config.hoverVerbosity == "detailed" && (
+                <SkillDescription
+                  skillDesc={skill.skill_desc}
+                  paramList={skill.param_list}
+                  slv={imposition - 1}
+                />
+              )}
             </TooltipContent>
           )}
         </Tooltip>

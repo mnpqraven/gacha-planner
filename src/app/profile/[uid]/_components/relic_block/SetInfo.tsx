@@ -68,7 +68,7 @@ export const SetInfo = forwardRef<HTMLButtonElement, SetInfoProps>(
               </div>
             ))}
           </TooltipTrigger>
-          {hoverVerbosity !== "none" && (
+          {hoverVerbosity === "detailed" && (
             <TooltipContent
               side="top"
               sideOffset={25}
@@ -109,10 +109,6 @@ function bySetId<T extends { setId?: number; set_id?: number }>(a: T, b: T) {
   return (a.setId ?? a.set_id ?? 0) - (b.setId ?? b.set_id ?? 0);
 }
 
-function canShow(
-  setId: number,
-  relics: RelicInput[],
-  requireNum: number = 2
-) {
+function canShow(setId: number, relics: RelicInput[], requireNum: number = 2) {
   return relics.filter((e) => e.setId == setId).length >= requireNum;
 }

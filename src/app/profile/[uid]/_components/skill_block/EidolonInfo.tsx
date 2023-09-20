@@ -9,6 +9,8 @@ import {
 } from "@/app/components/ui/Tooltip";
 import { useCharacterEidolon } from "@/hooks/queries/useCharacterEidolon";
 import { AvatarRankConfig } from "@/bindings/AvatarRankConfig";
+import { useAtomValue } from "jotai";
+import { configAtom } from "@/app/profile/armory-jotai/_store/main";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   characterId: number;
@@ -64,7 +66,7 @@ const EidolonIcon = forwardRef<HTMLDivElement, IconProps>(
     },
     ref
   ) => {
-    const { config } = useCardConfigController();
+    const config = useAtomValue(configAtom);
     const { hoverVerbosity } = config;
 
     return (

@@ -28,11 +28,7 @@ export function configReducer(
     case "updateWholeConfig":
       return { ...payload };
     case "changeUser": {
-      const { name, uid } = payload;
-      if (!!uid && !!name) return { ...state, uid, name };
-      if (!!uid) return { ...state, uid };
-      else if (!!name) return { ...state, name };
-      else return state;
+      return { ...state, ...payload };
     }
     default:
       return state;
