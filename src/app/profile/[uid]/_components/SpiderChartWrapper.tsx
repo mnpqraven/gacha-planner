@@ -16,9 +16,7 @@ import { useCharacterPromotion } from "@/hooks/queries/useCharacterPromotion";
 import { useLightConePromotion } from "@/hooks/queries/useLightConePromotion";
 import { useStatParser } from "@/hooks/useStatParser";
 import { useAtomValue } from "jotai";
-import { statParseParam } from "../../armory-jotai/_store/main";
-import { charIdAtom } from "../../armory-jotai/_store/character";
-import { lcIdAtom } from "../../armory-jotai/_store/lightcone";
+import { charIdAtom, lcIdAtom, statParseParam } from "../../_store";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   element: Element;

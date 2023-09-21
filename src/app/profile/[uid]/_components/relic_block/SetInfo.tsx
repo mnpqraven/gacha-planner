@@ -1,5 +1,4 @@
 "use client";
-import { RelicInput } from "@/app/profile/armory-jotai/_store/relic";
 import { HTMLAttributes, forwardRef } from "react";
 import { CardConfig } from "../../configReducer";
 import { useRelicSetBonuses } from "@/hooks/queries/useRelicSetBonus";
@@ -12,7 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 import { SkillDescription } from "@/app/components/Db/SkillDescription";
 import { RelicSetMarker } from "./RelicSetMarker";
-import { ParsedRelicSchema } from "@/hooks/useStatParser";
+import { RelicInput } from "@/app/profile/_store/relic";
 
 interface SetInfoProps extends HTMLAttributes<HTMLButtonElement> {
   relics: RelicInput[];
@@ -109,10 +108,6 @@ function bySetId<T extends { setId?: number; set_id?: number }>(a: T, b: T) {
   return (a.setId ?? a.set_id ?? 0) - (b.setId ?? b.set_id ?? 0);
 }
 
-function canShow(
-  setId: number,
-  relics: RelicInput[],
-  requireNum: number = 2
-) {
+function canShow(setId: number, relics: RelicInput[], requireNum: number = 2) {
   return relics.filter((e) => e.setId == setId).length >= requireNum;
 }

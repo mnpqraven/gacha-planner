@@ -1,4 +1,4 @@
-import { RelicCategory } from "../armory/schema";
+import { RelicType } from "@/bindings/RelicConfig";
 
 export const initialCardData: CardData = {
   characterId: undefined,
@@ -46,7 +46,7 @@ export function dataReducer(state: CardData, action: CardDataAction): CardData {
 export interface CardData {
   characterId: number | undefined;
   lightConeId: number | undefined;
-  relicCfg: { openState: Record<RelicCategory, boolean> };
+  relicCfg: { openState: Record<RelicType, boolean> };
 }
 
 /**
@@ -57,7 +57,7 @@ export interface CardData {
 interface CardDataActionSchema {
   changeCharacterId: number;
   changeLightConeId: number;
-  changeRelicOpenState: { type: RelicCategory; open: boolean };
+  changeRelicOpenState: { type: RelicType; open: boolean };
   updateWholeConfig: CardData;
 }
 

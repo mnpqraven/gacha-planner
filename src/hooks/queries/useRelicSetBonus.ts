@@ -1,4 +1,3 @@
-import { RelicSetConfig } from "@/bindings/RelicSetConfig";
 import { RelicSetSkillConfig } from "@/bindings/RelicSetSkillConfig";
 import { List } from "@/lib/generics";
 import API from "@/server/typedEndpoints";

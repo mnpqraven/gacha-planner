@@ -3,7 +3,6 @@
 import { Button } from "@/app/components/ui/Button";
 import { toBlob, toPng } from "html-to-image";
 import { useEffect, useState } from "react";
-import { useCardConfigController } from "../ConfigControllerContext";
 import { Clipboard, Download } from "lucide-react";
 import { useToast } from "@/app/components/ui/Toast/useToast";
 import {
@@ -12,14 +11,13 @@ import {
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
 import { useAtomValue } from "jotai";
-import { enkaRefAtom } from "../../armory-jotai/_viewer/atoms";
+import { enkaRefAtom } from "../../_store";
 
 export function Exporter() {
-  // const { enkaRef } = useCardConfigController();
   // we need a firefox check cause firefox can't directly copy image
   const [isFirefox, setIsFirefox] = useState(false);
   const { toast } = useToast();
-  const enkaRef = useAtomValue(enkaRefAtom)
+  const enkaRef = useAtomValue(enkaRefAtom);
 
   useEffect(() => {
     if (navigator.userAgent.indexOf("Firefox") > 0) setIsFirefox(true);

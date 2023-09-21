@@ -2,7 +2,6 @@ import { HTMLAttributes, forwardRef } from "react";
 import { AvatarSkillConfig, SkillType } from "@/bindings/AvatarSkillConfig";
 import { cn, getImagePath } from "@/lib/utils";
 import Image from "next/image";
-import { useCardConfigController } from "../../ConfigControllerContext";
 import { ChevronsUp } from "lucide-react";
 import {
   Tooltip,
@@ -11,6 +10,8 @@ import {
 } from "@/app/components/ui/Tooltip";
 import { useCharacterSkill } from "@/hooks/queries/useCharacterSkill";
 import { SkillDescription } from "@/app/components/Db/SkillDescription";
+import { useAtomValue } from "jotai";
+import { configAtom } from "@/app/profile/_store";
 
 const DISPLAY_SKILL_TYPES: SkillType[] = [
   "Talent",
@@ -126,7 +127,7 @@ const SkillIcon = forwardRef<HTMLDivElement, IconProps>(
     { src, skillInfo, slv, width = 48, height = 48, className, ...props },
     ref
   ) => {
-    const { config } = useCardConfigController();
+    const config = useAtomValue(configAtom);
     const { hoverVerbosity } = config;
 
     return (

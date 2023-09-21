@@ -43,7 +43,7 @@ import {
   SheetTrigger,
 } from "@/app/components/ui/Sheet";
 import { useSetAtom } from "jotai";
-import { configAtom } from "../armory-jotai/_store/main";
+import { configAtom } from "../_store";
 
 export const ConfigController = () => {
   const changeConfig = useSetAtom(configAtom);

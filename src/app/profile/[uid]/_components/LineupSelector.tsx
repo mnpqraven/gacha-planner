@@ -3,15 +3,10 @@
 import { HTMLAttributes, forwardRef } from "react";
 import Image from "next/image";
 import { cn, img } from "@/lib/utils";
-import { useCardConfigController } from "../ConfigControllerContext";
 import { Toggle } from "@/app/components/ui/Toggle";
-import { MihomoCharacter } from "../../types";
 import { Skeleton } from "@/app/components/ui/Skeleton";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import {
-  mhyCharacterIds,
-  selectedCharacterIndexAtom,
-} from "../../armory-jotai/_viewer/atoms";
+import { useAtom, useAtomValue } from "jotai";
+import { mhyCharacterIds, selectedCharacterIndexAtom } from "../../_store/card";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {}
 
@@ -19,12 +14,6 @@ export const LineupSelector = forwardRef<HTMLDivElement, Props>(
   ({ className, ...props }, ref) => {
     const charIds = useAtomValue(mhyCharacterIds);
     const [selectIndex, setSelectIndex] = useAtom(selectedCharacterIndexAtom);
-    // const { setCurrentCharacter, currentCharacter, mihomoResponse } =
-    //   useCardConfigController();
-
-    // const data: MihomoCharacter[] = mihomoResponse?.characters
-    //   ? mihomoResponse.characters
-    //   : new Array(4).fill(undefined);
 
     return (
       <div

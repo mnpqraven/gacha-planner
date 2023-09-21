@@ -21,9 +21,8 @@ import { Banner } from "@/bindings/Banner";
 import { RelicSetConfig } from "@/bindings/RelicSetConfig";
 import { RelicSubAffixConfig } from "@/bindings/RelicSubAffixConfig";
 import { RelicMainAffixConfig } from "@/bindings/RelicMainAffixConfig";
-import { RelicCategory } from "@/app/profile/armory/schema";
 import { RelicSetSkillConfig } from "@/bindings/RelicSetSkillConfig";
-import { RelicConfig } from "@/bindings/RelicConfig";
+import { RelicConfig, RelicType } from "@/bindings/RelicConfig";
 
 type CharId = { characterId: number };
 type LcId = { lcId: number };
@@ -65,7 +64,7 @@ const API = {
     ({ characterId }) => `/honkai/avatar/${characterId}/promotion`
   ),
   warpBanner: get<List<Banner>>("/honkai/warp_banners"),
-  relicSlotType: post<Record<number, RelicCategory>, List<number>>(
+  relicSlotType: post<Record<number, RelicType>, List<number>>(
     "/honkai/relics/slot_type"
   ),
   relics: post<List<RelicConfig>, List<number>>("/honkai/relics"),
@@ -80,7 +79,7 @@ const API = {
   substatSpread: get<List<RelicSubAffixConfig>>(
     "/honkai/relics/statspread/sub"
   ),
-  mainstatSpread: get<Record<RelicCategory, RelicMainAffixConfig[]>>(
+  mainstatSpread: get<Record<RelicType, RelicMainAffixConfig[]>>(
     "/honkai/relics/statspread/main"
   ),
 };

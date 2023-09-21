@@ -10,8 +10,8 @@ import {
   charAfterPromotion,
   lcAfterPromotion,
 } from "@/app/profile/[uid]/_components/useDataProcess";
-import { RelicCategory } from "@/app/profile/armory/schema";
 import { useMainStatSpread } from "./queries/useMainStatSpread";
+import { RelicType } from "@/bindings/RelicConfig";
 
 type BasicMetadata = { id: number; level: number; ascension: number };
 export interface SubStatSchema {
@@ -24,7 +24,7 @@ export type ParsedRelicSchema = {
   rarity: number;
   setId: number;
   // INFO: not yet needed
-  type: RelicCategory;
+  type: RelicType;
   level: number;
   property: Property;
   subStats: (SubStatSchema | undefined)[];

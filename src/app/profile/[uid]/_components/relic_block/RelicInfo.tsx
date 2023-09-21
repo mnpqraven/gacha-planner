@@ -1,12 +1,9 @@
 import { cn } from "@/lib/utils";
 import { HTMLAttributes, forwardRef } from "react";
-import { cva } from "class-variance-authority";
-import { RelicCategory } from "@/app/profile/armory/schema";
 import { useAtomValue } from "jotai";
-import { relicsStructAtom } from "@/app/profile/armory-jotai/_store/relic";
-import { configAtom } from "@/app/profile/armory-jotai/_store/main";
-import { RelicBox } from "@/app/profile/armory-jotai/_viewer/_relic/RelicBox";
+import { RelicBox } from "@/app/profile/custom/_viewer/_relic/RelicBox";
 import { SetInfo } from "./SetInfo";
+import { configAtom, relicsStructAtom } from "@/app/profile/_store";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {}
 export const RelicInfo = forwardRef<HTMLDivElement, Props>(

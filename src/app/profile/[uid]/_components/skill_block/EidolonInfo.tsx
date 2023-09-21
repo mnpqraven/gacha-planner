@@ -1,6 +1,5 @@
 import { cn, img, range, sanitizeNewline } from "@/lib/utils";
 import { Fragment, HTMLAttributes, forwardRef } from "react";
-import { useCardConfigController } from "../../ConfigControllerContext";
 import Image from "next/image";
 import {
   Tooltip,
@@ -9,6 +8,8 @@ import {
 } from "@/app/components/ui/Tooltip";
 import { useCharacterEidolon } from "@/hooks/queries/useCharacterEidolon";
 import { AvatarRankConfig } from "@/bindings/AvatarRankConfig";
+import { useAtomValue } from "jotai";
+import { configAtom } from "@/app/profile/_store";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   characterId: number;
@@ -64,7 +65,7 @@ const EidolonIcon = forwardRef<HTMLDivElement, IconProps>(
     },
     ref
   ) => {
-    const { config } = useCardConfigController();
+    const config = useAtomValue(configAtom);
     const { hoverVerbosity } = config;
 
     return (

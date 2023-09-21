@@ -1,11 +1,10 @@
 import { ConfigController } from "./ConfigControllerDialog";
-import { CharacterCardWrapper } from "./_components/CharacterCard";
 import { Exporter } from "./_components/Exporter";
 import { LineupSelector } from "./_components/LineupSelector";
 import { Share } from "./_components/Share";
 import { LANGS } from "@/lib/constants";
-import { StateProvider } from "../armory-jotai/StateProvider";
-import { DisplayCard } from "../armory-jotai/_viewer/DisplayCard";
+import { DisplayCard } from "../custom/_viewer/DisplayCard";
+import { StateProvider } from "../StateProvider";
 
 interface Props {
   params: { uid: string };
