@@ -17,12 +17,17 @@ import {
 import { DisplayCard } from "./_viewer/DisplayCard";
 import { Exporter } from "../[uid]/_components/Exporter";
 import { ConfigController } from "../[uid]/ConfigControllerDialog";
+import { Button } from "@/app/components/ui/Button";
+import Link from "next/link";
 
 export default async function ProfileCard() {
   return (
     <StateProvider devTools>
       <main className="flex flex-col items-center justify-center">
         <div className="mt-2 flex items-center justify-center gap-2">
+          <Button variant="outline">
+            <Link href="/card">Use UID</Link>
+          </Button>
           <Exporter />
           <ConfigController />
         </div>

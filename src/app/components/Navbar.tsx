@@ -50,7 +50,7 @@ const menu = [
     keybind: "r",
   },
   {
-    path: "/profile",
+    path: "/card",
     label: "Character Card",
     icon: <BookCopy className="h-4 w-4" />,
     keybind: "c",
@@ -62,7 +62,10 @@ const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {
   const defaultLinkClass =
     "flex items-center space-x-1 text-sm font-medium transition-colors hover:text-primary";
   const pathnameClass = (path: string) =>
-    cn(defaultLinkClass, pathname !== path ? "text-muted-foreground" : "");
+    cn(
+      defaultLinkClass,
+      pathname.startsWith(path) ? "text-muted-foreground" : ""
+    );
 
   return (
     <div className="sticky top-0 z-50 flex h-12 items-center border-b bg-background px-4">

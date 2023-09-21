@@ -11,7 +11,7 @@ import {
 import { useCharacterSkill } from "@/hooks/queries/useCharacterSkill";
 import { SkillDescription } from "@/app/components/Db/SkillDescription";
 import { useAtomValue } from "jotai";
-import { configAtom } from "@/app/profile/_store";
+import { configAtom } from "@/app/card/_store";
 
 const DISPLAY_SKILL_TYPES: SkillType[] = [
   "Talent",

@@ -2,16 +2,11 @@ import { AvatarPromotionConfig } from "@/bindings/AvatarPromotionConfig";
 import { EquipmentPromotionConfig } from "@/bindings/EquipmentPromotionConfig";
 import { useCharacterPromotion } from "@/hooks/queries/useCharacterPromotion";
 import { useLightConePromotion } from "@/hooks/queries/useLightConePromotion";
-import {
-  MihomoAttributeConfig,
-  MihomoCharacter,
-  MihomoPlayer,
-  MihomoSkillTreeConfig,
-} from "../../types";
+import { MihomoCharacter, MihomoSkillTreeConfig } from "../../types";
 import { Property, SkillTreeConfig } from "@/bindings/SkillTreeConfig";
 import { getNodeType } from "@/app/components/Character/TraceTable";
 import { Field } from "./SpiderChartWrapper";
-import { Element, Path } from "@/bindings/PatchBanner";
+import { Element } from "@/bindings/PatchBanner";
 import { asPercentage, rotate } from "@/lib/utils";
 
 const accumulator: { [k in Field]: Field[] } = {
@@ -476,78 +471,3 @@ function sumAfterTrace(
   });
   return nodeMap;
 }
-
-function getGreyValue(
-  promotionChar: AvatarPromotionConfig,
-  promotionLc: EquipmentPromotionConfig,
-  level: number,
-  ascension: number
-): { atk: number; def: number; hp: number } {
-  const char = charAfterPromotion({
-    promotionConfig: promotionChar,
-    level,
-    ascension,
-  });
-  const lc = lcAfterPromotion({
-    promotionConfig: promotionLc,
-    level,
-    ascension,
-  });
-  return {
-    atk: char.atk + lc.atk,
-    def: char.def + lc.def,
-    hp: char.hp + lc.hp,
-  };
-}
-
-function mhmGreyValue(char: MihomoCharacter) {
-  return char.properties;
-}
-
-function mhmBlueValue(chara: MihomoCharacter) {
-  // for now use mihomo's additions
-  return chara.additions;
-}
-
-// const finalized =  propertyAccessor() / getBounds()
-
-// NOTE: pela
-// lv 68
-// 1 atk trace (4%)
-// base atk: 472 + 18 (atk trace 4%) => base * atk%
-//
-// NOTE: kafka lc lv 80
-// base atk: 472 + 582 = 1054 + 4% (trace) = 42
-//
-//
-// INFO: => (base char + base lc) = grey
-// [grey * (trace% * relic%)] + relic flat = blue
-// sum = grey + blue
-//
-// INFO: bounds
-// separate into 4 categories for normalization:
-//
-// INFO: 1. fastest: property that appers in both main + subs with relatively
-// high rate (5.83% for cdmg/break)
-// cdmg + break (TOEVAL: DEF)
-// => bounds: (sum) 0 > 200%
-//
-// INFO: 2. norm flat: same as 1 but with lower rate
-// eres + ehr + c_rate + element_dmg
-// => bounds: (sum) 0 > 100%
-//
-// INFO: 3. norm flat: stats that contains both flat and %sub, mergin with
-// base stat
-// hp + atk + def
-// TODO: bounds:
-// hp atk: (blue / grey) -> 200%
-// def: (blue / grey) 300%
-//
-// INFO: 4. slow: not present as sub
-// heal_rate + sp_rate
-// => bounds:
-// heal_rate: (sum) 50%,
-// sp_rate: (sum) 50%
-//
-// INFO: 5. spd flat
-// => bounds: 161

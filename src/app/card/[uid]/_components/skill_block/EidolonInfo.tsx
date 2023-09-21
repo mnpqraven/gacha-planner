@@ -9,7 +9,7 @@ import {
 import { useCharacterEidolon } from "@/hooks/queries/useCharacterEidolon";
 import { AvatarRankConfig } from "@/bindings/AvatarRankConfig";
 import { useAtomValue } from "jotai";
-import { configAtom } from "@/app/profile/_store";
+import { configAtom } from "@/app/card/_store";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   characterId: number;

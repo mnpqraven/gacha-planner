@@ -11,7 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 import { SkillDescription } from "@/app/components/Db/SkillDescription";
 import { RelicSetMarker } from "./RelicSetMarker";
-import { RelicInput } from "@/app/profile/_store/relic";
+import { RelicInput } from "@/app/card/_store/relic";
 
 interface SetInfoProps extends HTMLAttributes<HTMLButtonElement> {
   relics: RelicInput[];

@@ -6,7 +6,7 @@ import { PathIcon } from "@/app/character-db/PathIcon";
 import { ElementIcon } from "@/app/character-db/ElementIcon";
 import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
 import { useAtomValue } from "jotai";
-import { configAtom } from "@/app/profile/_store";
+import { configAtom } from "@/app/card/_store";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   characterId: number;

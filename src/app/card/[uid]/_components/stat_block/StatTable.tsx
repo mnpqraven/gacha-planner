@@ -1,9 +1,5 @@
-import {
-  MihomoAttributeConfig,
-  MihomoPropertyConfig,
-} from "@/app/profile/types";
 import { Element } from "@/bindings/AvatarConfig";
-import { asPercentage, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { HTMLAttributes, forwardRef } from "react";
 import SVG from "react-inlinesvg";
 import {

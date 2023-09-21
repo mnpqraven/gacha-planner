@@ -36,6 +36,8 @@ import { MihomoPlayer } from "./types";
 import STORAGE from "@/server/storage";
 import { Toggle } from "../components/ui/Toggle";
 import { cn } from "@/lib/utils";
+import { Separator } from "../components/ui/Separator";
+import Link from "next/link";
 
 const schema = z.object({
   uid: z
@@ -136,10 +138,18 @@ export default function Profile() {
           >
             Search
           </Button>
+
+          <Button
+            variant="outline"
+            className="mt-4 w-fit items-center md:mt-[34px] md:self-start"
+            size="sm"
+          >
+            <Link href="/card/custom">Custom card</Link>
+          </Button>
         </form>
       </Form>
 
-      {query.isInitialLoading && <Loader2 className="mr-1 animate-spin" />}
+      {query.isLoading && <Loader2 className="mr-1 animate-spin" />}
       {query.data && (
         <div className="flex items-center gap-3">
           <PinProfileButton

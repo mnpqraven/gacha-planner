@@ -9,7 +9,7 @@ import { useLightConeSkill } from "./queries/useLightConeSkill";
 import {
   charAfterPromotion,
   lcAfterPromotion,
-} from "@/app/profile/[uid]/_components/useDataProcess";
+} from "@/app/card/[uid]/_components/useDataProcess";
 import { useMainStatSpread } from "./queries/useMainStatSpread";
 import { RelicType } from "@/bindings/RelicConfig";
 
