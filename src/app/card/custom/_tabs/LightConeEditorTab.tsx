@@ -21,7 +21,7 @@ import { LightConeUpdater } from "../_editor/LightConeUpdater";
 import { charIdAtom, lcIdAtom } from "../../_store";
 
 export function LightConeEditorTab() {
-  const { lightConeList } = useLightConeList();
+  const { data: lightConeList } = useLightConeList();
   const charId = useAtomValue(charIdAtom);
   const [open, setOpen] = useState(false);
   const [lcId, setLcId] = useAtom(lcIdAtom);

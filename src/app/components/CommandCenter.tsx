@@ -61,7 +61,7 @@ const CommandCenter = ({ routes }: Props) => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
-  const { lightConeList } = useLightConeList();
+  const { data: lightConeList } = useLightConeList();
   const { characterList } = useCharacterList();
   const [filteredLc, setFilteredLc] = useState<EquipmentConfig[]>([]);
   const [filteredChar, setFilteredChar] = useState<AvatarConfig[]>([]);
@@ -225,7 +225,7 @@ export { CommandCenter };
 
 interface RouteItemProps
   extends Route,
-  ComponentPropsWithoutRef<typeof CommandItem> { }
+    ComponentPropsWithoutRef<typeof CommandItem> {}
 
 const RouteItem = forwardRef<
   ElementRef<typeof CommandPrimitive.Item>,
