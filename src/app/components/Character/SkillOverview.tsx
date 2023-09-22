@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Slider } from "../ui/Slider";
-import { parseSkillType } from "@/lib/utils";
+import { getImagePath, parseSkillType } from "@/lib/utils";
 import { Toggle } from "../ui/Toggle";
 import { Separator } from "../ui/Separator";
 import { SkillDescription } from "../Db/SkillDescription";
@@ -20,7 +20,7 @@ const SkillOverview = ({ characterId }: Props) => {
   const [selectedSlv, setSelectedSlv] = useState(0);
 
   const { data: skills } = useCharacterSkill(characterId);
-  const { character } = useCharacterMetadata(characterId);
+  const { data: character } = useCharacterMetadata(characterId);
 
   const [selectedSkill, setSelectedSkill] = useState<
     AvatarSkillConfig | undefined
@@ -64,7 +64,7 @@ const SkillOverview = ({ characterId }: Props) => {
               pressed={skill.skill_id === selectedSkill.skill_id}
               onPressedChange={() => setSelectedSkill(skill)}
             >
-              {getImagePath(characterId, skill) && (
+              {!!getImagePath(characterId, skill) && (
                 <Image
                   src={`${getImagePath(characterId, skill)}`}
                   alt={skill.skill_name}
@@ -148,49 +148,4 @@ const SkillOverviewLoading = () => (
   </div>
 );
 
-function getImagePath(
-  characterId: number | null | undefined,
-  skill: AvatarSkillConfig
-): string | undefined {
-  let ttype = "";
-  if (skill.attack_type) {
-    switch (skill.attack_type) {
-      case "Normal":
-        ttype = "basic_attack";
-        break;
-      case "BPSkill":
-        ttype = "skill";
-        break;
-      case "Ultra":
-        ttype = "ultimate";
-        break;
-      case "Talent":
-        ttype = "talent";
-        break;
-      case "Maze":
-        ttype = "technique";
-        break;
-    }
-  } else {
-    switch (skill.skill_type_desc) {
-      case "Basic ATK":
-        ttype = "basic_atk";
-        break;
-      case "Skill":
-        ttype = "skill";
-        break;
-      case "Ultra":
-        ttype = "ultimate";
-        break;
-      case "Talent":
-        ttype = "talent";
-        break;
-      case "Technique":
-        ttype = "technique";
-        break;
-    }
-  }
-  if (!characterId) return undefined;
-  return `https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/icon/skill/${characterId}_${ttype}.png`;
-}
 export { SkillOverview, SkillOverviewLoading };

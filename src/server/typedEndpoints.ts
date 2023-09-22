@@ -18,6 +18,11 @@ import { env } from "@/envSchema.mjs";
 import { EquipmentPromotionConfig } from "@/bindings/EquipmentPromotionConfig";
 import { AvatarPromotionConfig } from "@/bindings/AvatarPromotionConfig";
 import { Banner } from "@/bindings/Banner";
+import { RelicSetConfig } from "@/bindings/RelicSetConfig";
+import { RelicSubAffixConfig } from "@/bindings/RelicSubAffixConfig";
+import { RelicMainAffixConfig } from "@/bindings/RelicMainAffixConfig";
+import { RelicSetSkillConfig } from "@/bindings/RelicSetSkillConfig";
+import { RelicConfig, RelicType } from "@/bindings/RelicConfig";
 
 type CharId = { characterId: number };
 type LcId = { lcId: number };
@@ -59,6 +64,24 @@ const API = {
     ({ characterId }) => `/honkai/avatar/${characterId}/promotion`
   ),
   warpBanner: get<List<Banner>>("/honkai/warp_banners"),
+  relicSlotType: post<Record<number, RelicType>, List<number>>(
+    "/honkai/relics/slot_type"
+  ),
+  relics: post<List<RelicConfig>, List<number>>("/honkai/relics"),
+  relicSets: get<List<RelicSetConfig>>("/honkai/relic_set"),
+  relicSet: get<List<RelicSetConfig>, { relicSetId: number }>(
+    ({ relicSetId }) => `/honkai/relic_set/${relicSetId}`
+  ),
+  relicSetBonuses: get<List<RelicSetSkillConfig>>("/honkai/relic_set/bonus"),
+  relicSetBonus: get<RelicSetSkillConfig, { relicSetId: number }>(
+    ({ relicSetId }) => `/honkai/relic_set/bonus/${relicSetId}`
+  ),
+  substatSpread: get<List<RelicSubAffixConfig>>(
+    "/honkai/relics/statspread/sub"
+  ),
+  mainstatSpread: get<Record<RelicType, RelicMainAffixConfig[]>>(
+    "/honkai/relics/statspread/main"
+  ),
 };
 
 type Get<TRes, P> = { get: (params: P) => Promise<TRes> };
@@ -89,26 +112,21 @@ function get<TRes, TParam>(
   };
 }
 
-function post<TRes, TPayload>(
-  path: string,
-  payload?: TPayload
-): DirectPost<TRes, TPayload>;
+function post<TRes, TPayload>(path: string): DirectPost<TRes, TPayload>;
 function post<TRes, TPayload, TParam>(
-  path: (t: TParam) => string,
-  payload?: TPayload
+  path: (t: TParam) => string
 ): Post<TRes, TPayload, TParam>;
 function post<TRes, TPayload, TParam>(
-  path: string | ((t: TParam) => string),
-  payload?: TPayload
+  path: string | ((t: TParam) => string)
 ): DirectPost<TRes, TPayload> | Post<TRes, TPayload, TParam> {
   if (typeof path === "string")
     return {
-      post: async () =>
+      post: async (payload?: TPayload) =>
         await serverFetch<TPayload, TRes>(path, { method: "POST", payload }),
     };
 
   return {
-    post: async (params: TParam) =>
+    post: async (params: TParam, payload?: TPayload) =>
       await serverFetch<TPayload, TRes>(path(params), {
         method: "POST",
         payload,
@@ -150,61 +168,6 @@ function getPost<TRes, TPayload, TParam>(
     };
   }
 }
-
-// type ApiRoute = {
-//   path: string;
-// };
-// type ApiGet<TResponse> = {
-//   get: (params?: string | number) => Promise<TResponse>;
-// };
-// type ApiPost<TPayload, TResponse> = {
-//   post: (opt?: { payload?: TPayload; params?: string }) => Promise<TResponse>;
-// };
-//
-// type Get<TRes> = ApiRoute & ApiGet<TRes>;
-// type Post<TReq, TRes> = ApiRoute & ApiPost<TReq, TRes>;
-// type GetPost<TReq, TRes> = ApiRoute & ApiGet<TRes> & ApiPost<TReq, TRes>;
-//
-// type Method = "GET" | "POST" | undefined;
-// function route<TReq, TRes>(path: string): GetPost<TReq, TRes>;
-// function route<TRes>(path: string, method: "GET"): Get<TRes>;
-// function route<TReq, TRes>(path: string, method: "POST"): Post<TReq, TRes>;
-// function route<TReq, TRes>(
-//   path: string,
-//   method?: Method
-// ): Get<TRes> | Post<TReq, TRes> | GetPost<TReq, TRes> {
-//   switch (method) {
-//     case "GET":
-//       return {
-//         path,
-//         get: async (params?: string | number) =>
-//           await serverFetch<TReq, TRes>(path, undefined, params),
-//       };
-//     case "POST":
-//       return {
-//         path,
-//         post: async (opt?: { payload?: TReq; params?: string }) =>
-//           await serverFetch<TReq, TRes>(
-//             path,
-//             { payload: opt?.payload, method: "POST" },
-//             opt?.params
-//           ),
-//       };
-//     default:
-//       return {
-//         // no method provided, allow both post and fetch
-//         path,
-//         get: async (params?: string | number) =>
-//           await serverFetch<TReq, TRes>(path, undefined, params),
-//         post: async (opt?: { payload?: TReq; params?: string }) =>
-//           await serverFetch<TReq, TRes>(
-//             path,
-//             { payload: opt?.payload, method: "POST" },
-//             opt?.params
-//           ),
-//       };
-//   }
-// }
 
 export function rpc<T extends ServiceType>(service: T) {
   const client = createPromiseClient(

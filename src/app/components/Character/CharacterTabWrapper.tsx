@@ -11,7 +11,7 @@ type Props = {
   characterId: number;
 };
 const CharacterTabWrapper = ({ characterId }: Props) => {
-  const { character } = useCharacterMetadata(characterId);
+  const { data: character } = useCharacterMetadata(characterId);
   const { data: skills } = useCharacterSkill(characterId);
 
   const client = useQueryClient();

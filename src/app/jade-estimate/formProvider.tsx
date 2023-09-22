@@ -30,7 +30,7 @@ function useJadeEstimateForm(): JadeEstimateFormContextPayload {
   const { data: rewardTable, isLoading } = useQuery({
     queryKey: ["jadeEstimate", formPayload],
     queryFn: async () => await rpc(JadeEstimateService).post(formPayload),
-    initialData: new JadeEstimateResponse(placeholderTableData),
+    // initialData: new JadeEstimateResponse(placeholderTableData),
     placeholderData: keepPreviousData,
   });
 

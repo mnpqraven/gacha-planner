@@ -1,5 +1,3 @@
-export type ParameterizedDescription = string[];
-
 export type Property =
   | "MaxHP"
   | "Attack"
@@ -57,16 +55,11 @@ export type Property =
   | "SpeedAddedRatio"
   | "AllDamageTypeAddedRatio";
 
-export interface RelicSetSkillConfig {
-  ability_name: ParameterizedDescription[];
-  ability_param_list: string[][];
-  property_list: RelicParam[][];
-  require_num: number[];
-  set_id: number;
-  skill_desc: ParameterizedDescription[];
-}
-
-export interface RelicParam {
+export interface RelicSubAffixConfig {
+  affix_id: number;
+  base_value: number;
+  group_id: number;
   property: Property;
-  value: number;
+  step_num: number;
+  step_value: number;
 }

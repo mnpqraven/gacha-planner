@@ -14,6 +14,7 @@ import {
 } from "@/app/components/ui/Tooltip";
 import { useFuturePatchDateList } from "@/hooks/queries/useFuturePatchDate";
 import { ExternalLink } from "lucide-react";
+import Link from "next/link";
 
 type Props = {
   date: Date;
@@ -100,7 +101,9 @@ const CalendarFooter = ({ date }: Props) => {
       <div className="flex gap-2.5">
         {lcQueries.map((query, index) =>
           query.data ? (
-            <LightConeIcon key={index} data={query.data} />
+            <Link href={`/lightcone-db/${query.data.equipment_id}`} key={index} >
+              <LightConeIcon data={query.data} />
+            </Link>
           ) : (
             <Tooltip key={index}>
               <TooltipTrigger disabled={!banner?.lc?.at(index)?.placeholder}>
