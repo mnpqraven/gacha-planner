@@ -26,7 +26,7 @@ import {
 
 const menu = [
   {
-    path: "/",
+    path: "/jade-estimate",
     label: "Stellar Jade Tracker",
     icon: <Ticket className="h-4 w-4" />,
     keybind: "q",
@@ -64,7 +64,7 @@ const Navbar = ({ className, ...props }: HTMLAttributes<HTMLElement>) => {
   const pathnameClass = (path: string) =>
     cn(
       defaultLinkClass,
-      pathname.startsWith(path) ? "text-muted-foreground" : ""
+      !pathname.startsWith(path) ? "text-muted-foreground" : ""
     );
 
   return (

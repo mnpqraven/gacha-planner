@@ -5,8 +5,8 @@ import { Badge } from "@/app/components/ui/Badge";
 import { prettyProperty, propertyIconUrl } from "@/lib/propertyHelper";
 import { cva } from "class-variance-authority";
 import { useMainStatSpread } from "@/hooks/queries/useMainStatSpread";
-import { RelicInput } from "@/app/profile/_store/relic";
 import { RelicType } from "@/bindings/RelicConfig";
+import { RelicInput } from "@/app/card/_store/relic";
 
 interface RelicProps extends HTMLAttributes<HTMLDivElement> {
   data: RelicInput;

@@ -74,7 +74,7 @@ export default function Profile() {
   useEffect(() => {
     if (!!query.data) {
       const la = prof.lang == "en" ? "" : `?lang=${prof.lang}`;
-      const url = `/profile/${prof.uid}${la}`;
+      const url = `/card/${prof.uid}${la}`;
       router.prefetch(url);
       prefetch(prof.uid, prof.lang);
     }
@@ -143,8 +143,9 @@ export default function Profile() {
             variant="outline"
             className="mt-4 w-fit items-center md:mt-[34px] md:self-start"
             size="sm"
+            disabled
           >
-            <Link href="/card/custom">Custom card</Link>
+            <Link href="/card/custom">Custom card (Soon!)</Link>
           </Button>
         </form>
       </Form>

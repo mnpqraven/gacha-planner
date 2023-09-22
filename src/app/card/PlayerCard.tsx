@@ -25,7 +25,7 @@ export const PlayerCard = forwardRef<HTMLButtonElement, Props>(
         {...props}
         asChild
       >
-        <Link href={`profile/${uid}${la}`}>
+        <Link href={`card/${uid}${la}`}>
           <Image
             src={img(player.avatar.icon)}
             alt={player.avatar.name}

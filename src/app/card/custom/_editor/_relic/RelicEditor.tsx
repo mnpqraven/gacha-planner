@@ -18,10 +18,10 @@ import { prettyProperty } from "@/lib/propertyHelper";
 import { Label } from "@/app/components/ui/Label";
 import { splitAtom } from "jotai/utils";
 import { SubStatSchema } from "@/hooks/useStatParser";
-import { RelicInput } from "@/app/profile/_store/relic";
 import { relicMainstatOptions, subStatOptions } from "./relicConfig";
 import { PropertySelect } from "../PropertySelect";
 import { RelicType } from "@/bindings/RelicConfig";
+import { RelicInput } from "@/app/card/_store/relic";
 
 export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
   const [relic, setRelic] = useAtom(atom);
