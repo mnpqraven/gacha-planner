@@ -46,7 +46,7 @@ export default async function Character({ params }: Props) {
       <TabsList className="h-fit [&>*]:whitespace-pre-wrap">
         <TabsTrigger value="skill">Skills</TabsTrigger>
         <TabsTrigger value="eidolon">Eidolons</TabsTrigger>
-        <TabsTrigger value="sig-lc">Signature Light Cone</TabsTrigger>
+        <TabsTrigger value="sig-lc">Featured Light Cone</TabsTrigger>
         <TabsTrigger value="trace">Traces</TabsTrigger>
       </TabsList>
 
