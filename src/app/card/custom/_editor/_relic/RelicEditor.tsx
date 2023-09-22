@@ -2,7 +2,7 @@ import { PrimitiveAtom, useAtom, useAtomValue } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { Property } from "@/bindings/SkillTreeConfig";
 import { img } from "@/lib/utils";
-import { useState } from "react";
+import { useId, useState } from "react";
 import Image from "next/image";
 import { Input } from "@/app/components/ui/Input";
 import { Button } from "@/app/components/ui/Button";
@@ -14,7 +14,11 @@ import {
 import { SubstatSpreadConfig } from "./SubstatSpreadConfig";
 import { useSubStatSpread } from "@/hooks/queries/useSubStatSpread";
 import { useToast } from "@/app/components/ui/Toast/useToast";
-import { prettyProperty } from "@/lib/propertyHelper";
+import {
+  prettyProperty,
+  propertyIconUrl,
+  propertyName,
+} from "@/lib/propertyHelper";
 import { Label } from "@/app/components/ui/Label";
 import { splitAtom } from "jotai/utils";
 import { SubStatSchema } from "@/hooks/useStatParser";
@@ -22,6 +26,7 @@ import { relicMainstatOptions, subStatOptions } from "./relicConfig";
 import { PropertySelect } from "../PropertySelect";
 import { RelicType } from "@/bindings/RelicConfig";
 import { RelicInput } from "@/app/card/_store/relic";
+import SVG from "react-inlinesvg";
 
 export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
   const [relic, setRelic] = useAtom(atom);
@@ -30,6 +35,8 @@ export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
     relicMainstatOptions.find((e) => e.type == type)?.options ?? [];
   const { data: spreadData } = useSubStatSpread();
   const { toast } = useToast();
+  const mainStatId = useId();
+  const levelId = useId();
 
   const [substatsAtom] = useState(
     focusAtom(atom, (optic) => optic.prop("subStats"))
@@ -88,27 +95,34 @@ export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-2">
       <div className="flex gap-2">
         <div className="flex flex-col gap-2">
-          <Label htmlFor="ms">Main stat</Label>
+          <Label htmlFor={mainStatId}>Main stat</Label>
           {isMainstatEditable(type) ? (
             <PropertySelect
-              id="ms"
+              id={mainStatId}
               className="w-48"
               options={mainStatOptions}
               onValueChange={updateMainstat}
               value={property}
             />
           ) : (
-            <div>{property}</div>
+            <div className="flex h-full items-center justify-center gap-2 rounded-md border px-3 py-2">
+              {property && (
+                <>
+                  <SVG src={propertyIconUrl(property)} width={24} height={24} />
+                  {propertyName(property)}
+                </>
+              )}
+            </div>
           )}
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="lv">Level</Label>
+          <Label htmlFor={levelId}>Level</Label>
           <Input
-            id="lv"
+            id={levelId}
             className="w-36"
             value={relic.level}
             type="number"

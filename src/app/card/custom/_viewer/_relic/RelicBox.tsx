@@ -28,7 +28,7 @@ export const RelicBox = forwardRef<HTMLDivElement, RelicProps>(
           ref={ref}
           {...props}
         >
-          placeholder wrapper
+          ???
         </div>
       );
 

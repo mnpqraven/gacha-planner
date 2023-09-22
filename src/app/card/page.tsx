@@ -139,14 +139,15 @@ export default function Profile() {
             Search
           </Button>
 
-          <Button
-            variant="outline"
-            className="mt-4 w-fit items-center md:mt-[34px] md:self-start"
-            size="sm"
-            disabled
-          >
-            <Link href="/card/custom">Custom card (Soon!)</Link>
-          </Button>
+          <Link href="/card/custom">
+            <Button
+              variant="outline"
+              className="mt-4 w-fit items-center md:mt-[34px] md:self-start"
+              size="sm"
+            >
+              Custom card
+            </Button>
+          </Link>
         </form>
       </Form>
 

@@ -27,6 +27,7 @@ export const PropertySelect = forwardRef<HTMLDivElement, Props>(
       itemDisabled,
       defaultValue,
       value,
+      id,
       ...props
     },
     ref
@@ -37,7 +38,7 @@ export const PropertySelect = forwardRef<HTMLDivElement, Props>(
         defaultValue={defaultValue}
         value={value ?? ""}
       >
-        <SelectTrigger className={className}>
+        <SelectTrigger className={className} id={id}>
           <SelectValue />
         </SelectTrigger>
 
