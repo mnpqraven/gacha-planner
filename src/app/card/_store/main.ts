@@ -58,7 +58,7 @@ export const statParseParam = atom<StatParserConstructor | undefined>((get) => {
       id: lcId,
       level: get(lcLevelAtom),
       ascension: get(lcPromotionAtom),
-      imposition: get(lcImpositionAtom),
+      imposition: get(lcImpositionAtom) - 1,
     },
     relic: relic as ParsedRelicSchema[],
   };

@@ -1,19 +1,24 @@
 "use client";
 
-import { useAtom, useAtomValue } from "jotai";
+import { atom, useAtom, useAtomValue } from "jotai";
 import { lcImpositionAtom, lcLevelAtom, lcPromotionAtom } from "../../_store";
 import { Input } from "@/app/components/ui/Input";
 import { Label } from "@/app/components/ui/Label";
-import { HTMLAttributes, forwardRef } from "react";
+import { HTMLAttributes, forwardRef, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { maxLevelAtom } from "../../_store/lightcone";
 
 export function LightConeUpdater() {
+  const maxLevel = useAtomValue(
+    useMemo(() => atom((get) => get(lcPromotionAtom) * 10 + 20), [])
+  );
+
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         <Label htmlFor="level">Level</Label>
         <LevelInput id="level" />
+        <span>/{maxLevel}</span>
       </div>
 
       <div className="flex items-center justify-between gap-2">
@@ -32,7 +37,7 @@ export function LightConeUpdater() {
 const LevelInput = forwardRef<
   HTMLInputElement,
   HTMLAttributes<HTMLInputElement>
->(({ className, ...props }) => {
+>(({ className, ...props }, ref) => {
   const maxLevel = useAtomValue(maxLevelAtom);
   const [level, setLevel] = useAtom(lcLevelAtom);
 
@@ -46,6 +51,7 @@ const LevelInput = forwardRef<
       value={level}
       onChange={(e) => setLevel(parseInt(e.target.value))}
       {...props}
+      ref={ref}
     />
   );
 });
@@ -54,7 +60,7 @@ LevelInput.displayName = "LevelInput";
 const PromotionInput = forwardRef<
   HTMLInputElement,
   HTMLAttributes<HTMLInputElement>
->(({ className, ...props }) => {
+>(({ className, ...props }, ref) => {
   const [ascension, setAscension] = useAtom(lcPromotionAtom);
   return (
     <Input
@@ -69,6 +75,7 @@ const PromotionInput = forwardRef<
         if (val >= 0 || val <= 6) setAscension(val);
       }}
       {...props}
+      ref={ref}
     />
   );
 });
@@ -77,7 +84,7 @@ PromotionInput.displayName = "PromotionInput";
 const ImpositionInput = forwardRef<
   HTMLInputElement,
   HTMLAttributes<HTMLInputElement>
->(({ className, ...props }) => {
+>(({ className, ...props }, ref) => {
   const [rank, setRank] = useAtom(lcImpositionAtom);
   return (
     <Input
@@ -92,6 +99,7 @@ const ImpositionInput = forwardRef<
         if (val >= 0 || val <= 6) setRank(val);
       }}
       {...props}
+      ref={ref}
     />
   );
 });

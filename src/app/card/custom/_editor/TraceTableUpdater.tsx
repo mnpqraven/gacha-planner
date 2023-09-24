@@ -13,7 +13,11 @@ import { cva } from "class-variance-authority";
 import { useAtomValue, useSetAtom } from "jotai";
 import Image from "next/image";
 import { HTMLAttributes, forwardRef } from "react";
-import { charTraceAtom, updateManyCharTraceAtom } from "../../_store";
+import {
+  charIdAtom,
+  charTraceAtom,
+  updateManyCharTraceAtom,
+} from "../../_store";
 
 const iconWrapVariants = cva(
   "flex items-center justify-center rounded-full ring-offset-transparent transition duration-500 hover:ring-2 hover:ring-offset-2",
@@ -32,11 +36,11 @@ const iconWrapVariants = cva(
 );
 
 interface Props {
-  characterId: number;
   path: Path;
 }
 
-export function TraceTableUpdater({ characterId, path }: Props) {
+export function TraceTableUpdater({ path }: Props) {
+  const characterId = useAtomValue(charIdAtom);
   const { data: traces } = useCharacterTrace(characterId);
   if (!traces) return "loading...";
   const splittedTraces = groupTrips(path);

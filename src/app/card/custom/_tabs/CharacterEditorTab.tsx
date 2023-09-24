@@ -11,30 +11,38 @@ import {
 import { Toggle } from "@/app/components/ui/Toggle";
 import { AvatarConfig } from "@/bindings/AvatarConfig";
 import { useCharacterList } from "@/hooks/queries/useCharacterList";
-import { img } from "@/lib/utils";
+import { cn, img } from "@/lib/utils";
 import { useAtom, useSetAtom } from "jotai";
 import Image from "next/image";
-import { useState } from "react";
+import { HTMLAttributes, forwardRef, useState } from "react";
 import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
 import { CharacterCard } from "@/app/character-db/CharacterCardWrapper";
 import { CharacterUpdater } from "../_editor/CharacterUpdater";
 import { TraceTableUpdater } from "../_editor/TraceTableUpdater";
 import { charIdAtom, lcIdAtom } from "../../_store";
 
-export function CharacterEditorTab() {
+export const CharacterEditorTab = forwardRef<
+  HTMLDivElement,
+  HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => {
   const [charId, updateId] = useAtom(charIdAtom);
   const updateLcId = useSetAtom(lcIdAtom);
   const { data: chara } = useCharacterMetadata(charId);
   const { characterList } = useCharacterList();
   const [open, setOpen] = useState(false);
-  const sorted = characterList.sort((a, b) => {
-    return (
-      b.rarity - a.rarity ||
-      a.avatar_name.localeCompare(b.avatar_name) ||
-      a.avatar_votag.localeCompare(b.avatar_votag)
-    );
-  });
   const filter = useCharacterFilter();
+
+  const sorted = characterList
+    .sort((a, b) => {
+      return (
+        b.rarity - a.rarity ||
+        a.avatar_name.localeCompare(b.avatar_name) ||
+        a.avatar_votag.localeCompare(b.avatar_votag)
+      );
+    })
+    .filter(filter.byElement)
+    .filter(filter.byPath)
+    .filter(filter.byRarity);
 
   function onCharacterSelect(to: AvatarConfig) {
     updateId(to.avatar_id);
@@ -43,14 +51,14 @@ export function CharacterEditorTab() {
   }
 
   return (
-    <div className="flex items-center">
-      <div className="flex flex-col items-center justify-center gap-6 p-4">
+    <div className={cn("flex gap-4", className)} {...props} ref={ref}>
+      <div className="flex flex-col items-center gap-6 p-4">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button variant="outline">Choose Character</Button>
+            <Button variant="outline">Select Character</Button>
           </DialogTrigger>
 
-          <DialogContent className="max-w-4xl">
+          <DialogContent className="max-w-5xl">
             <DbFilter minRarity={4} {...filter} />
 
             <div className="grid grid-cols-4">
@@ -67,7 +75,7 @@ export function CharacterEditorTab() {
 
         {!!chara && (
           <CharacterCard
-            className="h-fit w-48 p-4"
+            className="w-48 p-4"
             imgUrl={url(chara.avatar_id)}
             avatar_base_type={chara.avatar_base_type}
             avatar_name={chara.avatar_name}
@@ -81,15 +89,11 @@ export function CharacterEditorTab() {
 
       <CharacterUpdater />
 
-      {!!chara && (
-        <TraceTableUpdater
-          characterId={chara.avatar_id}
-          path={chara.avatar_base_type}
-        />
-      )}
+      {!!chara && <TraceTableUpdater path={chara.avatar_base_type} />}
     </div>
   );
-}
+});
+CharacterEditorTab.displayName = "CharacterEditorTab";
 
 interface ItemProps {
   chara: AvatarConfig;

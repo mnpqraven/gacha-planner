@@ -25,6 +25,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
+import { Separator } from "@/app/components/ui/Separator";
 
 export default async function ProfileCard() {
   return (
@@ -39,13 +40,12 @@ export default async function ProfileCard() {
         </div>
         <Accordion
           type="multiple"
-          // collapsible
           className="w-10/12"
-          defaultValue={["config-accordion", "card-accordion"]}
+          defaultValue={["config", "card"]}
         >
-          <AccordionItem value="config-accordion">
+          <AccordionItem value="config">
             <AccordionTrigger>Configuration</AccordionTrigger>
-            <AccordionContent>
+            <AccordionContent className="py-2">
               <Tabs defaultValue="charlc" className="w-full">
                 <TabsList>
                   <TabsTrigger value="charlc">
@@ -68,9 +68,15 @@ export default async function ProfileCard() {
                   </Tooltip>
                 </TabsList>
 
-                <TabsContent value="charlc" className="flex">
-                  <CharacterEditorTab />
-                  <LightConeEditorTab />
+                <TabsContent
+                  value="charlc"
+                  className="flex justify-between gap-2"
+                >
+                  <CharacterEditorTab className="flex-[2_2_0%]" />
+
+                  <Separator orientation="vertical" className="h-auto" />
+
+                  <LightConeEditorTab className="flex-1" />
                 </TabsContent>
                 <TabsContent value="relic">
                   <RelicEditorTab />
@@ -79,9 +85,9 @@ export default async function ProfileCard() {
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="card-accordion">
+          <AccordionItem value="card">
             <AccordionTrigger>Card</AccordionTrigger>
-            <AccordionContent className="flex justify-center">
+            <AccordionContent className="flex justify-center py-2">
               <DisplayCard mode="CUSTOM" />
             </AccordionContent>
           </AccordionItem>

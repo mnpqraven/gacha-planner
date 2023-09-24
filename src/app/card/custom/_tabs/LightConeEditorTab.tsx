@@ -12,15 +12,18 @@ import { useAtom, useAtomValue } from "jotai";
 import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
 import Image from "next/image";
 import { IMAGE_URL } from "@/lib/constants";
-import { useState } from "react";
+import { HTMLAttributes, forwardRef, useState } from "react";
 import { EquipmentConfig } from "@/bindings/EquipmentConfig";
 import { useLightConeMetadata } from "@/hooks/queries/useLightConeMetadata";
 import { LightConeCard } from "@/app/lightcone-db/LightConeCard";
-import { img } from "@/lib/utils";
+import { cn, img } from "@/lib/utils";
 import { LightConeUpdater } from "../_editor/LightConeUpdater";
 import { charIdAtom, lcIdAtom } from "../../_store";
 
-export function LightConeEditorTab() {
+export const LightConeEditorTab = forwardRef<
+  HTMLDivElement,
+  HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => {
   const { data: lightConeList } = useLightConeList();
   const charId = useAtomValue(charIdAtom);
   const [open, setOpen] = useState(false);
@@ -36,11 +39,11 @@ export function LightConeEditorTab() {
   }
 
   return (
-    <div className="flex">
-      <div className="flex flex-col items-center justify-center gap-6 p-4">
+    <div className={cn("flex gap-4", className)} {...props} ref={ref}>
+      <div className="flex flex-col items-center gap-6 p-4">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button variant="outline">Change Light Cone</Button>
+            <Button variant="outline">Select Light Cone</Button>
           </DialogTrigger>
           <DialogContent className="max-w-4xl">
             <div className="grid grid-cols-4">
@@ -73,7 +76,7 @@ export function LightConeEditorTab() {
 
         {!!lightCone && (
           <LightConeCard
-            className="h-fit w-48"
+            className="w-48"
             name={lightCone.equipment_name}
             imgUrl={img(
               `image/light_cone_preview/${lightCone.equipment_id}.png`
@@ -87,4 +90,5 @@ export function LightConeEditorTab() {
       <LightConeUpdater />
     </div>
   );
-}
+});
+LightConeEditorTab.displayName = "LightConeEditorTab";

@@ -1,4 +1,4 @@
-import { useAtom, useAtomValue } from "jotai";
+import { atom, useAtom, useAtomValue } from "jotai";
 import {
   charEidAtom,
   charIdAtom,
@@ -8,7 +8,6 @@ import {
   maxLevelAtom,
 } from "../../_store/character";
 import { Input } from "@/app/components/ui/Input";
-import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
 import { useCharacterSkill } from "@/hooks/queries/useCharacterSkill";
 import { AvatarSkillConfig, SkillType } from "@/bindings/AvatarSkillConfig";
 import { cn, getImagePath } from "@/lib/utils";
@@ -16,10 +15,17 @@ import Image from "next/image";
 import { getSkillMaxLevel } from "../../[uid]/_components/skill_block/SkillInfo";
 import { HTMLAttributes, forwardRef, useEffect, useMemo } from "react";
 import { Label } from "@/app/components/ui/Label";
+import { Badge } from "@/app/components/ui/Badge";
+
+const skillTypeMap = [
+  { skillTypeDesc: "Basic ATK", label: "Basic" },
+  { skillTypeDesc: "Talent", label: "Talent" },
+  { skillTypeDesc: "Skill", label: "Skill" },
+  { skillTypeDesc: "Ultimate", label: "Ult" },
+];
 
 export function CharacterUpdater() {
   const charId = useAtomValue(charIdAtom);
-  const { data: metadata } = useCharacterMetadata(charId);
   const { data: skills } = useCharacterSkill(charId);
   const sortedSkills = skills
     .filter(
@@ -40,16 +46,17 @@ export function CharacterUpdater() {
         toInt(b.attack_type, b.skill_type_desc)
       );
     });
-
-  if (!metadata) return null;
-  if (!skills) return null;
+  const maxLevel = useAtomValue(
+    useMemo(() => atom((get) => get(charPromotionAtom) * 10 + 20), [])
+  );
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-4">
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-2">
           <Label htmlFor="level">Level</Label>
           <LevelInput id="level" />
+          <span>/{maxLevel}</span>
         </div>
 
         <div className="flex items-center justify-between gap-2">
@@ -63,11 +70,12 @@ export function CharacterUpdater() {
         </div>
       </div>
 
-      <div className="flex flex-col">
-        {["Basic ATK", "Talent", "Skill", "Ultimate"].map((skillTypeDesc) => (
+      <div className="flex flex-col gap-2">
+        {skillTypeMap.map(({ skillTypeDesc, label }) => (
           <SkillSection
             charId={charId}
             key={skillTypeDesc}
+            label={label}
             data={sortedSkills.filter(
               (e) => e.skill_type_desc == skillTypeDesc
             )}
@@ -81,7 +89,7 @@ export function CharacterUpdater() {
 const LevelInput = forwardRef<
   HTMLInputElement,
   HTMLAttributes<HTMLInputElement>
->(({ className, ...props }) => {
+>(({ className, ...props }, ref) => {
   const maxLevel = useAtomValue(maxLevelAtom);
   const [level, setLevel] = useAtom(charLevelAtom);
 
@@ -98,6 +106,7 @@ const LevelInput = forwardRef<
       value={level}
       onChange={(e) => setLevel(parseInt(e.target.value))}
       {...props}
+      ref={ref}
     />
   );
 });
@@ -106,7 +115,7 @@ LevelInput.displayName = "LevelInput";
 const PromotionInput = forwardRef<
   HTMLInputElement,
   HTMLAttributes<HTMLInputElement>
->(({ className, ...props }) => {
+>(({ className, ...props }, ref) => {
   const [ascension, setAscension] = useAtom(charPromotionAtom);
   return (
     <Input
@@ -121,6 +130,7 @@ const PromotionInput = forwardRef<
         if (val >= 0 || val <= 6) setAscension(val);
       }}
       {...props}
+      ref={ref}
     />
   );
 });
@@ -129,11 +139,11 @@ PromotionInput.displayName = "PromotionInput";
 const EidolonInput = forwardRef<
   HTMLInputElement,
   HTMLAttributes<HTMLInputElement>
->(() => {
+>(({ className, ...props }, ref) => {
   const [eidolon, setEidolon] = useAtom(charEidAtom);
   return (
     <Input
-      className="w-12"
+      className={cn("w-12", className)}
       type="number"
       autoComplete="off"
       min={0}
@@ -143,6 +153,8 @@ const EidolonInput = forwardRef<
         const val = parseInt(e.currentTarget.value);
         if (val >= 0 || val <= 6) setEidolon(val);
       }}
+      {...props}
+      ref={ref}
     />
   );
 });
@@ -151,9 +163,11 @@ EidolonInput.displayName = "EidolonInput";
 function SkillSection({
   charId,
   data,
+  label,
 }: {
   charId: number | undefined;
   data: AvatarSkillConfig[];
+  label: string;
 }) {
   const eidolon = useAtomValue(charEidAtom);
   const maxLv = useMemo(
@@ -169,14 +183,9 @@ function SkillSection({
   );
 
   return (
-    <div>
-      {data.map((skill) => (
-        <div key={skill.skill_id} className="flex flex-col">
-          {skill.skill_name} - {skill.skill_type_desc}
-        </div>
-      ))}
+    <div className="h-20">
       {!!data[0] && (
-        <div className="flex">
+        <div className="flex gap-2">
           <Image
             src={`${getImagePath(charId, data[0])}`}
             alt={`${data[0].skill_id}`}
@@ -184,7 +193,10 @@ function SkillSection({
             height={64}
             className="h-16 w-16"
           />
-          <SkillInput id={data[0].skill_id} maxLv={maxLv} />
+          <div className="flex flex-col gap-2">
+            <Badge className="w-fit">{label}</Badge>
+            <SkillInput id={data[0].skill_id} maxLv={maxLv} />
+          </div>
         </div>
       )}
     </div>

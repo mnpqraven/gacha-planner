@@ -79,28 +79,28 @@ const DbFilter = ({
               <span className="text-xs">⌘/Ctrl + F</span>
             </kbd>
           </div>
-          {minRarity && updateRarity && (
-            <div className="flex rounded-md border p-1">
-              {rarityList.map((rarity) => (
-                <Toggle
-                  key={rarity}
-                  className="flex text-muted-foreground hover:text-primary"
-                  onPressedChange={() => updateRarity(rarity)}
-                >
-                  <span className="text-xl font-bold">{rarity}</span>
-                  <div className="aspect-square h-7">
-                    <Image
-                      src="/Star.png"
-                      height={128}
-                      width={128}
-                      alt={rarity + " ✦"}
-                      className="pointer-events-none"
-                    />
-                  </div>
-                </Toggle>
-              ))}
-            </div>
-          )}
+        </div>
+      )}
+      {minRarity && updateRarity && (
+        <div className="flex rounded-md border p-1">
+          {rarityList.map((rarity) => (
+            <Toggle
+              key={rarity}
+              className="flex text-muted-foreground hover:text-primary"
+              onPressedChange={() => updateRarity(rarity)}
+            >
+              <span className="text-xl font-bold">{rarity}</span>
+              <div className="aspect-square h-7">
+                <Image
+                  src="/Star.png"
+                  height={128}
+                  width={128}
+                  alt={rarity + " ✦"}
+                  className="pointer-events-none"
+                />
+              </div>
+            </Toggle>
+          ))}
         </div>
       )}
       {updatePath && (

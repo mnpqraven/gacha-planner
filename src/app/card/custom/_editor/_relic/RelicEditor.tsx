@@ -2,9 +2,8 @@ import { PrimitiveAtom, useAtom, useAtomValue } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { Property } from "@/bindings/SkillTreeConfig";
 import { img } from "@/lib/utils";
-import { useId, useState } from "react";
+import { useMemo } from "react";
 import Image from "next/image";
-import { Input } from "@/app/components/ui/Input";
 import { Button } from "@/app/components/ui/Button";
 import {
   Popover,
@@ -14,33 +13,35 @@ import {
 import { SubstatSpreadConfig } from "./SubstatSpreadConfig";
 import { useSubStatSpread } from "@/hooks/queries/useSubStatSpread";
 import { useToast } from "@/app/components/ui/Toast/useToast";
-import {
-  prettyProperty,
-  propertyIconUrl,
-  propertyName,
-} from "@/lib/propertyHelper";
+import { prettyProperty } from "@/lib/propertyHelper";
 import { Label } from "@/app/components/ui/Label";
-import { splitAtom } from "jotai/utils";
+import { selectAtom, splitAtom } from "jotai/utils";
 import { SubStatSchema } from "@/hooks/useStatParser";
-import { relicMainstatOptions, subStatOptions } from "./relicConfig";
+import { subStatOptions } from "./relicConfig";
 import { PropertySelect } from "../PropertySelect";
 import { RelicType } from "@/bindings/RelicConfig";
 import { RelicInput } from "@/app/card/_store/relic";
-import SVG from "react-inlinesvg";
+import { AlignHorizontalDistributeCenter } from "lucide-react";
 
 export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
-  const [relic, setRelic] = useAtom(atom);
-  const { type, setId, property } = relic;
-  const mainStatOptions =
-    relicMainstatOptions.find((e) => e.type == type)?.options ?? [];
+  const setIdAtom = useMemo(
+    () => selectAtom(atom, (optic) => optic.setId),
+    [atom]
+  );
+  const propertyAtom = useMemo(
+    () => selectAtom(atom, (optic) => optic.property),
+    [atom]
+  );
+  const substatsAtom = useMemo(
+    () => focusAtom(atom, (optic) => optic.prop("subStats")),
+    [atom]
+  );
+
+  const relic = useAtomValue(atom);
+  const setId = useAtomValue(setIdAtom);
+  const property = useAtomValue(propertyAtom);
   const { data: spreadData } = useSubStatSpread();
   const { toast } = useToast();
-  const mainStatId = useId();
-  const levelId = useId();
-
-  const [substatsAtom] = useState(
-    focusAtom(atom, (optic) => optic.prop("subStats"))
-  );
 
   const [substats, setSubstats] = useAtom(substatsAtom);
   const splittedSubstatAtom = useAtomValue(splitAtom(substatsAtom));
@@ -50,24 +51,6 @@ export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
   const occupiedProperties: Property[] = !!property
     ? [property, ...substats.filter(Boolean).map((e) => e!.property)]
     : substats.filter(Boolean).map((e) => e!.property);
-
-  function updateMainstat(property: Property) {
-    // remove the occupying substat
-    const subStats = substats;
-    const findIndex = substats.findIndex((e) => !!e && e.property == property);
-    if (findIndex !== -1) {
-      subStats[findIndex] = undefined;
-    }
-    setRelic((relic) => ({
-      ...relic,
-      property,
-      subStats,
-    }));
-  }
-
-  function updateLevel(level: number) {
-    setRelic((relic) => ({ ...relic, level }));
-  }
 
   function onSubStatSelect(prop: Property, index: number) {
     let value = 0;
@@ -95,59 +78,17 @@ export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex gap-2">
-        <Image
-          src={getRelicIcon(relic.type, setId)}
-          alt=""
-          height={64}
-          width={64}
-          className="h-24 w-24"
-        />
+    <div className="flex gap-2">
+      <Image
+        src={getRelicIcon(relic.type, setId)}
+        alt=""
+        height={64}
+        width={64}
+        className="h-24 w-24"
+      />
 
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <Label htmlFor={mainStatId} className="w-[4.5rem]">
-              Main stat
-            </Label>
-            {isMainstatEditable(type) ? (
-              <PropertySelect
-                id={mainStatId}
-                className="w-48"
-                options={mainStatOptions}
-                onValueChange={updateMainstat}
-                value={property}
-              />
-            ) : !!property ? (
-              <div className="flex h-full w-48 items-center gap-2 rounded-md border px-3 py-2">
-                <SVG src={propertyIconUrl(property)} width={24} height={24} />
-                {propertyName(property)}
-              </div>
-            ) : null}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Label htmlFor={levelId} className="w-[4.5rem]">
-              Level
-            </Label>
-            <Input
-              id={levelId}
-              className="w-48"
-              value={relic.level}
-              type="number"
-              min={0}
-              max={15}
-              onChange={(e) => {
-                if (!Number.isNaN(e.target.value))
-                  updateLevel(parseInt(e.target.value));
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-2">
-        {splittedSubstatAtom.map((atom, index) => (
+      <div className="grid flex-1 grid-cols-2 gap-2">
+        {splittedSubstatAtom.map((ssAtom, index) => (
           <div key={index} className="flex items-center gap-2">
             <PropertySelect
               className="w-44"
@@ -163,26 +104,27 @@ export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
                   className="px-2"
                   onClick={() => warnProperty(substats.at(index)?.property)}
                 >
-                  Substats
+                  <AlignHorizontalDistributeCenter />
                 </Button>
               </PopoverTrigger>
 
               <PopoverContent side="top" asChild>
                 <SubstatSpreadConfig
-                  atom={atom}
+                  atom={ssAtom}
                   spreadData={spreadData}
                   setId={setId}
                 />
               </PopoverContent>
             </Popover>
 
-            <ValueLabel atom={atom} />
+            <ValueLabel atom={ssAtom} />
           </div>
         ))}
       </div>
     </div>
   );
 }
+
 function ValueLabel({
   atom,
 }: {
@@ -191,10 +133,6 @@ function ValueLabel({
   const value = useAtomValue(atom);
   if (!value) return null;
   return prettyProperty(value.property, value.value).prettyValue;
-}
-
-function isMainstatEditable(type: RelicType) {
-  return type !== "HEAD" && type !== "HAND";
 }
 
 function getRelicIcon(type: RelicType, setId: number) {
