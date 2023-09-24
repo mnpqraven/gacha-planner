@@ -1,7 +1,7 @@
 "use client";
 
 import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom, useAtom } from "jotai";
 import { LANGS } from "@/lib/constants";
 import { useStatParser } from "@/hooks/useStatParser";
 import { CharacterInfo } from "../../[uid]/_components/info_block/CharacterInfo";
@@ -21,24 +21,27 @@ import {
 import { enkaRefAtom } from "../../_store";
 
 type Lang = (typeof LANGS)[number];
-type Props =
+export type DisplayCardProps =
   | {
       mode: "API";
       uid: string;
       lang: Lang | undefined;
     }
-  | { mode: "ARMORY" };
+  | { mode: "CUSTOM" };
 
-export function DisplayCard(props: Props) {
+export function DisplayCard(props: DisplayCardProps) {
   const armoryData = useAtomValue(armoryStructAtom);
-  const parseParams = useAtomValue(statParseParam);
-  const config = useAtomValue(configAtom);
-  const parsedStats = useStatParser(parseParams);
+  const [config, updateConfig] = useAtom(configAtom);
+  const parsedStats = useStatParser(useAtomValue(statParseParam));
+  const { enkaRef } = useEnkaRef();
+  const { data: charMetadata } = useCharacterMetadata(armoryData.player.id);
+
+  useEffect(() => {
+    updateConfig({ type: "changeMode", payload: props.mode });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useMihomoApiUpdate(props);
-  const { enkaRef } = useGlobalEnkaRef();
-
-  const { data: charMetadata } = useCharacterMetadata(armoryData.player.id);
 
   if (!!charMetadata) {
     return (
@@ -109,7 +112,7 @@ export function DisplayCard(props: Props) {
   }
 }
 
-function useGlobalEnkaRef() {
+function useEnkaRef() {
   const enkaRef = useRef<HTMLDivElement>(null);
   const setEnkaRef = useSetAtom(enkaRefAtom);
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { HTMLAttributes, forwardRef } from "react";
 import { useAtomValue } from "jotai";
-import { RelicBox } from "@/app/card/custom/_viewer/_relic/RelicBox";
+import { RelicBox } from "@/app/card/[uid]/_components/relic_block/RelicBox";
 import { SetInfo } from "./SetInfo";
 import { configAtom, relicsStructAtom } from "@/app/card/_store";
 

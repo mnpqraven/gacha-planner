@@ -48,3 +48,5 @@ export const statParseParam = atom<StatParserConstructor | undefined>((get) => {
 });
 
 armoryStructAtom.debugLabel = "armoryStructAtom";
+configAtom.debugLabel = "configAtom";
+statParseParam.debugLabel = "statParseParam";

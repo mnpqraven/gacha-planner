@@ -62,7 +62,7 @@ export default async function ProfileCard() {
           <AccordionItem value="card-accordion">
             <AccordionTrigger>Card</AccordionTrigger>
             <AccordionContent className="flex justify-center">
-              <DisplayCard mode="ARMORY" />
+              <DisplayCard mode="CUSTOM" />
             </AccordionContent>
           </AccordionItem>
         </Accordion>

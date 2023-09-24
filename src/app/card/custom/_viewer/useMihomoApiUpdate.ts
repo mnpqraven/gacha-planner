@@ -20,20 +20,9 @@ import { optionCharacterPromotion } from "@/hooks/queries/useCharacterPromotion"
 import { optionsCharacterTrace } from "@/hooks/queries/useCharacterTrace";
 import { optionLightConePromotion } from "@/hooks/queries/useLightConePromotion";
 import { optionLightConeSkill } from "@/hooks/queries/useLightConeSkill";
+import { DisplayCardProps } from "./DisplayCard";
 
-type Lang = (typeof LANGS)[number];
-type Props =
-  | {
-      mode: "API";
-      uid: string;
-      lang: Lang | undefined;
-    }
-  | { mode: "ARMORY" };
-
-/**
- * @param props - if undefined then this is a noop
- */
-export function useMihomoApiUpdate(props: Props) {
+export function useMihomoApiUpdate(props: DisplayCardProps) {
   const { mode } = props;
   const { query } = useMihomoInfo(
     mode == "API"
@@ -71,24 +60,10 @@ export function useMihomoApiUpdate(props: Props) {
   }, [client, query.data]);
 
   useEffect(() => {
-    if (props.mode == "API") {
-      updateConfig({ type: "changeMode", payload: "API" });
-    } else {
-      updateConfig({ type: "changeMode", payload: "CUSTOM" });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.mode]);
-
-  useEffect(() => {
     if (!!query.data && props.mode == "API") {
       const { nickname, uid } = query.data.player;
       updateConfig({ type: "changeUser", payload: { name: nickname, uid } });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.mode, query.data]);
 
-  useEffect(() => {
-    if (!!query.data && props.mode == "API") {
       setMhyCharIds(query.data.characters.map((e) => e.id));
 
       const tempSetIds = query.data.characters
@@ -97,17 +72,19 @@ export function useMihomoApiUpdate(props: Props) {
       updateSetIds(Array.from(new Set(tempSetIds)));
 
       const chara = query.data.characters[charIndex];
+      const skillsPairs = chara.skills.map((skill) => [skill.id, skill.level]);
+      const tracePairs = chara.skill_trees.map((trace) => [
+        trace.id,
+        trace.level > 0,
+      ]);
+
       setCharStruct({
         id: chara.id,
         level: chara.level,
         ascension: chara.promotion,
         eidolon: chara.rank,
-        skills: Object.fromEntries(
-          chara.skills.map((skill) => [skill.id, skill.level])
-        ),
-        trace: Object.fromEntries(
-          chara.skill_trees.map((trace) => [trace.id, trace.level > 0])
-        ),
+        skills: Object.fromEntries(skillsPairs),
+        trace: Object.fromEntries(tracePairs),
       });
       if (!!chara.light_cone) {
         setLcStruct({

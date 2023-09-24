@@ -70,14 +70,14 @@ export function useStatParser(props?: StatParserConstructor) {
     !relicBonuses ||
     !mainStatLevels
   ) {
-    console.log(
-      "should not see this null",
-      traceData,
-      charPromotionData,
-      props,
-      relicBonuses,
-      mainStatLevels
-    );
+    // console.log(
+    //   "useStatParser() loading...",
+    //   traceData,
+    //   charPromotionData,
+    //   props,
+    //   relicBonuses,
+    //   mainStatLevels
+    // );
     return undefined;
   }
 

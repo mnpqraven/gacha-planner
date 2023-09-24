@@ -88,7 +88,7 @@ export async function exportImage(
 ): Promise<void> {
   if (!!element) {
     if (opt.mode === "DOWNLOAD") {
-      return toPng(element, { cacheBust: true })
+      return toPng(element)
         .then((dataUrl) => {
           const link = document.createElement("a");
           link.download = "hsr-card.png";

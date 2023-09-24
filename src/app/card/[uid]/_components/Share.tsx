@@ -6,13 +6,16 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
-import { forwardRef } from "react";
+import { HTMLAttributes, forwardRef } from "react";
 import { Share2 as ShareIcon } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { env } from "@/envSchema.mjs";
 import { useToast } from "@/app/components/ui/Toast/useToast";
 
-export const Share = forwardRef(() => {
+export const Share = forwardRef<
+  HTMLButtonElement,
+  HTMLAttributes<HTMLButtonElement>
+>((props, ref) => {
   const pathname = usePathname();
   const search = useSearchParams();
   const { toast } = useToast();
@@ -38,7 +41,13 @@ export const Share = forwardRef(() => {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="outline" className="px-2" onClick={onShare}>
+        <Button
+          variant="outline"
+          className="px-2"
+          onClick={onShare}
+          {...props}
+          ref={ref}
+        >
           <ShareIcon />
         </Button>
       </TooltipTrigger>

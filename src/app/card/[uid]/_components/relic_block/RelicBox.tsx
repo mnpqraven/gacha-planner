@@ -14,8 +14,6 @@ interface RelicProps extends HTMLAttributes<HTMLDivElement> {
 }
 export const RelicBox = forwardRef<HTMLDivElement, RelicProps>(
   ({ data, className, active, ...props }, ref) => {
-    // NOTE: upperbound = 6
-    // TODO: placeholder render for unknown setId
     const { data: mainstatSpread } = useMainStatSpread();
 
     if (!data.setId || !data.property || !mainstatSpread)
