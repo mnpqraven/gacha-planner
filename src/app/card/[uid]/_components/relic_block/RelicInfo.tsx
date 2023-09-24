@@ -19,7 +19,7 @@ export const RelicInfo = forwardRef<HTMLDivElement, Props>(
       >
         {config.showBaseUrl && (
           <span className="flex-1 self-end text-muted-foreground">
-            hsr.othi.dev/profile{!!config.uid ? `/${config.uid}` : ""}
+            hsr.othi.dev/card{!!config.uid ? `/${config.uid}` : ""}
           </span>
         )}
 

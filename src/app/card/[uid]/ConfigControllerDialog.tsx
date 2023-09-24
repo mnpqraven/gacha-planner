@@ -2,7 +2,6 @@
 
 import { Button, ButtonProps } from "@/app/components/ui/Button";
 import { Close } from "@radix-ui/react-dialog";
-import { Switch } from "@/app/components/ui/Switch";
 import {
   Tooltip,
   TooltipContent,
@@ -10,29 +9,10 @@ import {
 } from "@/app/components/ui/Tooltip";
 import { cn } from "@/lib/utils";
 import { SlidersHorizontal } from "lucide-react";
-import {
-  ComponentPropsWithoutRef,
-  ElementRef,
-  ReactNode,
-  forwardRef,
-} from "react";
+import { ComponentPropsWithoutRef, ElementRef, forwardRef } from "react";
 import { CardConfig, initialConfig } from "./configReducer";
 import { UseFormReturn, useForm } from "react-hook-form";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/app/components/ui/Form";
-import { DottedPaths } from "@/lib/generics";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/app/components/ui/Select";
+import { Form } from "@/app/components/ui/Form";
 import {
   Sheet,
   SheetContent,
@@ -44,6 +24,9 @@ import {
 } from "@/app/components/ui/Sheet";
 import { useSetAtom } from "jotai";
 import { configAtom } from "../_store";
+import { FormSelect } from "@/app/components/ui/Form/FormSelect";
+import { FormSwitch } from "@/app/components/ui/Form/FormSwitch";
+import { FormInput } from "@/app/components/ui/Form/FormInput";
 
 export const ConfigController = () => {
   const changeConfig = useSetAtom(configAtom);
@@ -109,6 +92,7 @@ export const ConfigControllerSheet = forwardRef<
     { value: "simple", label: "Simple" },
     { value: "detailed", label: "Detailed" },
   ];
+  type Options = (typeof verbosityOptions)[number];
 
   return (
     <SheetContent ref={ref} {...props}>
@@ -130,13 +114,23 @@ export const ConfigControllerSheet = forwardRef<
               name="showBaseUrl"
               label="Show Website URL"
             />
-            <FormSelect<(typeof verbosityOptions)[number], CardConfig>
+            <FormSelect<Options, CardConfig>
               name="hoverVerbosity"
               label="Hover info"
               options={verbosityOptions}
               valueAccessor={(item) => item.value}
               labelAccessor={(item) => item.label}
-              className="w-28 gap-2"
+              className="w-32 gap-2"
+            />
+            <FormInput<CardConfig>
+              name="name"
+              label="Player Name"
+              className="w-32"
+            />
+            <FormInput<CardConfig>
+              name="uid"
+              label="Player UID"
+              className="w-32"
             />
           </div>
 
@@ -153,82 +147,3 @@ export const ConfigControllerSheet = forwardRef<
   );
 });
 ConfigControllerSheet.displayName = "ConfigControllerDialog";
-
-interface FormSwitchProps<TForm extends object>
-  extends Omit<ComponentPropsWithoutRef<typeof FormField>, "render"> {
-  name: DottedPaths<TForm> extends string ? DottedPaths<TForm> : string;
-  label?: string | ReactNode;
-}
-function FormSwitch<TForm extends object>({
-  name,
-  label,
-  ...props
-}: FormSwitchProps<TForm>) {
-  return (
-    <FormField
-      name={name}
-      render={({ field }) => (
-        <FormItem>
-          <div className="flex items-center justify-between space-x-2">
-            {label && <FormLabel>{label}</FormLabel>}
-            <FormControl>
-              <Switch checked={field.value} onCheckedChange={field.onChange} />
-            </FormControl>
-          </div>
-        </FormItem>
-      )}
-      {...props}
-    />
-  );
-}
-
-interface FormSelectProps<TOptions, TForm extends object>
-  extends Omit<ComponentPropsWithoutRef<typeof FormField>, "render"> {
-  name: DottedPaths<TForm> extends string ? DottedPaths<TForm> : string;
-  options: TOptions[];
-  valueAccessor: (value: TOptions) => string;
-  labelAccessor: ((value: TOptions) => ReactNode) | ReactNode;
-  label?: string | ReactNode;
-  placeholder?: string;
-  className?: string;
-}
-function FormSelect<TOptions, TForm extends object>({
-  name,
-  label,
-  options,
-  labelAccessor,
-  valueAccessor,
-  className,
-  ...props
-}: FormSelectProps<TOptions, TForm>) {
-  return (
-    <FormField
-      name={name as string}
-      render={({ field }) => (
-        <FormItem>
-          <div className="flex items-center justify-between space-x-2">
-            {label && <FormLabel>{label}</FormLabel>}
-            <Select defaultValue={field.value} onValueChange={field.onChange}>
-              <FormControl>
-                <SelectTrigger className={className}>
-                  <SelectValue />
-                </SelectTrigger>
-              </FormControl>
-
-              <SelectContent position="popper">
-                {options.map((item, index) => (
-                  <SelectItem key={index} value={valueAccessor(item)}>
-                    {typeof labelAccessor === "function"
-                      ? labelAccessor(item)
-                      : labelAccessor}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </FormItem>
-      )}
-      {...props}
-    />
-  );
-}

@@ -1,4 +1,5 @@
 export const initialConfig: CardConfig = {
+  mode: "API",
   showStatName: false,
   showPlayerInfo: true,
   hoverVerbosity: "simple",
@@ -34,6 +35,8 @@ export function configReducer(
       else if (!!name) return { ...state, name };
       else return state;
     }
+    case "changeMode":
+      return { ...state, mode: payload };
     default:
       return state;
   }
@@ -44,6 +47,7 @@ export function configReducer(
  * controlling the display of the whole character card
  */
 export interface CardConfig {
+  mode: "API" | "CUSTOM";
   showPlayerInfo: boolean;
   showStatName: boolean;
   hoverVerbosity: "none" | "simple" | "detailed";
@@ -67,6 +71,7 @@ interface CardConfigActionSchema {
   toggleEmptyStat: boolean;
   updateWholeConfig: CardConfig;
   changeUser: { uid?: string; name?: string };
+  changeMode: "API" | "CUSTOM";
 }
 
 type TypePayloadPair<K extends keyof CardConfigActionSchema> = {

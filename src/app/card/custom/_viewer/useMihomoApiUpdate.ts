@@ -44,6 +44,15 @@ export function useMihomoApiUpdate(props: Props) {
   const updateConfig = useSetAtom(configAtom);
 
   useEffect(() => {
+    if (props.mode == "API") {
+      updateConfig({ type: "changeMode", payload: "API" });
+    } else {
+      updateConfig({ type: "changeMode", payload: "CUSTOM" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.mode]);
+
+  useEffect(() => {
     if (!!query.data && props.mode == "API") {
       const { nickname, uid } = query.data.player;
       updateConfig({ type: "changeUser", payload: { name: nickname, uid } });
