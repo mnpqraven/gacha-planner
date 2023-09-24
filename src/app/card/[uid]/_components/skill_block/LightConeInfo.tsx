@@ -9,45 +9,39 @@ import {
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
 import { SkillDescription } from "@/app/components/Db/SkillDescription";
-import { CardConfig } from "../../configReducer";
 import { useLightConeMetadata } from "@/hooks/queries/useLightConeMetadata";
+import { useAtomValue } from "jotai";
+import {
+  lcIdAtom,
+  lcImpositionAtom,
+  lcLevelAtom,
+  lcPromotionAtom,
+} from "@/app/card/_store";
+import { hoverVerbosityAtom } from "@/app/card/_store/main";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   displayStat?: boolean;
-  lcId?: number | string;
-  level: number;
-  ascension: number;
-  imposition: number;
-  config: CardConfig;
 }
 export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
-  (
-    {
-      displayStat = false,
-      lcId,
-      level,
-      ascension,
-      imposition,
-      config,
-      className,
-      ...props
-    },
-    ref
-  ) => {
+  ({ displayStat = false, className, ...props }, ref) => {
     const ratio = 902 / 1260;
-    const { data: skill } = useLightConeSkill(
-      !!lcId ? Number(lcId) : undefined
-    );
-    const { lightCone } = useLightConeMetadata(
-      !!lcId ? Number(lcId) : undefined
-    );
+
+    const lightConeId = useAtomValue(lcIdAtom);
+    const { data: skill } = useLightConeSkill(lightConeId);
+    const { lightCone } = useLightConeMetadata(lightConeId);
+
+    const level = useAtomValue(lcLevelAtom);
+    const ascension = useAtomValue(lcPromotionAtom);
+    const imposition = useAtomValue(lcImpositionAtom);
+
+    const hoverVerbosity = useAtomValue(hoverVerbosityAtom);
 
     if (!lightCone) return null;
 
     const { equipment_name: name } = lightCone;
     const maxLevel = ascension * 10 + 20;
 
-    if (!lcId) return null;
+    if (!lightConeId) return null;
 
     return (
       <div
@@ -76,16 +70,16 @@ export const LightConeInfo = forwardRef<HTMLDivElement, Props>(
         </div>
 
         <Tooltip>
-          <TooltipTrigger disabled={config.hoverVerbosity === "none"}>
+          <TooltipTrigger disabled={hoverVerbosity === "none"}>
             <Image
-              src={img(`image/light_cone_portrait/${lcId}.png`)}
+              src={img(`image/light_cone_portrait/${lightConeId}.png`)}
               alt=""
               width={350 * ratio}
               height={350}
               className="justify-self-end shadow-xl shadow-border"
             />
           </TooltipTrigger>
-          {config.hoverVerbosity !== "none" && !!skill && (
+          {hoverVerbosity !== "none" && !!skill && (
             <TooltipContent className="w-96 text-base" side="left">
               <p className="mb-2 font-bold text-accent-foreground">
                 {skill.skill_name}

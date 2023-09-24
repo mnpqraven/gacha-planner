@@ -11,24 +11,18 @@ import {
 import { useCharacterSkill } from "@/hooks/queries/useCharacterSkill";
 import { SkillDescription } from "@/app/components/Db/SkillDescription";
 import { useAtomValue } from "jotai";
-import { configAtom } from "@/app/card/_store";
-
-const DISPLAY_SKILL_TYPES: SkillType[] = [
-  "Talent",
-  "Normal",
-  "BPSkill",
-  "Ultra",
-];
+import { charEidAtom, charSkillAtom } from "@/app/card/_store";
+import { hoverVerbosityAtom } from "@/app/card/_store/main";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   characterId: number;
-  eidolon: number;
-  // skill id: slv
-  skills: Record<number, number>;
 }
 
 export const SkillInfo = forwardRef<HTMLDivElement, Props>(
-  ({ className, characterId, eidolon, skills: skList, ...props }, ref) => {
+  ({ className, characterId, ...props }, ref) => {
+    const skList = useAtomValue(charSkillAtom);
+    const eidolon = useAtomValue(charEidAtom);
+
     const { data } = useCharacterSkill(characterId);
 
     const skills = data
@@ -73,7 +67,7 @@ export const SkillInfo = forwardRef<HTMLDivElement, Props>(
               )}
             </span>
             <SkillIcon
-              src={`${getImagePath(characterId, skillInfo)}`}
+              src={getImagePath(characterId, skillInfo)}
               skillInfo={skillInfo}
               slv={skList[skillInfo.skill_id]}
             />
@@ -115,52 +109,55 @@ export const SkillInfo = forwardRef<HTMLDivElement, Props>(
 );
 SkillInfo.displayName = "SkillInfo";
 
-interface IconProps extends HTMLAttributes<HTMLDivElement> {
-  src: string;
+interface IconProps {
+  src: string | undefined;
   skillInfo: AvatarSkillConfig;
   slv: number;
   width?: number;
   height?: number;
+  className?: string;
 }
-const SkillIcon = forwardRef<HTMLDivElement, IconProps>(
-  (
-    { src, skillInfo, slv, width = 48, height = 48, className, ...props },
-    ref
-  ) => {
-    const config = useAtomValue(configAtom);
-    const { hoverVerbosity } = config;
+function SkillIcon({
+  src,
+  skillInfo,
+  slv,
+  width = 48,
+  height = 48,
+  className,
+}: IconProps) {
+  const hoverVerbosity = useAtomValue(hoverVerbosityAtom);
 
-    return (
-      <Tooltip>
-        <TooltipTrigger disabled={hoverVerbosity === "none"}>
+  return (
+    <Tooltip>
+      <TooltipTrigger disabled={hoverVerbosity === "none"}>
+        {src && (
           <Image
             src={src}
             alt={skillInfo.skill_name}
             width={width}
             height={height}
-            className="invert dark:invert-0"
+            className={cn("invert dark:invert-0", className)}
           />
-        </TooltipTrigger>
-        {hoverVerbosity === "simple" ? (
-          <TooltipContent>{skillInfo.skill_name}</TooltipContent>
-        ) : hoverVerbosity === "detailed" ? (
-          <TooltipContent className="w-96 py-2 text-justify text-base">
-            <p className="mb-2 text-base font-bold text-accent-foreground">
-              {skillInfo.skill_name}
-            </p>
+        )}
+      </TooltipTrigger>
+      {hoverVerbosity === "simple" ? (
+        <TooltipContent>{skillInfo.skill_name}</TooltipContent>
+      ) : hoverVerbosity === "detailed" ? (
+        <TooltipContent className="w-96 py-2 text-justify text-base">
+          <p className="mb-2 text-base font-bold text-accent-foreground">
+            {skillInfo.skill_name}
+          </p>
 
-            <SkillDescription
-              skillDesc={skillInfo.skill_desc}
-              paramList={skillInfo.param_list}
-              slv={slv}
-            />
-          </TooltipContent>
-        ) : null}
-      </Tooltip>
-    );
-  }
-);
-SkillIcon.displayName = "SkillIcon ";
+          <SkillDescription
+            skillDesc={skillInfo.skill_desc}
+            paramList={skillInfo.param_list}
+            slv={slv}
+          />
+        </TooltipContent>
+      ) : null}
+    </Tooltip>
+  );
+}
 
 function getLabel(skillType: SkillType | null | undefined): string {
   switch (skillType) {

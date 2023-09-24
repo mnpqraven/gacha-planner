@@ -7,6 +7,7 @@ import { cva } from "class-variance-authority";
 import { useMainStatSpread } from "@/hooks/queries/useMainStatSpread";
 import { RelicType } from "@/bindings/RelicConfig";
 import { RelicInput } from "@/app/card/_store/relic";
+import { Loader2 } from "lucide-react";
 
 interface RelicProps extends HTMLAttributes<HTMLDivElement> {
   data: RelicInput;
@@ -53,7 +54,7 @@ export const RelicBox = forwardRef<HTMLDivElement, RelicProps>(
               backgroundImage: `url(${img(getUrl(data.setId, data.type))})`,
               backgroundSize: "cover",
             }}
-          />
+          ></div>
           <Badge className="absolute left-0 top-0 flex justify-center border px-1 shadow-md shadow-border">
             +{data.level}
           </Badge>
@@ -67,31 +68,33 @@ export const RelicBox = forwardRef<HTMLDivElement, RelicProps>(
         </div>
 
         <div id="sub" className="flex flex-col gap-1">
-          {data.subStats.map((sub, index) =>
-            !!sub ? (
-              <div key={index} className="flex flex-col">
-                <div key={index} className="flex justify-between gap-1">
-                  <SVG src={propertyIconUrl(sub.property)} />
-                  {prettyProperty(sub.property, sub.value).prettyValue}
-                </div>
-
-                <div id="substat-counter" className="flex gap-1">
-                  {Array.from(range(1, data.rarity + 1)).map((num) => (
-                    <div
-                      key={num}
-                      className={substatVariant({
-                        currentCount: num,
-                        substatCount: sub.step,
-                        rarity: data.rarity as 3 | 4 | 5,
-                      })}
-                    />
-                  ))}
-                </div>
+          {data.subStats.map((sub, index) => (
+            <div key={index} className="flex flex-col">
+              <div key={index} className="flex justify-between gap-1">
+                {!!sub ? (
+                  <>
+                    <SVG src={propertyIconUrl(sub.property)} />
+                    {prettyProperty(sub.property, sub.value).prettyValue}
+                  </>
+                ) : (
+                  <Loader2 className="h-6 w-6 animate-[spin_3s_linear_infinite]" />
+                )}
               </div>
-            ) : (
-              <div key={index}>placeholdersub</div>
-            )
-          )}
+
+              <div id="substat-counter" className="flex gap-1">
+                {Array.from(range(1, data.rarity + 1)).map((num) => (
+                  <div
+                    key={num}
+                    className={substatVariant({
+                      currentCount: num,
+                      substatCount: sub?.step ?? 0,
+                      rarity: data.rarity as 3 | 4 | 5,
+                    })}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );

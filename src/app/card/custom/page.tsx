@@ -32,10 +32,10 @@ export default async function ProfileCard() {
           <ConfigController />
         </div>
         <Accordion
-          type="single"
-          collapsible
+          type="multiple"
+          // collapsible
           className="w-10/12"
-          defaultValue="config-accordion"
+          defaultValue={["config-accordion", "card-accordion"]}
         >
           <AccordionItem value="config-accordion">
             <AccordionTrigger>Configuration</AccordionTrigger>

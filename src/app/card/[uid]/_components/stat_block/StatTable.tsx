@@ -7,23 +7,29 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
-import { CardConfig } from "../../configReducer";
 import { Property } from "@/bindings/SkillTreeConfig";
 import {
   prettyProperty,
   propertyIconUrl,
   sortByProperty,
 } from "@/lib/propertyHelper";
+import { useAtomValue } from "jotai";
+import { statParseParam } from "@/app/card/_store";
+import { useStatParser } from "@/hooks/useStatParser";
+import { hoverVerbosityAtom } from "@/app/card/_store/main";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  data: Partial<Record<Property, number>>;
   element: Element;
-  config: CardConfig;
 }
 
 export const StatTable = forwardRef<HTMLDivElement, Props>(
-  ({ data, element, config, className, ...props }, ref) => {
-    const asObject = Object.entries(data)
+  ({ element, className, ...props }, ref) => {
+    const hoverVerbosity = useAtomValue(hoverVerbosityAtom);
+    const parsedStats = useStatParser(useAtomValue(statParseParam));
+
+    if (!parsedStats) return null;
+
+    const asObject = Object.entries(parsedStats.statTable)
       .map(([property, value]) => ({
         property,
         value,
@@ -48,7 +54,7 @@ export const StatTable = forwardRef<HTMLDivElement, Props>(
         {asObject.map(({ property, value }, index) => (
           <Tooltip key={property}>
             <TooltipTrigger
-              disabled={config.hoverVerbosity === "none"}
+              disabled={hoverVerbosity === "none"}
               className={cn(
                 "flex items-center gap-2 py-1",
                 index % 2 === 0 ? "border-r" : ""
@@ -61,7 +67,7 @@ export const StatTable = forwardRef<HTMLDivElement, Props>(
               <div>{prettyProperty(property, value).prettyValue}</div>
             </TooltipTrigger>
 
-            {config.hoverVerbosity !== "none" && (
+            {hoverVerbosity !== "none" && (
               <TooltipContent side={index % 2 === 0 ? "left" : "right"}>
                 {prettyProperty(property, value).label}
               </TooltipContent>

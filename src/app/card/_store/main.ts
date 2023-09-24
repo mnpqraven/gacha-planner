@@ -1,12 +1,24 @@
 import { atom } from "jotai";
-import { lcStructAtom } from "./lightcone";
+import {
+  lcIdAtom,
+  lcImpositionAtom,
+  lcLevelAtom,
+  lcPromotionAtom,
+  lcStructAtom,
+} from "./lightcone";
 import { relicsStructAtom } from "./relic";
-import { charStructAtom } from "./character";
+import {
+  charIdAtom,
+  charLevelAtom,
+  charPromotionAtom,
+  charStructAtom,
+  charTraceAtom,
+} from "./character";
 import {
   ParsedRelicSchema,
   StatParserConstructor,
 } from "@/hooks/useStatParser";
-import { atomWithReducer } from "jotai/utils";
+import { atomWithReducer, selectAtom } from "jotai/utils";
 import {
   CardConfig,
   CardConfigAction,
@@ -19,6 +31,11 @@ export const configAtom = atomWithReducer<CardConfig, CardConfigAction>(
   configReducer
 );
 
+export const hoverVerbosityAtom = selectAtom(
+  configAtom,
+  (atom) => atom.hoverVerbosity
+);
+
 export const armoryStructAtom = atom((get) => ({
   player: get(charStructAtom),
   relic: get(relicsStructAtom),
@@ -26,27 +43,27 @@ export const armoryStructAtom = atom((get) => ({
 }));
 
 export const statParseParam = atom<StatParserConstructor | undefined>((get) => {
-  const charId = get(charStructAtom).id;
-  const lcId = get(lcStructAtom).id;
+  const charId = get(charIdAtom);
+  const lcId = get(lcIdAtom);
   const relic = get(relicsStructAtom).filter((e) => !!e.property && e.setId);
   if (!charId || !lcId) return undefined;
   return {
     character: {
-      level: get(charStructAtom).level,
+      level: get(charLevelAtom),
       id: charId,
-      ascension: get(charStructAtom).ascension,
+      ascension: get(charPromotionAtom),
     },
-    traceTable: get(charStructAtom).trace,
+    traceTable: get(charTraceAtom),
     lightCone: {
       id: lcId,
-      level: get(lcStructAtom).level,
-      ascension: get(lcStructAtom).ascension,
-      imposition: get(lcStructAtom).imposition,
+      level: get(lcLevelAtom),
+      ascension: get(lcPromotionAtom),
+      imposition: get(lcImpositionAtom),
     },
     relic: relic as ParsedRelicSchema[],
   };
 });
 
-armoryStructAtom.debugLabel = "armoryStructAtom";
 configAtom.debugLabel = "configAtom";
 statParseParam.debugLabel = "statParseParam";
+armoryStructAtom.debugLabel = "armoryStructAtom";

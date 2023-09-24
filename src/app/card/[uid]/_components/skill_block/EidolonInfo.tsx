@@ -1,5 +1,5 @@
 import { cn, img, range, sanitizeNewline } from "@/lib/utils";
-import { Fragment, HTMLAttributes, forwardRef } from "react";
+import { Fragment, HTMLAttributes, forwardRef, useMemo } from "react";
 import Image from "next/image";
 import {
   Tooltip,
@@ -9,15 +9,16 @@ import {
 import { useCharacterEidolon } from "@/hooks/queries/useCharacterEidolon";
 import { AvatarRankConfig } from "@/bindings/AvatarRankConfig";
 import { useAtomValue } from "jotai";
-import { configAtom } from "@/app/card/_store";
+import { charEidAtom } from "@/app/card/_store";
+import { hoverVerbosityAtom } from "@/app/card/_store/main";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   characterId: number;
-  eidolon: number;
 }
 export const EidolonInfo = forwardRef<HTMLDivElement, Props>(
-  ({ className, characterId, eidolon, ...props }, ref) => {
+  ({ className, characterId, ...props }, ref) => {
     const { data: eidolons } = useCharacterEidolon(characterId);
+    const eidolon = useAtomValue(charEidAtom);
 
     return (
       <div
@@ -65,8 +66,7 @@ const EidolonIcon = forwardRef<HTMLDivElement, IconProps>(
     },
     ref
   ) => {
-    const config = useAtomValue(configAtom);
-    const { hoverVerbosity } = config;
+    const hoverVerbosity = useAtomValue(hoverVerbosityAtom);
 
     return (
       <Tooltip>

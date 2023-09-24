@@ -1,6 +1,5 @@
 "use client";
 import { HTMLAttributes, forwardRef } from "react";
-import { CardConfig } from "../../configReducer";
 import { useRelicSetBonuses } from "@/hooks/queries/useRelicSetBonus";
 import { useRelicSets } from "@/hooks/queries/useRelicSetList";
 import {
@@ -12,14 +11,15 @@ import { cn } from "@/lib/utils";
 import { SkillDescription } from "@/app/components/Db/SkillDescription";
 import { RelicSetMarker } from "./RelicSetMarker";
 import { RelicInput } from "@/app/card/_store/relic";
+import { useAtomValue } from "jotai";
+import { hoverVerbosityAtom } from "@/app/card/_store/main";
 
 interface SetInfoProps extends HTMLAttributes<HTMLButtonElement> {
   relics: RelicInput[];
-  config: CardConfig;
 }
 export const SetInfo = forwardRef<HTMLButtonElement, SetInfoProps>(
-  ({ relics, config, className, ...props }, ref) => {
-    const { hoverVerbosity } = config;
+  ({ relics, className, ...props }, ref) => {
+    const hoverVerbosity = useAtomValue(hoverVerbosityAtom);
     const { data: relicBonuses } = useRelicSetBonuses();
     const { data: relicSets } = useRelicSets();
 
