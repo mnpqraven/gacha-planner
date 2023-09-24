@@ -16,7 +16,6 @@ export function useRelics(setIds: number[] | undefined, opt: Options = {}) {
     ...optionsRelic(setIds),
     ...opt,
   });
-  console.log("wtf", query.data, setIds);
 
   return query;
 }

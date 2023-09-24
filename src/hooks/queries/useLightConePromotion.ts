@@ -1,12 +1,26 @@
+import { EquipmentPromotionConfig } from "@/bindings/EquipmentPromotionConfig";
 import API from "@/server/typedEndpoints";
-import { useQuery } from "@tanstack/react-query";
+import { UseQueryOptions, queryOptions, useQuery } from "@tanstack/react-query";
 
-export function useLightConePromotion(lightConeId: number | undefined) {
+export const optionLightConePromotion = (lcId: number | undefined) =>
+  queryOptions<EquipmentPromotionConfig>({
+    queryKey: ["lightConePromotion", lcId],
+    queryFn: async () => await API.lightConePromotion.get({ lcId: lcId! }),
+    enabled: !!lcId,
+  });
+
+export function useLightConePromotion(
+  lcId: number | undefined,
+  opt: Options = {}
+) {
   const query = useQuery({
-    queryKey: ["lightConePromotion", lightConeId],
-    queryFn: async () =>
-      await API.lightConePromotion.get({ lcId: lightConeId! }),
-    enabled: !!lightConeId,
+    ...optionLightConePromotion(lcId),
+    ...opt,
   });
   return query;
 }
+
+type Options = Omit<
+  UseQueryOptions<EquipmentPromotionConfig>,
+  "queryKey" | "queryFn" | "enabled"
+>;

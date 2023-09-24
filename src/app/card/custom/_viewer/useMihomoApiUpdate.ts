@@ -14,6 +14,12 @@ import {
   selectedCharacterIndexAtom,
 } from "../../_store";
 import { mhyCharacterIds } from "../../_store/card";
+import { useQueryClient } from "@tanstack/react-query";
+import { optionCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
+import { optionCharacterPromotion } from "@/hooks/queries/useCharacterPromotion";
+import { optionsCharacterTrace } from "@/hooks/queries/useCharacterTrace";
+import { optionLightConePromotion } from "@/hooks/queries/useLightConePromotion";
+import { optionLightConeSkill } from "@/hooks/queries/useLightConeSkill";
 
 type Lang = (typeof LANGS)[number];
 type Props =
@@ -42,6 +48,27 @@ export function useMihomoApiUpdate(props: Props) {
   const [setIds, updateSetIds] = useState<number[]>([]);
   const { data: relicsData } = useRelics(setIds);
   const updateConfig = useSetAtom(configAtom);
+  const client = useQueryClient();
+
+  useEffect(() => {
+    if (!!query.data) {
+      const charIds = query.data.characters.map((e) => e.id);
+      const lcIds = query.data.characters
+        .filter((e) => !!e.light_cone)
+        .map((e) => e.light_cone?.id!);
+
+      charIds.forEach((id) => {
+        client.prefetchQuery(optionsCharacterTrace(id));
+        client.prefetchQuery(optionCharacterPromotion(id));
+        client.prefetchQuery(optionCharacterMetadata(id));
+      });
+      lcIds.forEach((e) => {
+        const id = Number(e);
+        client.prefetchQuery(optionLightConePromotion(id));
+        client.prefetchQuery(optionLightConeSkill(id));
+      });
+    }
+  }, [client, query.data]);
 
   useEffect(() => {
     if (props.mode == "API") {

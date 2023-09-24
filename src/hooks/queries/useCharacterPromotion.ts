@@ -1,20 +1,24 @@
 import { AvatarPromotionConfig } from "@/bindings/AvatarPromotionConfig";
 import API from "@/server/typedEndpoints";
-import { UseQueryOptions, useQuery } from "@tanstack/react-query";
+import { UseQueryOptions, queryOptions, useQuery } from "@tanstack/react-query";
 
 type Options = Omit<
-  UseQueryOptions<AvatarPromotionConfig, unknown, AvatarPromotionConfig>,
+  UseQueryOptions<AvatarPromotionConfig>,
   "enabled" | "queryKey" | "queryFn"
 >;
+export const optionCharacterPromotion = (charId: number | undefined) =>
+  queryOptions<AvatarPromotionConfig>({
+    queryKey: ["promotion", charId],
+    queryFn: async () => await API.promotion.get({ characterId: charId! }),
+    enabled: !!charId,
+  });
 
 export function useCharacterPromotion(
   characterId: number | undefined,
   opt: Options = {}
 ) {
   const query = useQuery({
-    queryKey: ["promotion", characterId],
-    queryFn: async () => await API.promotion.get({ characterId: characterId! }),
-    enabled: !!characterId,
+    ...optionCharacterPromotion(characterId),
     ...opt,
   });
   return query;

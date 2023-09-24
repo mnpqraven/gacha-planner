@@ -35,7 +35,6 @@ export const StatTable = forwardRef<HTMLDivElement, Props>(
       property: Property;
       value: number;
     }[];
-    console.log("yo", asObject);
 
     return (
       <div

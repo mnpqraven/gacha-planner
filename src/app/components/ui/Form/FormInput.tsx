@@ -10,6 +10,9 @@ export interface FormInputProps<TForm extends object> extends InputProps {
 export function FormInput<TForm extends object>({
   name,
   label,
+  onBlur,
+  onChange,
+  value,
   ...props
 }: FormInputProps<TForm>) {
   return (

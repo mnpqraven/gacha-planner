@@ -9,7 +9,12 @@ import {
 } from "@/app/components/ui/Tooltip";
 import { cn } from "@/lib/utils";
 import { SlidersHorizontal } from "lucide-react";
-import { ComponentPropsWithoutRef, ElementRef, forwardRef } from "react";
+import {
+  ComponentPropsWithoutRef,
+  ElementRef,
+  forwardRef,
+  useEffect,
+} from "react";
 import { CardConfig, initialConfig } from "./configReducer";
 import { UseFormReturn, useForm } from "react-hook-form";
 import { Form } from "@/app/components/ui/Form";
@@ -22,7 +27,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/app/components/ui/Sheet";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { configAtom } from "../_store";
 import { FormSelect } from "@/app/components/ui/Form/FormSelect";
 import { FormSwitch } from "@/app/components/ui/Form/FormSwitch";
@@ -93,6 +98,14 @@ export const ConfigControllerSheet = forwardRef<
     { value: "detailed", label: "Detailed" },
   ];
   type Options = (typeof verbosityOptions)[number];
+
+  const { uid, name } = useAtomValue(configAtom);
+
+  useEffect(() => {
+    if (!!uid) form.setValue("uid", uid);
+    if (!!name) form.setValue("name", name);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uid, name]);
 
   return (
     <SheetContent ref={ref} {...props}>

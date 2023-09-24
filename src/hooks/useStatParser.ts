@@ -224,7 +224,7 @@ export function useStatParser(props?: StatParserConstructor) {
     statTable: toStatTable(baseValues, summed),
     normalized,
   };
-  console.log("useStatParser ret", result);
+  // console.log("useStatParser ret", result);
 
   return result;
 }

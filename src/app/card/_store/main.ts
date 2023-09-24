@@ -7,9 +7,17 @@ import {
   StatParserConstructor,
 } from "@/hooks/useStatParser";
 import { atomWithReducer } from "jotai/utils";
-import { configReducer, initialConfig } from "../[uid]/configReducer";
+import {
+  CardConfig,
+  CardConfigAction,
+  configReducer,
+  initialConfig,
+} from "../[uid]/configReducer";
 
-export const configAtom = atomWithReducer(initialConfig, configReducer);
+export const configAtom = atomWithReducer<CardConfig, CardConfigAction>(
+  initialConfig,
+  configReducer
+);
 
 export const armoryStructAtom = atom((get) => ({
   player: get(charStructAtom),

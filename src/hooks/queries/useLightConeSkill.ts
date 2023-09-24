@@ -1,20 +1,26 @@
 import { EquipmentSkillConfig } from "@/bindings/EquipmentSkillConfig";
 import API from "@/server/typedEndpoints";
-import { UseQueryOptions, useQuery } from "@tanstack/react-query";
+import { UseQueryOptions, queryOptions, useQuery } from "@tanstack/react-query";
 
-type Options = Omit<
-  UseQueryOptions<EquipmentSkillConfig, unknown, EquipmentSkillConfig>,
-  "queryKey" | "queryFn" | "enabled"
->;
+export const optionLightConeSkill = (lightConeId: number | undefined) =>
+  queryOptions<EquipmentSkillConfig>({
+    queryKey: ["lightConeSkill", lightConeId],
+    queryFn: async () => await API.lightConeSkill.get({ lcId: lightConeId! }),
+    enabled: !!lightConeId,
+  });
+
 export function useLightConeSkill(
   lightConeId: number | undefined,
   opt: Options = {}
 ) {
   const query = useQuery({
-    queryKey: ["lightConeSkill", lightConeId],
-    queryFn: async () => await API.lightConeSkill.get({ lcId: lightConeId! }),
-    enabled: !!lightConeId,
+    ...optionLightConeSkill(lightConeId),
     ...opt,
   });
   return query;
 }
+
+type Options = Omit<
+  UseQueryOptions<EquipmentSkillConfig>,
+  "queryKey" | "queryFn" | "enabled"
+>;
