@@ -44,15 +44,15 @@ function RelicSelector({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="w-12">{relic.type}</div>
+    <div className="flex items-center justify-between gap-3">
+      <span className="font-bold">{relicTypeName(relic.type)}</span>
 
       <Select onValueChange={updateRelic} value={`${relic.setId}`}>
         <SelectTrigger className="w-96">
           <SelectValue />
         </SelectTrigger>
         <SelectContent className="max-h-full overflow-y-auto">
-          {relicSets?.filter(separateType(relic.type)).map((set) => (
+          {relicSets?.filter(bySeparateType(relic.type)).map((set) => (
             <SelectItem key={set.set_id} value={String(set.set_id)}>
               <div className="flex items-center gap-2">
                 <Image
@@ -72,7 +72,7 @@ function RelicSelector({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
   );
 }
 
-function separateType(type: RelicType) {
+function bySeparateType(type: RelicType) {
   switch (type) {
     case "HEAD":
     case "HAND":
@@ -84,5 +84,22 @@ function separateType(type: RelicType) {
     case "NECK":
       return (set: RelicSetConfig) =>
         set.set_skill_list.every((num) => num <= 2);
+  }
+}
+
+function relicTypeName(type: RelicType) {
+  switch (type) {
+    case "HEAD":
+      return "Head";
+    case "HAND":
+      return "Glove";
+    case "BODY":
+      return "Body";
+    case "FOOT":
+      return "Boot";
+    case "OBJECT":
+      return "Planar Sphere";
+    case "NECK":
+      return "Link Robe";
   }
 }

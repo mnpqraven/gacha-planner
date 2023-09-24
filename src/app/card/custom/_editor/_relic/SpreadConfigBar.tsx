@@ -16,7 +16,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   spreadInfo: RelicSubAffixConfig;
 }
 
-const variant = cva("h-1.5 w-8 border-skewed", {
+const variant = cva("h-1.5 w-8 border-skewed mb-2", {
   variants: {
     status: {
       LOW: "bg-[#4f79b2]",
@@ -38,15 +38,17 @@ const SpreadConfigBar = forwardRef<HTMLDivElement, Props>(
     }
 
     return (
-      <div ref={ref} className={cn(className, "flex flex-col")} {...props}>
-        {/* DEBUG HOISTED VALUE: {totalValue} */}
-        {/* <span>{value}</span> */}
+      <div
+        ref={ref}
+        className={cn(className, "flex flex-col items-center")}
+        {...props}
+      >
         <div
           className={variant({
             status:
               ssValue > 0 ? judgeRollValue(ssValue, spreadInfo) : "default",
           })}
-        />
+        ></div>
         {substatRollButtons.map(({ key, icon, label }) => (
           <Tooltip key={key} disableHoverableContent>
             <TooltipTrigger asChild>

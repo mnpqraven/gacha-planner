@@ -7,29 +7,20 @@ import { cva } from "class-variance-authority";
 import { useMainStatSpread } from "@/hooks/queries/useMainStatSpread";
 import { RelicType } from "@/bindings/RelicConfig";
 import { RelicInput } from "@/app/card/_store/relic";
-import { Loader2 } from "lucide-react";
+import { CircleSlash, Loader2 } from "lucide-react";
+import Image from "next/image";
+import { PrimitiveAtom, useAtomValue } from "jotai";
+import { MarkerIcon } from "./MarkerIcon";
 
 interface RelicProps extends HTMLAttributes<HTMLDivElement> {
-  data: RelicInput;
-  active?: boolean;
+  atom: PrimitiveAtom<RelicInput>;
 }
 export const RelicBox = forwardRef<HTMLDivElement, RelicProps>(
-  ({ data, className, active, ...props }, ref) => {
+  ({ atom, className, ...props }, ref) => {
+    const data = useAtomValue(atom);
     const { data: mainstatSpread } = useMainStatSpread();
 
-    if (!data.setId || !data.property || !mainstatSpread)
-      return (
-        <div
-          className={cn(
-            "flex h-[134px] gap-1 rounded-md border p-2 shadow-md shadow-border",
-            className
-          )}
-          ref={ref}
-          {...props}
-        >
-          ???
-        </div>
-      );
+    if (!mainstatSpread) return null;
 
     const promotionConfig = mainstatSpread[data.type].find(
       (e) => e.property == data.property
@@ -48,23 +39,32 @@ export const RelicBox = forwardRef<HTMLDivElement, RelicProps>(
         {...props}
       >
         <div id="main" className="relative flex w-24 items-end justify-center">
-          <div
-            className="absolute top-0 z-0 h-24 w-24"
-            style={{
-              backgroundImage: `url(${img(getUrl(data.setId, data.type))})`,
-              backgroundSize: "cover",
-            }}
-          ></div>
+          {!!data.setId ? (
+            <Image
+              className="absolute top-0 z-0 h-24 w-24"
+              src={img(getUrl(data.setId, data.type))}
+              alt=""
+              width={96}
+              height={96}
+            />
+          ) : (
+            <CircleSlash className="absolute top-0 z-0 h-24 w-24 p-2" />
+          )}
           <Badge className="absolute left-0 top-0 flex justify-center border px-1 shadow-md shadow-border">
             +{data.level}
           </Badge>
-          {active && <MarkerIcon className="absolute right-1.5 top-1.5" />}
+          <MarkerIcon
+            className="absolute right-1.5 top-1.5"
+            setId={data.setId}
+          />
 
-          <div className="z-10 flex w-full gap-1 font-bold">
-            <SVG src={propertyIconUrl(data.property)} />
+          {data.property && (
+            <div className="z-10 flex w-full gap-1 font-bold">
+              <SVG src={propertyIconUrl(data.property)} />
 
-            {prettyProperty(data.property, mainStatValue).prettyValue}
-          </div>
+              {prettyProperty(data.property, mainStatValue).prettyValue}
+            </div>
+          )}
         </div>
 
         <div id="sub" className="flex flex-col gap-1">
@@ -101,20 +101,6 @@ export const RelicBox = forwardRef<HTMLDivElement, RelicProps>(
   }
 );
 RelicBox.displayName = "Relic";
-
-const MarkerIcon = forwardRef<HTMLSpanElement, HTMLAttributes<HTMLSpanElement>>(
-  ({ className, ...props }, ref) => (
-    <span
-      className={cn("h-2 w-2 rounded-full bg-green-600", className)}
-      style={{
-        boxShadow: "0 0 5px 1px rgb(22 163 74)",
-      }}
-      ref={ref}
-      {...props}
-    />
-  )
-);
-MarkerIcon.displayName = "MarkerIcon";
 
 function getUrl(setId: number, type: RelicType | undefined) {
   let suffix: string | undefined = undefined;

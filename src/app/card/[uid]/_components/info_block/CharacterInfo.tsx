@@ -70,7 +70,7 @@ export const CharacterInfo = forwardRef<HTMLDivElement, Props>(
         <div className="grid w-full grid-cols-3">
           <UserPlateLeft path={data.avatar_base_type} />
 
-          <div className="flex flex-col place-self-center">
+          <div className="flex flex-col items-center place-self-center">
             <div className="font-bold">{data.avatar_name}</div>
             <div>
               <span className="font-bold">Lv. {level}</span>/{maxLevel}

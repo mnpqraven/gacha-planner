@@ -97,46 +97,6 @@ export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex gap-2">
-        <div className="flex flex-col gap-2">
-          <Label htmlFor={mainStatId}>Main stat</Label>
-          {isMainstatEditable(type) ? (
-            <PropertySelect
-              id={mainStatId}
-              className="w-48"
-              options={mainStatOptions}
-              onValueChange={updateMainstat}
-              value={property}
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center gap-2 rounded-md border px-3 py-2">
-              {property && (
-                <>
-                  <SVG src={propertyIconUrl(property)} width={24} height={24} />
-                  {propertyName(property)}
-                </>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Label htmlFor={levelId}>Level</Label>
-          <Input
-            id={levelId}
-            className="w-36"
-            value={relic.level}
-            type="number"
-            min={0}
-            max={15}
-            onChange={(e) => {
-              if (!Number.isNaN(e.target.value))
-                updateLevel(parseInt(e.target.value));
-            }}
-          />
-        </div>
-      </div>
-
-      <div className="flex gap-1">
         <Image
           src={getRelicIcon(relic.type, setId)}
           alt=""
@@ -144,40 +104,81 @@ export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
           width={64}
           className="h-24 w-24"
         />
-        <div className="grid grid-cols-2 gap-2">
-          {splittedSubstatAtom.map((atom, index) => (
-            <div key={index} className="flex items-center gap-2">
+
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <Label htmlFor={mainStatId} className="w-[4.5rem]">
+              Main stat
+            </Label>
+            {isMainstatEditable(type) ? (
               <PropertySelect
-                className="w-44"
-                options={subStatOptions.map((e) => e.option)}
-                itemDisabled={(prop) => occupiedProperties.includes(prop)}
-                onValueChange={(prop) => onSubStatSelect(prop, index)}
-                value={substats.at(index)?.property}
+                id={mainStatId}
+                className="w-48"
+                options={mainStatOptions}
+                onValueChange={updateMainstat}
+                value={property}
               />
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="px-2"
-                    onClick={() => warnProperty(substats.at(index)?.property)}
-                  >
-                    Substats
-                  </Button>
-                </PopoverTrigger>
+            ) : !!property ? (
+              <div className="flex h-full w-48 items-center gap-2 rounded-md border px-3 py-2">
+                <SVG src={propertyIconUrl(property)} width={24} height={24} />
+                {propertyName(property)}
+              </div>
+            ) : null}
+          </div>
 
-                <PopoverContent side="top" asChild>
-                  <SubstatSpreadConfig
-                    atom={atom}
-                    spreadData={spreadData}
-                    setId={setId}
-                  />
-                </PopoverContent>
-              </Popover>
-
-              <ValueLabel atom={atom} />
-            </div>
-          ))}
+          <div className="flex items-center gap-2">
+            <Label htmlFor={levelId} className="w-[4.5rem]">
+              Level
+            </Label>
+            <Input
+              id={levelId}
+              className="w-48"
+              value={relic.level}
+              type="number"
+              min={0}
+              max={15}
+              onChange={(e) => {
+                if (!Number.isNaN(e.target.value))
+                  updateLevel(parseInt(e.target.value));
+              }}
+            />
+          </div>
         </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        {splittedSubstatAtom.map((atom, index) => (
+          <div key={index} className="flex items-center gap-2">
+            <PropertySelect
+              className="w-44"
+              options={subStatOptions.map((e) => e.option)}
+              itemDisabled={(prop) => occupiedProperties.includes(prop)}
+              onValueChange={(prop) => onSubStatSelect(prop, index)}
+              value={substats.at(index)?.property}
+            />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="px-2"
+                  onClick={() => warnProperty(substats.at(index)?.property)}
+                >
+                  Substats
+                </Button>
+              </PopoverTrigger>
+
+              <PopoverContent side="top" asChild>
+                <SubstatSpreadConfig
+                  atom={atom}
+                  spreadData={spreadData}
+                  setId={setId}
+                />
+              </PopoverContent>
+            </Popover>
+
+            <ValueLabel atom={atom} />
+          </div>
+        ))}
       </div>
     </div>
   );

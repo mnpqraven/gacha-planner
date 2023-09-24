@@ -131,8 +131,7 @@ const SubstatSpreadConfig = forwardRef<HTMLDivElement, Props>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [value]);
 
-    if (!spreadInfo) return "spreadinfo loading...";
-    if (!value?.property || !setId || !value) return null;
+    if (!spreadInfo || !value?.property || !setId || !value) return null;
 
     const { minRoll, midRoll, maxRoll } = getSpreadValues(spreadInfo);
 
@@ -151,7 +150,6 @@ const SubstatSpreadConfig = forwardRef<HTMLDivElement, Props>(
 
     return (
       <div ref={ref} className={cn(className, "flex w-96 flex-col")} {...props}>
-        <div>{value.property}</div>
         <div id="table" className="flex gap-2 rounded-md border">
           {spreadTable.map(({ label, value }) => (
             <div className="flex grow flex-col items-center p-1" key={label}>
@@ -195,7 +193,7 @@ const SubstatSpreadConfig = forwardRef<HTMLDivElement, Props>(
           )}
         </div>
 
-        <div id="setters" className="flex">
+        <div id="setters" className="flex justify-center">
           {spreadAtoms.map((atom, index) => (
             <SpreadConfigBar key={index} atom={atom} spreadInfo={spreadInfo} />
           ))}

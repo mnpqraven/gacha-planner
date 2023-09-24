@@ -3,7 +3,7 @@ import { HTMLAttributes, forwardRef, useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { RelicBox } from "@/app/card/[uid]/_components/relic_block/RelicBox";
 import { SetInfo } from "./SetInfo";
-import { configAtom, relicsStructAtom } from "@/app/card/_store";
+import { configAtom, splitRelicAtom } from "@/app/card/_store";
 import { selectAtom } from "jotai/utils";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {}
@@ -15,7 +15,7 @@ export const RelicInfo = forwardRef<HTMLDivElement, Props>(
     const uid = useAtomValue(
       useMemo(() => selectAtom(configAtom, (atom) => atom.uid), [])
     );
-    const characterRelics = useAtomValue(relicsStructAtom);
+    const splittedRelics = useAtomValue(splitRelicAtom);
 
     return (
       <div
@@ -30,26 +30,14 @@ export const RelicInfo = forwardRef<HTMLDivElement, Props>(
         )}
 
         <div className={cn("grid grid-cols-2 gap-2 place-self-center")}>
-          {characterRelics.map((relic, index) => (
-            <RelicBox
-              data={relic}
-              key={index}
-              active={isActive(relic.setId, characterRelics)}
-            />
+          {splittedRelics.map((atom, index) => (
+            <RelicBox atom={atom} key={index} />
           ))}
         </div>
 
-        <SetInfo relics={characterRelics} />
+        <SetInfo />
       </div>
     );
   }
 );
 RelicInfo.displayName = "RelicInfo";
-
-function isActive<T extends { setId?: number }>(
-  currentSetId: number | undefined,
-  relics: T[]
-) {
-  const count = relics.filter((e) => e.setId == currentSetId).length;
-  return count >= 2;
-}
