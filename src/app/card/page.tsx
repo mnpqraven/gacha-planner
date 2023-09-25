@@ -36,7 +36,6 @@ import { MihomoPlayer } from "./types";
 import STORAGE from "@/server/storage";
 import { Toggle } from "../components/ui/Toggle";
 import { cn } from "@/lib/utils";
-import { Separator } from "../components/ui/Separator";
 import Link from "next/link";
 
 const schema = z.object({

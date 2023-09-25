@@ -1,3 +1,4 @@
+import { img } from "@/lib/utils";
 import Image from "next/image";
 
 interface Props {
@@ -11,7 +12,7 @@ export default function Layout({ children, params }: Props) {
     <main className="grid grid-cols-1 overflow-hidden px-2 pt-4 lg:grid-cols-2">
       <div className="aspect-square">
         <Image
-          src={portraitUrl(characterId)}
+          src={img(`image/character_portrait/${characterId}.png`)}
           width={2048}
           height={2048}
           className="place-self-start object-contain"
@@ -21,8 +22,4 @@ export default function Layout({ children, params }: Props) {
       {children}
     </main>
   );
-}
-
-function portraitUrl(charId: number | string): string {
-  return `https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/image/character_portrait/${charId}.png`;
 }

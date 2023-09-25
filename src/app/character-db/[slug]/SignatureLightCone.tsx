@@ -3,8 +3,8 @@
 import { LightConeCard } from "@/app/lightcone-db/LightConeCard";
 import { Content } from "@/app/lightcone-db/[slug]/Content";
 import { Portrait } from "@/app/lightcone-db/[slug]/Portrait";
-import { useLightConeMetadataMany } from "@/hooks/queries/useLightConeMetadataMany";
-import { useLightConeSkillMany } from "@/hooks/queries/useLightConeSkillMany";
+import { useLightConeMetadatas } from "@/hooks/queries/useLightConeMetadatas";
+import { useLightConeSkills } from "@/hooks/queries/useLightConeSkills";
 import { useSuspendedSignatureAtlas } from "@/hooks/queries/useSignatureAtlas";
 import { IMAGE_URL } from "@/lib/constants";
 import { isEmpty } from "@/lib/utils";
@@ -18,14 +18,14 @@ interface Props {
 const SignatureLightCone = ({ characterId }: Props) => {
   console.log(characterId);
   const { data: atlas } = useSuspendedSignatureAtlas();
-  const lc_ids = atlas?.find((e) => e.charId === characterId)?.lcId ?? [];
-  const { data: lcSkills } = useLightConeSkillMany(lc_ids);
+  const lc_ids = atlas?.find((e) => e.charId === characterId)?.lcId;
+  const { data: lcSkills } = useLightConeSkills(lc_ids);
 
   const [selectedLcId, setSelectedLcId] = useState<number | undefined>(
     undefined
   );
 
-  const { data: lcMetadatas } = useLightConeMetadataMany(lc_ids);
+  const { data: lcMetadatas } = useLightConeMetadatas(lc_ids);
   const metadata = lcMetadatas?.find((e) => e.equipment_id == selectedLcId);
   const skill = lcSkills?.find((e) => e.skill_id == metadata?.skill_id);
 

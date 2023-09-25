@@ -15,14 +15,22 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "../components/ui/HoverCard";
-import { useContext } from "react";
-import { JadeEstimateFormContext } from "./formProvider";
 import { JadeEstimateResponse } from "@grpc/jadeestimate_pb";
 import { placeholderTableData } from "./defaultTableData";
 import { PlainMessage } from "@bufbuild/protobuf";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useAtomValue } from "jotai";
+import { estimateFormAtom } from "./_store/main";
+import { rpc } from "@/server/typedEndpoints";
+import { JadeEstimateService } from "@grpc/jadeestimate_connect";
 
 const JadeRewardTable = () => {
-  const { rewardTable } = useContext(JadeEstimateFormContext);
+  const formPayload = useAtomValue(estimateFormAtom);
+  const { data: rewardTable } = useQuery({
+    queryKey: ["jadeEstimate", formPayload],
+    queryFn: async () => await rpc(JadeEstimateService).post(formPayload),
+    placeholderData: keepPreviousData,
+  });
   const data = rewardTable ?? placeholderTableData;
 
   return (

@@ -5,7 +5,6 @@ import {
   TabsTrigger,
 } from "@/app/components/ui/Tabs";
 import { CharacterEditorTab } from "./_tabs/CharacterEditorTab";
-import { StateProvider } from "../StateProvider";
 import { LightConeEditorTab } from "./_tabs/LightConeEditorTab";
 import { RelicEditorTab } from "./_tabs/RelicEditorTab";
 import {
@@ -26,6 +25,7 @@ import {
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
 import { Separator } from "@/app/components/ui/Separator";
+import { StateProvider } from "@/app/components/StateProvider";
 
 export default async function ProfileCard() {
   return (

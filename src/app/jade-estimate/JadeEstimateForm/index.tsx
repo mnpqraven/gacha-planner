@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { cn } from "@/lib/utils";
+import { cn, range } from "@/lib/utils";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -28,8 +28,8 @@ import {
   SelectValue,
 } from "../../components/ui/Select";
 import { Calendar } from "../../components/ui/Calendar";
-import { useContext, useEffect, useState } from "react";
-import { dateToISO, objToDate } from "../../components/schemas";
+import { useEffect, useMemo, useState } from "react";
+import { objToDate } from "../../components/schemas";
 import { useFuturePatchDateList } from "@/hooks/queries/useFuturePatchDate";
 import {
   CommandEmpty,
@@ -40,25 +40,24 @@ import {
   CommandDialog,
 } from "../../components/ui/Command";
 import equal from "fast-deep-equal/react";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
-import STORAGE from "@/server/storage";
-import { useFuturePatchBannerList } from "@/hooks/queries/useFuturePatchBanner";
 import { CalendarFooter } from "./CalendarFooter";
 import { CurrentRollTab } from "./CurrentRollTab";
 import { RailPassField } from "./RailPassField";
 import { BattlePassField } from "./BattlePassField";
 import { Switch } from "../../components/ui/Switch";
 import { PartialMessage } from "@bufbuild/protobuf";
-import {
-  BattlePassType,
-  EqTier,
-  JadeEstimateCfg,
-  Server,
-} from "@grpc/jadeestimate_pb";
-import { JadeEstimateFormContext } from "@/app/jade-estimate/formProvider";
+import { EqTier, JadeEstimateCfg, Server } from "@grpc/jadeestimate_pb";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { schema } from "./schema";
 import { useCacheValidate } from "@/hooks/useCacheValidate";
+import { useAtom } from "jotai";
+import {
+  defaultValues,
+  estimateFormAtom,
+  selectedCalendarDateAtom,
+  selectedMonthAtom,
+} from "../_store/main";
+import { Patch } from "@/bindings/Patch";
 
 type Props = {
   submitButton?: boolean;
@@ -66,65 +65,34 @@ type Props = {
 
 type FormSchema = PartialMessage<JadeEstimateCfg>;
 
-export const defaultValues: PartialMessage<JadeEstimateCfg> = {
-  server: Server.America,
-  untilDate: dateToISO.parse(new Date()),
-  battlePass: { battlePassType: BattlePassType.None, currentLevel: 0 },
-  railPass: {
-    useRailPass: false,
-    daysLeft: 30,
-  },
-  eq: EqTier.Zero,
-  moc: 0,
-  mocCurrentWeekDone: true,
-  currentRolls: 0,
-};
-
 export default function JadeEstimateForm({ submitButton = false }: Props) {
-  const [uncontrolledDate, setUncontrolledDate] = useState<Date>(new Date());
-  const [monthController, setMonthController] = useState<Date | undefined>(
-    uncontrolledDate
-  );
-  const [storagedForm, setStoragedForm] = useLocalStorage<
-    FormSchema | undefined
-  >(STORAGE.jadeEstimateForm, undefined);
-
   const [open, setOpen] = useState(false);
+  const [beforeFirstRender, setBeforeFirstRender] = useState(true);
+  // INFO: month marker on calendar
+  const [selectedCalendarDate, setSelectedCalendarDate] = useAtom(
+    selectedCalendarDateAtom
+  );
 
-  // FORM SETUP
+  const [monthController, setMonthController] = useAtom(selectedMonthAtom);
+
+  // INFO: localStorage managed by Jotai store
+  const [storagedForm, setStoragedForm] = useAtom(estimateFormAtom);
+
+  // INFO: FORM SETUP
   const form = useForm<JadeEstimateCfg>({
     resolver: zodResolver(schema),
     defaultValues,
   });
+
   const debounceOnChange = useDebounce(form.handleSubmit(onSubmit), 300);
   const untilDateSubscription = form.watch("untilDate");
 
   const server = form.watch("server"); // 0 asia 1 america
-  // console.log("server", server);
   const { futurePatchDateList: binding } = useFuturePatchDateList();
-  // console.log("binding", binding);
-  // const { futurePatchBannerList } = useFuturePatchBannerList();
-
-  const asia_us_diff = 10 * 60 * 60 * 1000; // h m s ms
-
-  const futurePatchDateList =
-    server == 0
-      ? binding
-      : binding.map((e) => ({
-          ...e,
-          date2ndBanner: new Date(
-            new Date(e.date2ndBanner).getTime() + asia_us_diff
-          ).toISOString(),
-          dateEnd: new Date(
-            new Date(e.dateEnd).getTime() + asia_us_diff
-          ).toISOString(),
-          dateStart: new Date(
-            new Date(e.dateStart).getTime() + asia_us_diff
-          ).toISOString(),
-        }));
-  // console.log("transformed", futurePatchDateList);
-
-  const { updateForm } = useContext(JadeEstimateFormContext);
+  const futurePatchDateList = useMemo(
+    () => getPatchDates(binding, server),
+    [binding, server]
+  );
 
   useCacheValidate({
     schema,
@@ -141,22 +109,15 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
   }, [untilDateSubscription]);
 
   useEffect(() => {
-    if (storagedForm) {
+    if (storagedForm && beforeFirstRender) {
       form.reset(storagedForm);
-
-      {
-        // update date states for calendar footer
-        const updatedDate = objToDate.parse(storagedForm.untilDate);
-        setUncontrolledDate(updatedDate);
-        setMonthController(updatedDate);
-      }
-      updateForm(storagedForm);
+      setBeforeFirstRender(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storagedForm]);
 
   function onSubmit(values: FormSchema) {
-    // NOTE: this deep check is importnant
+    // NOTE: this deep check is important
     if (!equal(values, defaultValues) && !equal(values, storagedForm)) {
       setStoragedForm(values);
     }
@@ -166,10 +127,10 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
     // today
     if (date === "0") {
       let nextDate = new Date();
-      setUncontrolledDate(nextDate);
+      setSelectedCalendarDate(nextDate);
       setMonthController(nextDate);
     } else {
-      setUncontrolledDate(new Date(date));
+      setSelectedCalendarDate(new Date(date));
       setMonthController(new Date(date));
     }
     setOpen(false);
@@ -294,11 +255,11 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
                       <Calendar
                         className="py-0"
                         mode="single"
-                        selected={uncontrolledDate}
+                        selected={selectedCalendarDate}
                         onSelect={(e) => {
                           if (e) {
-                            setUncontrolledDate(e);
-                            dateField.onChange(dateToISO.parse(e));
+                            setSelectedCalendarDate(e);
+                            // dateField.onChange(dateToISO.parse(e));
                           }
                         }}
                         disabled={beforeToday}
@@ -327,7 +288,7 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
                             textUnderlinePosition: "under",
                           },
                         }}
-                        footer={<CalendarFooter date={uncontrolledDate} />}
+                        footer={<CalendarFooter date={selectedCalendarDate} />}
                         initialFocus
                       />
                     </PopoverContent>
@@ -461,6 +422,23 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
   );
 }
 
+function getPatchDates(patches: Patch[], server: Server) {
+  const asia_us_diff = 10 * 60 * 60 * 1000; // h m s ms
+  if (server == Server.Asia) return patches;
+  return patches.map((e) => ({
+    ...e,
+    date2ndBanner: new Date(
+      new Date(e.date2ndBanner).getTime() + asia_us_diff
+    ).toISOString(),
+    dateEnd: new Date(
+      new Date(e.dateEnd).getTime() + asia_us_diff
+    ).toISOString(),
+    dateStart: new Date(
+      new Date(e.dateStart).getTime() + asia_us_diff
+    ).toISOString(),
+  }));
+}
+
 function beforeToday(date: Date): boolean {
   const b = new Date();
   b.setHours(0);
@@ -470,12 +448,6 @@ function beforeToday(date: Date): boolean {
   return date < b;
 }
 
-function* range(start: number, end: number, step: number) {
-  while (start <= end) {
-    yield start;
-    start += step;
-  }
-}
 function mocStars(): number[] {
   return Array.from(range(0, 30, 3));
 }

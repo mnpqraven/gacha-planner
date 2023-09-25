@@ -9,16 +9,19 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 
-export const optionsLightConeMetadataMany = (lightConeIds: number[]) =>
+export const optionsLightConeMetadataMany = (
+  lightConeIds: number[] | undefined
+) =>
   queryOptions<List<EquipmentConfig>, unknown, EquipmentConfig[]>({
     queryKey: ["lightConeMetadata", lightConeIds],
     queryFn: async () =>
-      await API.lightConeMetadataMany.post({ list: lightConeIds }),
+      await API.lightConeMetadataMany.post({ list: lightConeIds! }),
     select: (data) => data.list,
+    enabled: !!lightConeIds,
   });
 
-export function useLightConeMetadataMany(
-  lightConeIds: number[],
+export function useLightConeMetadatas(
+  lightConeIds: number[] | undefined,
   opt: Options = {}
 ) {
   const query = useQuery({

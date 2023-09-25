@@ -15,21 +15,13 @@ import { Checkbox } from "../ui/Checkbox";
 import { useImmer } from "use-immer";
 import { useEffect } from "react";
 import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
+import { Path } from "@/bindings/AvatarConfig";
 
 const DEBUG = true;
 
 type Props = {
   characterId: number;
   wrapperSize?: number;
-  // maxEnergy: number;
-  // path:
-  //   | "Erudition"
-  //   | "Nihility"
-  //   | "Destruction"
-  //   | "Hunt"
-  //   | "Preservation"
-  //   | "Harmony"
-  //   | "Abundance";
   editMode?: boolean;
   onChange?: (data: Record<number, boolean>) => void;
 };
@@ -40,7 +32,7 @@ const TraceTable = ({
   editMode = false,
   onChange,
 }: Props) => {
-  const { data } = useCharacterMetadata();
+  const { data } = useCharacterMetadata(characterId);
   const [editModeTable, setEditModeTable] = useImmer<Record<number, boolean>>(
     {}
   );
@@ -94,6 +86,8 @@ const TraceTableInner = ({
   onCheckedChange,
 }: Omit<Props, "onChange"> & {
   onCheckedChange: (checked: boolean, pointId: number) => void;
+  path: Path;
+  maxEnergy: number;
 }) => {
   const updateLines = useXarrow();
   const { theme } = useTheme();

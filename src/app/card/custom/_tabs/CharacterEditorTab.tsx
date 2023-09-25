@@ -30,16 +30,9 @@ export const CharacterEditorTab = forwardRef<
   const { data: chara } = useCharacterMetadata(charId);
   const { characterList } = useCharacterList();
   const [open, setOpen] = useState(false);
-  const filter = useCharacterFilter();
+  const { filter } = useCharacterFilter();
 
   const sorted = characterList
-    .sort((a, b) => {
-      return (
-        b.rarity - a.rarity ||
-        a.avatar_name.localeCompare(b.avatar_name) ||
-        a.avatar_votag.localeCompare(b.avatar_votag)
-      );
-    })
     .filter(filter.byElement)
     .filter(filter.byPath)
     .filter(filter.byRarity);

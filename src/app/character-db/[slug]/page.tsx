@@ -18,7 +18,6 @@ import { SignatureLightCone } from "./SignatureLightCone";
 import { Suspense } from "react";
 import getQueryClient from "@/lib/queryClientHelper";
 import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
-import { optionsSignatureAtlas } from "@/hooks/queries/useSignatureAtlas";
 import { optionsCharacterEidolon } from "@/hooks/queries/useCharacterEidolon";
 import { optionsCharacterTrace } from "@/hooks/queries/useCharacterTrace";
 import { optionsProperties } from "@/hooks/queries/useProperties";

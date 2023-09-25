@@ -4,7 +4,7 @@ import { LineupSelector } from "./_components/LineupSelector";
 import { Share } from "./_components/Share";
 import { LANGS } from "@/lib/constants";
 import { DisplayCard } from "../custom/_viewer/DisplayCard";
-import { StateProvider } from "../StateProvider";
+import { StateProvider } from "@/app/components/StateProvider";
 
 interface Props {
   params: { uid: string };

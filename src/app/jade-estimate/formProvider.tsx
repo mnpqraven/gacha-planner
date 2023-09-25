@@ -1,13 +1,13 @@
 "use client";
 
 import { ReactNode, createContext, useState } from "react";
-import { defaultValues } from "./JadeEstimateForm";
 import { PartialMessage } from "@bufbuild/protobuf";
 import { JadeEstimateCfg, JadeEstimateResponse } from "@grpc/jadeestimate_pb";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { rpc } from "@/server/typedEndpoints";
 import { JadeEstimateService } from "@grpc/jadeestimate_connect";
 import { placeholderTableData } from "./defaultTableData";
+import { defaultValues } from "./_store/main";
 
 interface JadeEstimateFormContextPayload {
   rewardTable: JadeEstimateResponse | undefined;
@@ -30,7 +30,6 @@ function useJadeEstimateForm(): JadeEstimateFormContextPayload {
   const { data: rewardTable, isLoading } = useQuery({
     queryKey: ["jadeEstimate", formPayload],
     queryFn: async () => await rpc(JadeEstimateService).post(formPayload),
-    // initialData: new JadeEstimateResponse(placeholderTableData),
     placeholderData: keepPreviousData,
   });
 

@@ -9,31 +9,31 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 
-export const optionsLightConeSkillMany = (ids: number[]) =>
+export const optionsLightConeSkills = (lcIds: number[] | undefined) =>
   queryOptions<List<EquipmentSkillConfig>, unknown, EquipmentSkillConfig[]>({
-    queryKey: ["lightConeSkill", ids],
-    queryFn: async () => await API.lightConeSkillMany.post({ list: ids }),
+    queryKey: ["lightConeSkill", lcIds],
+    queryFn: async () => await API.lightConeSkillMany.post({ list: lcIds! }),
     select: (data) => data.list,
+    enabled: !!lcIds,
   });
 
-export function useLightConeSkillMany(
+export function useLightConeSkills(
   lightConeIds: number[] | undefined,
   opt: Options = {}
 ) {
   const query = useQuery({
-    ...optionsLightConeSkillMany(lightConeIds ?? []),
-    enabled: !!lightConeIds,
+    ...optionsLightConeSkills(lightConeIds),
     ...opt,
   });
   return query;
 }
 
-export function useSuspendedLightConeSkillMany(
+export function useSuspendedLightConeSkills(
   lightConeIds: number[],
   opt: SuspendedOptions = {}
 ) {
   const query = useSuspenseQuery({
-    ...optionsLightConeSkillMany(lightConeIds),
+    ...optionsLightConeSkills(lightConeIds),
     ...opt,
   });
   return query;
