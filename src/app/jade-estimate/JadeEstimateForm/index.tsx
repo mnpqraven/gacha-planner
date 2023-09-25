@@ -326,27 +326,11 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value={String(EqTier.Zero)}>
-                      0 (TL 20-)
-                    </SelectItem>
-                    <SelectItem value={String(EqTier.One)}>
-                      1 (TL 20+)
-                    </SelectItem>
-                    <SelectItem value={String(EqTier.Two)}>
-                      2 (TL 30+)
-                    </SelectItem>
-                    <SelectItem value={String(EqTier.Three)}>
-                      3 (TL 40+)
-                    </SelectItem>
-                    <SelectItem value={String(EqTier.Four)}>
-                      4 (TL 50+)
-                    </SelectItem>
-                    <SelectItem value={String(EqTier.Five)}>
-                      5 (TL 60+)
-                    </SelectItem>
-                    <SelectItem value={String(EqTier.Six)}>
-                      6 (TL 65+)
-                    </SelectItem>
+                    {tbLevels.map(({ value, label }) => (
+                      <SelectItem value={String(value)} key={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -421,6 +405,16 @@ export default function JadeEstimateForm({ submitButton = false }: Props) {
     </Form>
   );
 }
+
+const tbLevels = [
+  { value: EqTier.Zero, label: "0 (TL 20-)" },
+  { value: EqTier.One, label: "1 (TL 20+)" },
+  { value: EqTier.Two, label: "2 (TL 30+)" },
+  { value: EqTier.Three, label: "3 (TL 40+)" },
+  { value: EqTier.Four, label: "4 (TL 50+)" },
+  { value: EqTier.Five, label: "5 (TL 60+)" },
+  { value: EqTier.Six, label: "6 (TL 65+)" },
+];
 
 function getPatchDates(patches: Patch[], server: Server) {
   const asia_us_diff = 10 * 60 * 60 * 1000; // h m s ms
