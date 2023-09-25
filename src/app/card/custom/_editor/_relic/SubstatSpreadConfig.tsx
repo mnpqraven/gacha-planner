@@ -2,9 +2,9 @@ import { Button } from "@/app/components/ui/Button";
 import { Input } from "@/app/components/ui/Input";
 import { Toggle } from "@/app/components/ui/Toggle";
 import { Property } from "@/bindings/RelicMainAffixConfig";
-import { isPropertyPercent } from "@/lib/propertyHelper";
+import { isPropertyPercent, prettyProperty } from "@/lib/propertyHelper";
 import { asPercentage, cn, range } from "@/lib/utils";
-import { PrimitiveAtom, atom, useAtomValue } from "jotai";
+import { PrimitiveAtom, atom, useAtom, useAtomValue } from "jotai";
 import { splitAtom } from "jotai/utils";
 import { Check, Pencil } from "lucide-react";
 import {
@@ -24,82 +24,45 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   spreadData: RelicSubAffixConfig[];
 }
 
-/** Text representation of the substat's value */
-// const valueAsStringAtom = atom({ text: "0", percent: false });
-// const substatValueAtom = atom(
-//   (get) =>
-//     parseFloat(get(valueAsStringAtom).text) /
-//     (get(valueAsStringAtom).percent ? 100 : 1),
-//   (get, set, update: number) => {
-//     set(valueAsStringAtom, {
-//       text: update.toFixed(2),
-//       percent: get(valueAsStringAtom).percent,
-//     });
-//     set(substatValueAtom, update);
-//   }
-// );
-
-// const spreadRollsAtoms = atom(
-//   Array.from(range(0, 5)).fill(0),
-//   (get, set, next: number[] | ((prev: number[]) => number[])) => {
-//     const list = Array.isArray(next) ? next : next(get(spreadRollsAtoms));
-//     set(spreadRollsAtoms, list);
-//     // INFO: update the hidden input value when spread if changed from
-//     // pressing roll buttons
-//     const sum = list.reduce((a, b) => a + b, 0);
-//     const { percent } = get(valueAsStringAtom);
-//     set(valueAsStringAtom, {
-//       text: (sum * (percent ? 100 : 1)).toFixed(2),
-//       percent,
-//     });
-//   }
-// );
-
-// const spreadAtomList = splitAtom(spreadRollsAtoms);
-
 const SubstatSpreadConfig = forwardRef<HTMLDivElement, Props>(
   ({ atom: atomm, spreadData, setId, className, ...props }, ref) => {
-    // const spreadAtoms = useAtomValue(spreadAtomList);
-    // INFO: separate atom for every child item
-    // const [valueLocalAtom] = useState(substatValueAtom);
-    // const [valueAsStringLocalAtom] = useState(valueAsStringAtom)
-    // const [spreadLocalAtom] = useState(spreadRollsAtoms);
-
     // should only set this in 2 spots, once on input checkbox, once on roll buttons
     const value = useAtomValue(atomm);
+    const [message, setMessage] = useState<string | undefined>(undefined);
     const spreadInfo = spreadData?.find((e) => e.property == value?.property);
-    const expensiveCalc = useMemo(
+    const defaultSpreadRolls = useMemo(
       () =>
         calculateSpread({
-          strategy: "TOPDOWN",
           spreadData: spreadInfo!,
           value: value?.value,
-        }),
+        }).rolls,
       [spreadInfo, value?.value]
     );
-    const [spreadLocalAtom] = useState(
-      atom(expensiveCalc, (get, set, next: number[]) => {
-        set(spreadLocalAtom, next);
-        const got = get(atomm);
-        if (!!got) {
-          set(atomm, {
-            property: got.property,
-            step: next.filter((e) => e > 0).length,
-            value: next.reduce((a, b) => a + b, 0),
-          });
-        }
-      })
+    const spreadLocalAtom = useMemo(
+      () =>
+        atom(defaultSpreadRolls, (get, set, next: number[]) => {
+          set(spreadLocalAtom, next);
+          const got = get(atomm);
+          if (!!got) {
+            set(atomm, {
+              property: got.property,
+              step: next.filter((e) => e > 0).length,
+              value: next.reduce((a, b) => a + b, 0),
+            });
+          }
+        }),
+      []
     );
-    const [spreadSplittedLocalAtom] = useState(splitAtom(spreadLocalAtom));
-    const readOnlySpread = useAtomValue(spreadLocalAtom);
+    const spreadSplittedLocalAtom = useMemo(
+      () => splitAtom(spreadLocalAtom),
+      []
+    );
+    const [readOnlySpread, setSpread] = useAtom(spreadLocalAtom);
     const spreadAtoms = useAtomValue(spreadSplittedLocalAtom);
-    // const [valueAsString, setValueAsString] = useAtom(valueAsStringLocalAtom);
-    // const [spread, setSpread] = useAtom(spreadLocalAtom);
     const [valueAsString, setValueAsString] = useState({
       text: getDefaultTextValue(value?.value, value?.property),
       percent: false,
     });
-    console.log("render");
 
     const [disabled, setDisabled] = useState(true);
 
@@ -112,22 +75,8 @@ const SubstatSpreadConfig = forwardRef<HTMLDivElement, Props>(
           text: (value.value * (percent ? 100 : 1)).toFixed(2),
           percent,
         });
-
-        // setSpread((draft) => draft.map((e, i) => (i == 0 ? defaultValue : e)));
       }
 
-      return () => {
-        // if (!!propertyType) {
-        //   const value = spread.reduce((a, b) => a + b, 0);
-        //   const step = spread.filter((e) => e > 0).length;
-        //   console.log("debug spread", spread, "value and step", value, step);
-        //   setParentA({
-        //     property: propertyType,
-        //     value: spread.reduce((a, b) => a + b, 0),
-        //     step: spread.filter((e) => e > 0).length,
-        //   });
-        // }
-      };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [value]);
 
@@ -148,8 +97,28 @@ const SubstatSpreadConfig = forwardRef<HTMLDivElement, Props>(
       }
     };
 
+    const onUserInputConfirm = () => {
+      const parsed = valueAsString.percent
+        ? Number(valueAsString.text) / 100
+        : Number(valueAsString.text);
+      const { valid, message, rolls } = calculateSpread({
+        spreadData: spreadInfo,
+        value: parsed,
+      });
+      setMessage(message);
+
+      if (valid) {
+        setSpread(rolls);
+        setDisabled(!disabled);
+      }
+    };
+
     return (
-      <div ref={ref} className={cn(className, "flex w-96 flex-col")} {...props}>
+      <div
+        ref={ref}
+        className={cn(className, "flex w-96 flex-col gap-2")}
+        {...props}
+      >
         <div id="table" className="flex gap-2 rounded-md border">
           {spreadTable.map(({ label, value }) => (
             <div className="flex grow flex-col items-center p-1" key={label}>
@@ -160,10 +129,10 @@ const SubstatSpreadConfig = forwardRef<HTMLDivElement, Props>(
         </div>
 
         {/* spread buttons */}
-        <div id="edit-row" className="flex items-center gap-2">
+        <div id="edit-row" className="flex items-center justify-center gap-2">
           {!disabled ? (
             <Input
-              className="w-24"
+              className="w-20"
               disabled={disabled}
               value={valueAsString.text}
               onChange={(e) => onUserInputChange(e.target.value)}
@@ -185,13 +154,14 @@ const SubstatSpreadConfig = forwardRef<HTMLDivElement, Props>(
           {!disabled && (
             <Button
               className="bg-green-700 px-2 hover:bg-green-700/90"
-              type="submit"
-              // onClick={() => calculateSpread("TOPDOWN")}
+              onClick={onUserInputConfirm}
             >
               <Check />
             </Button>
           )}
         </div>
+
+        <div className="text-center text-destructive">{message}</div>
 
         <div id="setters" className="flex justify-center">
           {spreadAtoms.map((atom, index) => (
@@ -211,10 +181,6 @@ function getSumValue(numbers: number[], isPercent: boolean) {
 
 export { SubstatSpreadConfig };
 
-// substatValueAtom.debugLabel = "substatValueRelicAtom";
-// spreadRollsAtoms.debugLabel = "spreadRollsRelicAtoms";
-// spreadAtomList.debugLabel = "spreadRelicAtomList";
-
 function getDefaultTextValue(
   value: number | undefined,
   prop: Property | undefined
@@ -228,32 +194,77 @@ function getDefaultTextValue(
  * take the substat value and return the corresponding spread values
  */
 function calculateSpread({
-  strategy,
   value,
   spreadData,
 }: {
-  strategy: "EQUAL" | "TOPDOWN";
   value: number | undefined;
   spreadData: RelicSubAffixConfig;
-}) {
-  console.log("autoCalculateSpread");
-  if (!value) return Array.from(range(0, 5)).fill(0);
-  let toUpdate: number[] = [];
-  if (strategy == "TOPDOWN") {
-    while (value > 0) {
-      const maxRoll = getSpreadValues(spreadData).maxRoll.value;
-      toUpdate.push(value >= maxRoll ? maxRoll : value);
-      value -= maxRoll;
-    }
-  } else {
-    while (value > 0) {
-      const midRoll = getSpreadValues(spreadData).midRoll.value;
-      toUpdate.push(value >= midRoll ? midRoll : value);
-      value -= midRoll;
-    }
+}): { valid: boolean; rolls: number[]; message?: string } {
+  if (!value)
+    return {
+      valid: false,
+      rolls: Array.from(range(0, 5)).fill(0),
+      message: "Value is empty",
+    };
+  // calculates how many rolls would it take for @params value
+  const absMin = getSpreadValues(spreadData).minRoll.value;
+  const absMax = getSpreadValues(spreadData).maxRoll.value;
+  let approxRolls = 0;
+  let dummyVal = { min: 0, max: 0 };
+  while (true) {
+    approxRolls += 1;
+    dummyVal.max += absMax;
+    dummyVal.min += absMin;
+    if (value >= dummyVal.min && value <= dummyVal.max) break;
   }
-  console.log("toUpdate", toUpdate);
-  return Array.from(range(0, 5)).map((i) => toUpdate.at(i) ?? 0);
+
+  if (approxRolls > 6)
+    return {
+      valid: false,
+      rolls: Array.from(range(0, 5)).fill(0),
+      message: `Please enter value between ${
+        prettyProperty(spreadData.property, absMin * 1).prettyValue
+      } and ${prettyProperty(spreadData.property, absMax * 6).prettyValue}`,
+    };
+
+  // INFO: top down strategy
+  let toUpdate: number[] = [];
+  let tempVal = value;
+  while (tempVal > 0) {
+    const maxRoll = getSpreadValues(spreadData).maxRoll.value;
+    toUpdate.push(tempVal >= maxRoll ? maxRoll : tempVal);
+    tempVal -= maxRoll;
+  }
+
+  // see if top down strategy is valid
+  const isValid = !!toUpdate.at(-1) ? toUpdate.at(-1)! >= absMin : false;
+
+  if (isValid)
+    return {
+      valid: true,
+      rolls: Array.from(range(0, 5)).map((i) => toUpdate.at(i) ?? 0),
+    };
+
+  // even strategy
+  const mean = value / approxRolls;
+  const rolls = Array.from({ length: 5 }).map((_, i) =>
+    i < approxRolls ? mean : 0
+  );
+  const valid = rolls
+    .filter((num) => num !== 0)
+    .every((num) => num <= absMax && num >= absMin);
+
+  return {
+    valid,
+    rolls,
+    message: valid
+      ? undefined
+      : `Please enter value between ${
+          prettyProperty(spreadData.property, absMin * approxRolls).prettyValue
+        } and ${
+          prettyProperty(spreadData.property, absMax * approxRolls).prettyValue
+        }`,
+  };
 }
 
 function getSpreadValues({
