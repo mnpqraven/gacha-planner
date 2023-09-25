@@ -23,7 +23,7 @@ import {
 } from "../components/ui/Select";
 import { Loader2, Pin, PinOff } from "lucide-react";
 import { useMihomoInfo } from "./[uid]/useMihomoInfo";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PlayerCard } from "./PlayerCard";
 import { useRouter } from "next/navigation";
 import {
@@ -31,12 +31,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "../components/ui/Tooltip";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { MihomoPlayer } from "./types";
-import STORAGE from "@/server/storage";
 import { Toggle } from "../components/ui/Toggle";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { PrimitiveAtom, atom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import { cachedProfileAtoms, cachedProfilesAtom } from "./_store/main";
 
 const schema = z.object({
   uid: z
@@ -61,10 +60,13 @@ export default function Profile() {
   const [prof, setProf] = useState(defaultValues);
   const { query, prefetch } = useMihomoInfo(prof);
   const router = useRouter();
-  const [playerProfiles, setPlayerProfiles] = useLocalStorage<MihomoPlayer[]>(
-    STORAGE.playerProfiles,
-    []
+
+  const playerProfileAtoms = useAtomValue(cachedProfileAtoms);
+  const queryProfileAtom = useMemo(
+    () => atom(query.data?.player),
+    [query.data]
   );
+  const queryProfile = useAtomValue(queryProfileAtom);
 
   function onSubmit(values: FormSchema) {
     setProf(values);
@@ -151,34 +153,22 @@ export default function Profile() {
       </Form>
 
       {query.isLoading && <Loader2 className="mr-1 animate-spin" />}
-      {query.data && (
+      {!!queryProfile && (
         <div className="flex items-center gap-3">
-          <PinProfileButton
-            profile={query.data.player}
-            storage={playerProfiles ?? []}
-            onStorageUpdate={setPlayerProfiles}
-          />
+          <PinProfileButton atom={queryProfileAtom} />
 
-          <PlayerCard
-            player={query.data.player}
-            uid={prof.uid}
-            lang={form.watch("lang")}
-          />
+          <PlayerCard atom={queryProfileAtom} lang={form.watch("lang")} />
         </div>
       )}
-      {playerProfiles && playerProfiles.length > 0 && (
+      {playerProfileAtoms.length > 0 && (
         <>
           <h1 className="my-4">Saved Profile</h1>
           <div className="flex flex-col gap-4">
-            {playerProfiles.map((profile) => (
-              <div className="flex items-center gap-3" key={profile.uid}>
-                <PinProfileButton
-                  profile={profile}
-                  storage={playerProfiles ?? []}
-                  onStorageUpdate={setPlayerProfiles}
-                />
+            {playerProfileAtoms.map((profileAtom, index) => (
+              <div className="flex items-center gap-3" key={index}>
+                <UnpinButton atom={profileAtom} />
 
-                <PlayerCard player={profile} uid={profile.uid} lang="en" />
+                <PlayerCard atom={profileAtom} />
               </div>
             ))}
           </div>
@@ -188,63 +178,62 @@ export default function Profile() {
   );
 }
 
-function PinProfileButton({
-  profile,
-  storage: playerProfiles,
-  onStorageUpdate,
-}: {
-  profile: MihomoPlayer;
-  storage: MihomoPlayer[];
-  onStorageUpdate: (storage: MihomoPlayer[]) => void;
-}) {
-  const isSaved = (data: MihomoPlayer, storage: MihomoPlayer[] | undefined) =>
-    !!storage?.find((e) => e.uid === data.uid);
+interface PinProps {
+  atom: PrimitiveAtom<MihomoPlayer | undefined>;
+}
+function PinProfileButton({ atom }: PinProps) {
+  const [playerProfiles, setPlayerProfiles] = useAtom(cachedProfilesAtom);
+  // safe define
+  const current = useAtomValue(atom);
+  const find = playerProfiles.find((e) => e.uid == current?.uid);
+  const pressed = !!find;
 
-  function upsertLocalSave(saveState: boolean, data: MihomoPlayer) {
-    let next = !!playerProfiles ? [...playerProfiles] : [];
-    const findIndex = next.findIndex((e) => e.uid == data.uid);
-    if (saveState) {
-      // upsert logic
-      if (findIndex === -1) {
-        // push
-        next = [...next, data];
-      } else {
-        // update
-        next = next.map((profile, index) =>
-          index === findIndex ? data : profile
-        );
-      }
-    } else {
-      const n = !!playerProfiles ? [...playerProfiles] : [];
-      const index = n.findIndex((e) => e.uid === data.uid);
-      n.splice(index, 1);
-      next = n;
+  function updatePin() {
+    if (!!find) {
+      // delete
+      setPlayerProfiles(playerProfiles.filter((e) => e.uid !== current?.uid));
+    } else if (!!current) {
+      // append
+      setPlayerProfiles([...playerProfiles, current]);
     }
-
-    onStorageUpdate(next);
   }
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Toggle onPressedChange={(state) => upsertLocalSave(state, profile)}>
-          <Pin
-            className={cn(
-              "h-4 w-4",
-              isSaved(profile, playerProfiles) ? "hidden" : ""
-            )}
-          />
-          <PinOff
-            className={cn(
-              "h-4 w-4",
-              isSaved(profile, playerProfiles) ? "" : "hidden"
-            )}
-          />
+        <Toggle onPressedChange={updatePin}>
+          {pressed ? (
+            <PinOff className={"h-4 w-4"} />
+          ) : (
+            <Pin className={"h-4 w-4"} />
+          )}
         </Toggle>
       </TooltipTrigger>
-      <TooltipContent>
-        {isSaved(profile, playerProfiles) ? "Unsave" : "Save"} Profile
-      </TooltipContent>
+      <TooltipContent>{pressed ? "Unsave" : "Save"}</TooltipContent>
+    </Tooltip>
+  );
+}
+
+interface UnpinProps {
+  atom: PrimitiveAtom<MihomoPlayer>;
+}
+function UnpinButton({ atom }: UnpinProps) {
+  const setPlayerProfileAtoms = useSetAtom(cachedProfileAtoms);
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Toggle
+          onPressedChange={() => {
+            setPlayerProfileAtoms({
+              type: "remove",
+              atom,
+            });
+          }}
+        >
+          <PinOff className={"h-4 w-4"} />
+        </Toggle>
+      </TooltipTrigger>
+      <TooltipContent>Unsave</TooltipContent>
     </Tooltip>
   );
 }

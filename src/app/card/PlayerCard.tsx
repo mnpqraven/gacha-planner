@@ -6,16 +6,19 @@ import { cn, img } from "@/lib/utils";
 import { Separator } from "../components/ui/Separator";
 import Link from "next/link";
 import { LANGS } from "@/lib/constants";
+import { PrimitiveAtom, useAtomValue } from "jotai";
 
 type Lang = (typeof LANGS)[number];
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
-  player: MihomoPlayer;
-  uid: string;
-  lang: Lang | undefined;
+  atom: PrimitiveAtom<MihomoPlayer | undefined> | PrimitiveAtom<MihomoPlayer>;
+  lang?: Lang;
 }
 export const PlayerCard = forwardRef<HTMLButtonElement, Props>(
-  ({ player, uid, lang, className, ...props }, ref) => {
+  ({ atom, lang = "en", className, ...props }, ref) => {
+    const player = useAtomValue(atom);
     const la = !lang || lang == "en" ? "" : `?lang=${lang}`;
+
+    if (!player) return null;
 
     return (
       <Button
@@ -25,7 +28,7 @@ export const PlayerCard = forwardRef<HTMLButtonElement, Props>(
         {...props}
         asChild
       >
-        <Link href={`card/${uid}${la}`}>
+        <Link href={`card/${player.uid}${la}`}>
           <Image
             src={img(player.avatar.icon)}
             alt={player.avatar.name}

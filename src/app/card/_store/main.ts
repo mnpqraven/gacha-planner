@@ -18,13 +18,19 @@ import {
   ParsedRelicSchema,
   StatParserConstructor,
 } from "@/hooks/useStatParser";
-import { atomWithReducer, selectAtom } from "jotai/utils";
+import {
+  atomWithReducer,
+  atomWithStorage,
+  selectAtom,
+  splitAtom,
+} from "jotai/utils";
 import {
   CardConfig,
   CardConfigAction,
   configReducer,
   initialConfig,
 } from "../[uid]/configReducer";
+import { MihomoPlayer } from "../types";
 
 export const configAtom = atomWithReducer<CardConfig, CardConfigAction>(
   initialConfig,
@@ -63,6 +69,12 @@ export const statParseParam = atom<StatParserConstructor | undefined>((get) => {
     relic: relic as ParsedRelicSchema[],
   };
 });
+
+export const cachedProfilesAtom = atomWithStorage<MihomoPlayer[]>(
+  "playerProfiles",
+  []
+);
+export const cachedProfileAtoms = splitAtom(cachedProfilesAtom);
 
 configAtom.debugLabel = "configAtom";
 statParseParam.debugLabel = "statParseParam";
