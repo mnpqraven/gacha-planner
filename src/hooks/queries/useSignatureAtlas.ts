@@ -7,25 +7,17 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import { SignatureAtlasService } from "@grpc/atlas_connect";
-import { SignatureReturn } from "@grpc/atlas_pb";
+import { SignatureReturn, SignatureReturns } from "@grpc/atlas_pb";
 import { PlainMessage } from "@bufbuild/protobuf";
 
 export const optionsSignatureAtlas = () =>
-  queryOptions<
-    PlainMessage<SignatureReturn>[],
-    unknown,
-    PlainMessage<SignatureReturn>[]
-  >({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+  queryOptions<SignatureReturns, unknown, PlainMessage<SignatureReturn>[]>({
     queryKey: ["signatures"],
-    queryFn: async () =>
-      await rpc(SignatureAtlasService)
-        .list({})
-        .then((data) =>
-          data.list.map(
-            (e) => JSON.parse(e.toJsonString()) as PlainMessage<SignatureReturn>
-          )
-        ),
+    queryFn: async () => await rpc(SignatureAtlasService).list({}),
+    select: (data) =>
+      data.list.map(
+        (e) => JSON.parse(e.toJsonString()) as PlainMessage<SignatureReturn>
+      ),
   });
 
 export function useSignatureAtlas(opt: Options = {}) {
@@ -45,17 +37,13 @@ export function useSuspendedSignatureAtlas(opt: SuspendedOptions = {}) {
 }
 
 type Options = Omit<
-  UseQueryOptions<
-    PlainMessage<SignatureReturn>[],
-    unknown,
-    PlainMessage<SignatureReturn>[]
-  >,
+  UseQueryOptions<SignatureReturns, unknown, PlainMessage<SignatureReturn>[]>,
   "queryKey" | "queryFn" | "select"
 >;
 
 type SuspendedOptions = Omit<
   UseSuspenseQueryOptions<
-    PlainMessage<SignatureReturn>[],
+    SignatureReturns,
     unknown,
     PlainMessage<SignatureReturn>[]
   >,
