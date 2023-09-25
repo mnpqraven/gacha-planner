@@ -14,21 +14,22 @@ import { useCharacterSkill } from "@/hooks/queries/useCharacterSkill";
 import { Checkbox } from "../ui/Checkbox";
 import { useImmer } from "use-immer";
 import { useEffect } from "react";
+import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
 
 const DEBUG = true;
 
 type Props = {
   characterId: number;
   wrapperSize?: number;
-  maxEnergy: number;
-  path:
-    | "Erudition"
-    | "Nihility"
-    | "Destruction"
-    | "Hunt"
-    | "Preservation"
-    | "Harmony"
-    | "Abundance";
+  // maxEnergy: number;
+  // path:
+  //   | "Erudition"
+  //   | "Nihility"
+  //   | "Destruction"
+  //   | "Hunt"
+  //   | "Preservation"
+  //   | "Harmony"
+  //   | "Abundance";
   editMode?: boolean;
   onChange?: (data: Record<number, boolean>) => void;
 };
@@ -36,14 +37,17 @@ type Props = {
 const TraceTable = ({
   characterId,
   wrapperSize = 480,
-  path,
-  maxEnergy,
   editMode = false,
   onChange,
 }: Props) => {
+  const { data } = useCharacterMetadata();
   const [editModeTable, setEditModeTable] = useImmer<Record<number, boolean>>(
     {}
   );
+
+  useEffect(() => {
+    if (!!onChange) onChange(editModeTable);
+  }, [editModeTable, onChange]);
 
   function onCheckedChange(checked: boolean, pointId: number) {
     setEditModeTable((draft) => {
@@ -51,9 +55,9 @@ const TraceTable = ({
     });
   }
 
-  useEffect(() => {
-    if (!!onChange) onChange(editModeTable);
-  }, [editModeTable, onChange]);
+  if (!data) return null;
+
+  const { avatar_base_type: path, spneed: maxEnergy } = data;
 
   return (
     <div

@@ -3,35 +3,32 @@
 import Link from "next/link";
 import { DbFilter } from "../components/Db/DbFilter";
 import Fuse from "fuse.js";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LightConeCard } from "./LightConeCard";
 import useLightConeFilter from "../components/Db/useLightConeFilter";
 import { useRouter } from "next/navigation";
 import { IMAGE_URL } from "@/lib/constants";
 import { useLightConeList } from "@/hooks/queries/useLightConeList";
+import { EquipmentConfig } from "@/bindings/EquipmentConfig";
 
-const LightConeCatalogue = () => {
-  const router = useRouter();
-  const filter = useLightConeFilter();
-  const { data } = useLightConeList();
-  const [searchData, setSearchData] = useState(data);
-  const processedData = searchData
-    .filter(filter.byRarity)
-    .filter(filter.byPath);
+const keys = ["metadata.equipment_name", "metadata.equipment_id", "max_sp"];
+
+function search(data: EquipmentConfig[], query: string | undefined) {
   const fz = new Fuse(data, {
-    keys: ["metadata.equipment_name", "metadata.equipment_id", "max_sp"],
+    keys,
     threshold: 0.4,
   });
 
-  function updateSearch(query: string) {
-    if (query.length > 0) {
-      const res = fz.search(query);
-      setSearchData(res.map((e) => e.item));
-    } else {
-      //reset
-      setSearchData(data);
-    }
-  }
+  if (query?.length) return fz.search(query).map((e) => e.item);
+  else return data;
+}
+const LightConeCatalogue = () => {
+  const router = useRouter();
+  const { filter, query, updateQuery } = useLightConeFilter();
+  const { data } = useLightConeList();
+  const processedData = search(data, query)
+    .filter(filter.byRarity)
+    .filter(filter.byPath);
 
   function onEnter(_query: string) {
     if (processedData.length > 0)
@@ -42,7 +39,7 @@ const LightConeCatalogue = () => {
     <div className="flex flex-col gap-4">
       <DbFilter
         minRarity={4}
-        updateText={updateSearch}
+        updateText={updateQuery}
         onEnterKey={onEnter}
         {...filter}
       />

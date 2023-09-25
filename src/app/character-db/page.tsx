@@ -1,4 +1,3 @@
-import API from "@/server/typedEndpoints";
 import CharacterCatalogue from "./CharacterCatalogue";
 import getQueryClient from "@/lib/queryClientHelper";
 import { optionsCharacterList } from "@/hooks/queries/useCharacterList";
@@ -16,9 +15,9 @@ export default async function CharacterDb() {
 
   return (
     <main className="px-2 py-4 md:container md:px-0">
-      <HydrationBoundary state={dehydratedState}>
-        <CharacterCatalogue />
-      </HydrationBoundary>
+      {/* <HydrationBoundary state={dehydratedState}> */}
+      <CharacterCatalogue />
+      {/* </HydrationBoundary> */}
     </main>
   );
 }

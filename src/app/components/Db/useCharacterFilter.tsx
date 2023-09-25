@@ -5,6 +5,7 @@ export default function useCharacterFilter() {
   const [rarity, setRarity] = useState<number[]>([]);
   const [path, setPath] = useState<Path[]>([]);
   const [element, setElement] = useState<Element[]>([]);
+  const [query, updateQuery] = useState<string | undefined>(undefined);
 
   const rarityFilter = (e: AvatarConfig) => {
     if (rarity.length === 0) return true;
@@ -61,11 +62,15 @@ export default function useCharacterFilter() {
   }
 
   return {
-    byRarity: rarityFilter,
-    byPath: pathFilter,
-    byElement: elementFilter,
-    updateRarity,
-    updatePath,
-    updateElement,
+    filter: {
+      byRarity: rarityFilter,
+      byPath: pathFilter,
+      byElement: elementFilter,
+      updateRarity,
+      updatePath,
+      updateElement,
+    },
+    query,
+    updateQuery,
   };
 }

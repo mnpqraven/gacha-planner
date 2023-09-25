@@ -22,7 +22,9 @@ export const optionsSignatureAtlas = () =>
       await rpc(SignatureAtlasService)
         .list({})
         .then((data) =>
-          data.list.map((e) => e.toJson() as PlainMessage<SignatureReturn>)
+          data.list.map(
+            (e) => JSON.parse(e.toJsonString()) as PlainMessage<SignatureReturn>
+          )
         ),
   });
 

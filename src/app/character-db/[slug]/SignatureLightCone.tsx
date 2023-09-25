@@ -3,31 +3,44 @@
 import { LightConeCard } from "@/app/lightcone-db/LightConeCard";
 import { Content } from "@/app/lightcone-db/[slug]/Content";
 import { Portrait } from "@/app/lightcone-db/[slug]/Portrait";
-import { useSuspendedLightConeMetadataMany } from "@/hooks/queries/useLightConeMetadataMany";
-import { useSuspendedLightConeSkillMany } from "@/hooks/queries/useLightConeSkillMany";
+import { useLightConeMetadataMany } from "@/hooks/queries/useLightConeMetadataMany";
+import { useLightConeSkillMany } from "@/hooks/queries/useLightConeSkillMany";
 import { useSuspendedSignatureAtlas } from "@/hooks/queries/useSignatureAtlas";
 import { IMAGE_URL } from "@/lib/constants";
 import { isEmpty } from "@/lib/utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Loading from "./loading";
 
 interface Props {
   characterId: number;
 }
 
 const SignatureLightCone = ({ characterId }: Props) => {
-  const { data } = useSuspendedSignatureAtlas();
-  const lc_ids = data.find((e) => e.charId === characterId)?.lcId ?? [];
-  const { data: lcMetadatas } = useSuspendedLightConeMetadataMany(lc_ids);
-  const { data: lcSkills } = useSuspendedLightConeSkillMany(lc_ids);
+  console.log(characterId);
+  const { data: atlas } = useSuspendedSignatureAtlas();
+  const lc_ids = atlas?.find((e) => e.charId === characterId)?.lcId ?? [];
+  const { data: lcSkills } = useLightConeSkillMany(lc_ids);
 
-  const [selectedLcId, setSelectedLcId] = useState(lc_ids.at(0));
+  const [selectedLcId, setSelectedLcId] = useState<number | undefined>(
+    undefined
+  );
 
-  const metadata = lcMetadatas.find((e) => e.equipment_id == selectedLcId);
-  const skill = lcSkills.find((e) => e.skill_id == metadata?.skill_id);
+  const { data: lcMetadatas } = useLightConeMetadataMany(lc_ids);
+  const metadata = lcMetadatas?.find((e) => e.equipment_id == selectedLcId);
+  const skill = lcSkills?.find((e) => e.skill_id == metadata?.skill_id);
 
-  if (isEmpty(lcMetadatas) || !metadata || !skill) return null;
+  useEffect(() => {
+    if (!!lcMetadatas) {
+      setSelectedLcId(lcMetadatas.at(0)?.equipment_id);
+    }
+  }, [lcMetadatas]);
 
-  const sortedLcs = lcMetadatas.sort((a, b) => b.rarity - a.rarity);
+  // TODO: make these suspense (optional)
+  if (!lcMetadatas || !metadata || !skill) return <Loading />;
+
+  if (isEmpty(lcMetadatas)) return null;
+
+  const sortedLcs = lcMetadatas?.sort((a, b) => b.rarity - a.rarity);
 
   return (
     <div className="block">
@@ -38,7 +51,7 @@ const SignatureLightCone = ({ characterId }: Props) => {
 
         <div className="col-span-2 flex flex-col">
           <div className="grid grid-cols-4">
-            {sortedLcs.map((lc, index) => (
+            {sortedLcs?.map((lc, index) => (
               <div
                 key={index}
                 onClick={() => setSelectedLcId(lc.equipment_id)}

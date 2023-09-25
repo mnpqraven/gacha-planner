@@ -1,4 +1,3 @@
-import API from "@/server/typedEndpoints";
 import LightConeCatalogue from "./LightConeCatalogue";
 import getQueryClient from "@/lib/queryClientHelper";
 import { optionsLightConeList } from "@/hooks/queries/useLightConeList";
@@ -16,9 +15,9 @@ export default async function LightConeDb() {
 
   return (
     <main className="px-2 py-4 md:container md:px-0">
-      <HydrationBoundary state={dehydratedState}>
-        <LightConeCatalogue />
-      </HydrationBoundary>
+      {/* <HydrationBoundary state={dehydratedState}> */}
+      <LightConeCatalogue />
+      {/* </HydrationBoundary> */}
     </main>
   );
 }

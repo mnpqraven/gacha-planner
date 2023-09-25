@@ -4,6 +4,7 @@ import { useState } from "react";
 export default function useLightConeFilter() {
   const [rarity, setRarity] = useState<number[]>([]);
   const [path, setPath] = useState<Path[]>([]);
+  const [query, updateQuery] = useState<string | undefined>(undefined);
 
   const rarityFilter = (e: EquipmentConfig) => {
     if (rarity.length === 0) return true;
@@ -42,9 +43,13 @@ export default function useLightConeFilter() {
   }
 
   return {
-    byRarity: rarityFilter,
-    byPath: pathFilter,
-    updateRarity,
-    updatePath,
+    filter: {
+      byRarity: rarityFilter,
+      byPath: pathFilter,
+      updateRarity,
+      updatePath,
+    },
+    query,
+    updateQuery,
   };
 }
