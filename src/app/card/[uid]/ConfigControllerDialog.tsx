@@ -133,7 +133,8 @@ export const ConfigControllerSheet = forwardRef<
               options={verbosityOptions}
               valueAccessor={(item) => item.value}
               labelAccessor={(item) => item.label}
-              className="w-32 gap-2"
+              orientation="horizontal"
+              className="w-32"
             />
             <FormInput<CardConfig>
               name="name"

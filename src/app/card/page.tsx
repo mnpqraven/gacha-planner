@@ -1,6 +1,23 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import {
+  ErrorOption,
+  Field,
+  FieldArray,
+  FieldArrayPath,
+  FieldError,
+  FieldErrors,
+  FieldValues,
+  FormState,
+  Path,
+  PathValue,
+  RegisterOptions,
+  SubmitErrorHandler,
+  SubmitHandler,
+  UseFormRegisterReturn,
+  UseFormReturn,
+  useForm,
+} from "react-hook-form";
 import { Input } from "../components/ui/Input";
 import {
   Form,
@@ -23,7 +40,7 @@ import {
 } from "../components/ui/Select";
 import { Loader2, Pin, PinOff } from "lucide-react";
 import { useMihomoInfo } from "./[uid]/useMihomoInfo";
-import { useEffect, useMemo, useState } from "react";
+import { BaseSyntheticEvent, useEffect, useMemo, useState } from "react";
 import { PlayerCard } from "./PlayerCard";
 import { useRouter } from "next/navigation";
 import {
@@ -36,6 +53,7 @@ import { Toggle } from "../components/ui/Toggle";
 import Link from "next/link";
 import { PrimitiveAtom, atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { cachedProfileAtoms, cachedProfilesAtom } from "./_store/main";
+import { FormSelect } from "../components/ui/Form/FormSelect";
 
 const schema = z.object({
   uid: z
@@ -53,13 +71,14 @@ type FormSchema = z.infer<typeof schema>;
 const defaultValues: FormSchema = { uid: "", lang: "en" };
 
 export default function Profile() {
+  const router = useRouter();
   const form = useForm<FormSchema>({
     defaultValues,
     resolver: zodResolver(schema),
   });
+  const { uid: uidError } = form.formState.errors;
   const [prof, setProf] = useState(defaultValues);
   const { query, prefetch } = useMihomoInfo(prof);
-  const router = useRouter();
 
   const playerProfileAtoms = useAtomValue(cachedProfileAtoms);
   const queryProfileAtom = useMemo(
@@ -67,10 +86,6 @@ export default function Profile() {
     [query.data]
   );
   const queryProfile = useAtomValue(queryProfileAtom);
-
-  function onSubmit(values: FormSchema) {
-    setProf(values);
-  }
 
   useEffect(() => {
     if (!!query.data) {
@@ -83,74 +98,22 @@ export default function Profile() {
   }, [query.data]);
 
   return (
-    <main className="flex flex-col items-center">
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="mt-12 flex h-32 flex-col items-center justify-center gap-4 md:flex-row md:items-start"
-        >
-          <FormField
-            name="uid"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>UID</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter your UID..."
-                    className="w-56"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage className="w-56 whitespace-pre-wrap" />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            name="lang"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Language</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {Object.entries(LANG).map(([lang, label]) => (
-                      <SelectItem key={lang} value={lang}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormItem>
-            )}
-          />
-
-          <Button
-            type="submit"
-            className="mt-4 w-fit items-center md:mt-[34px] md:self-start"
-            size="sm"
-          >
+    <main className="flex flex-col items-center gap-12">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-end gap-4">
+          <UidForm form={form} onSubmit={setProf} />
+          <Button type="submit" form="form" size="sm">
             Search
           </Button>
-
           <Link href="/card/custom">
-            <Button
-              variant="outline"
-              className="mt-4 w-fit items-center md:mt-[34px] md:self-start"
-              size="sm"
-            >
+            <Button variant="outline" className="w-fit items-center" size="sm">
               Custom card
             </Button>
           </Link>
-        </form>
-      </Form>
+        </div>
+
+        <div className="text-center text-destructive">{uidError?.message}</div>
+      </div>
 
       {query.isLoading && <Loader2 className="mr-1 animate-spin" />}
       {!!queryProfile && (
@@ -162,7 +125,7 @@ export default function Profile() {
       )}
       {playerProfileAtoms.length > 0 && (
         <>
-          <h1 className="my-4">Saved Profile</h1>
+          <h1>Saved Profile</h1>
           <div className="flex flex-col gap-4">
             {playerProfileAtoms.map((profileAtom, index) => (
               <div className="flex items-center gap-3" key={index}>
@@ -182,20 +145,16 @@ interface PinProps {
   atom: PrimitiveAtom<MihomoPlayer | undefined>;
 }
 function PinProfileButton({ atom }: PinProps) {
-  const [playerProfiles, setPlayerProfiles] = useAtom(cachedProfilesAtom);
+  const [profiles, setProfiles] = useAtom(cachedProfilesAtom);
   // safe define
   const current = useAtomValue(atom);
-  const find = playerProfiles.find((e) => e.uid == current?.uid);
-  const pressed = !!find;
+  const pressed = profiles.find((e) => e.uid == current?.uid);
 
   function updatePin() {
-    if (!!find) {
-      // delete
-      setPlayerProfiles(playerProfiles.filter((e) => e.uid !== current?.uid));
-    } else if (!!current) {
-      // append
-      setPlayerProfiles([...playerProfiles, current]);
-    }
+    // delete
+    if (!!pressed) setProfiles(profiles.filter((e) => e.uid !== current?.uid));
+    // append
+    else if (!!current) setProfiles([...profiles, current]);
   }
 
   return (
@@ -211,6 +170,46 @@ function PinProfileButton({ atom }: PinProps) {
       </TooltipTrigger>
       <TooltipContent>{pressed ? "Unsave" : "Save"}</TooltipContent>
     </Tooltip>
+  );
+}
+
+interface UidFormProps {
+  form: UseFormReturn<FormSchema>;
+  onSubmit: (values: FormSchema) => void;
+}
+function UidForm({ form, onSubmit }: UidFormProps) {
+  return (
+    <Form {...form}>
+      <form
+        id="form"
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="mt-12 flex flex-col items-center justify-center gap-4 md:flex-row md:items-start"
+      >
+        <FormField
+          name="uid"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>UID</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Enter your UID..."
+                  className="w-56"
+                  {...field}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <FormSelect<[string, string], FormSchema>
+          name="lang"
+          label="Language"
+          options={Object.entries(LANG)}
+          valueAccessor={([lang, _]) => lang}
+          labelAccessor={([_, label]) => label}
+        />
+      </form>
+    </Form>
   );
 }
 
