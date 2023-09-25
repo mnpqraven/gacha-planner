@@ -11,13 +11,10 @@ import { SignatureReturn, SignatureReturns } from "@grpc/atlas_pb";
 import { PlainMessage } from "@bufbuild/protobuf";
 
 export const optionsSignatureAtlas = () =>
-  queryOptions<SignatureReturns, unknown, PlainMessage<SignatureReturn>[]>({
+  queryOptions<SignatureReturns, unknown, SignatureReturn[]>({
     queryKey: ["signatures"],
     queryFn: async () => await rpc(SignatureAtlasService).list({}),
-    select: (data) =>
-      data.list.map(
-        (e) => JSON.parse(e.toJsonString()) as PlainMessage<SignatureReturn>
-      ),
+    select: (data) => data.list,
   });
 
 export function useSignatureAtlas(opt: Options = {}) {
@@ -37,15 +34,11 @@ export function useSuspendedSignatureAtlas(opt: SuspendedOptions = {}) {
 }
 
 type Options = Omit<
-  UseQueryOptions<SignatureReturns, unknown, PlainMessage<SignatureReturn>[]>,
+  UseQueryOptions<SignatureReturns, unknown, SignatureReturn[]>,
   "queryKey" | "queryFn" | "select"
 >;
 
 type SuspendedOptions = Omit<
-  UseSuspenseQueryOptions<
-    SignatureReturns,
-    unknown,
-    PlainMessage<SignatureReturn>[]
-  >,
+  UseSuspenseQueryOptions<SignatureReturns, unknown, SignatureReturn[]>,
   "queryKey" | "queryFn" | "select"
 >;

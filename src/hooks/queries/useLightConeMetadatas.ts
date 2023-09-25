@@ -32,7 +32,7 @@ export function useLightConeMetadatas(
   return query;
 }
 
-export function useSuspendedLightConeMetadataMany(
+export function useSuspendedLightConeMetadatas(
   lightConeIds: number[],
   opt: SuspendedOptions = {}
 ) {

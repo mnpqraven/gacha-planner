@@ -3,13 +3,11 @@
 import { LightConeCard } from "@/app/lightcone-db/LightConeCard";
 import { Content } from "@/app/lightcone-db/[slug]/Content";
 import { Portrait } from "@/app/lightcone-db/[slug]/Portrait";
-import { useLightConeMetadatas } from "@/hooks/queries/useLightConeMetadatas";
-import { useLightConeSkills } from "@/hooks/queries/useLightConeSkills";
+import { useSuspendedLightConeMetadatas } from "@/hooks/queries/useLightConeMetadatas";
+import { useSuspendedLightConeSkills } from "@/hooks/queries/useLightConeSkills";
 import { useSuspendedSignatureAtlas } from "@/hooks/queries/useSignatureAtlas";
 import { IMAGE_URL } from "@/lib/constants";
-import { isEmpty } from "@/lib/utils";
-import { useEffect, useState } from "react";
-import Loading from "./loading";
+import { useState } from "react";
 
 interface Props {
   characterId: number;
@@ -19,26 +17,16 @@ const SignatureLightCone = ({ characterId }: Props) => {
   console.log(characterId);
   const { data: atlas } = useSuspendedSignatureAtlas();
   const lc_ids = atlas?.find((e) => e.charId === characterId)?.lcId;
-  const { data: lcSkills } = useLightConeSkills(lc_ids);
 
-  const [selectedLcId, setSelectedLcId] = useState<number | undefined>(
-    undefined
-  );
+  const { data: lcSkills } = useSuspendedLightConeSkills(lc_ids ?? []);
+  const { data: lcMetadatas } = useSuspendedLightConeMetadatas(lc_ids ?? []);
 
-  const { data: lcMetadatas } = useLightConeMetadatas(lc_ids);
-  const metadata = lcMetadatas?.find((e) => e.equipment_id == selectedLcId);
-  const skill = lcSkills?.find((e) => e.skill_id == metadata?.skill_id);
+  const metadata = lcMetadatas.find((e) => e.equipment_id == selectedLcId);
+  const skill = lcSkills.find((e) => e.skill_id == metadata?.skill_id);
 
-  useEffect(() => {
-    if (!!lcMetadatas) {
-      setSelectedLcId(lcMetadatas.at(0)?.equipment_id);
-    }
-  }, [lcMetadatas]);
+  const [selectedLcId, setSelectedLcId] = useState(lc_ids?.at(0));
 
-  // TODO: make these suspense (optional)
-  if (!lcMetadatas || !metadata || !skill) return <Loading />;
-
-  if (isEmpty(lcMetadatas)) return null;
+  if (!metadata || !skill) return null;
 
   const sortedLcs = lcMetadatas?.sort((a, b) => b.rarity - a.rarity);
 

@@ -43,6 +43,7 @@ type Options = Omit<
   UseQueryOptions<List<EquipmentSkillConfig>, unknown, EquipmentSkillConfig[]>,
   "queryKey" | "queryFn"
 >;
+
 type SuspendedOptions = Omit<
   UseSuspenseQueryOptions<
     List<EquipmentSkillConfig>,

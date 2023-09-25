@@ -32,7 +32,7 @@ function Content({ data, skill, link = false }: Props) {
               {link ? (
                 <Link
                   href={`/lightcone-db/${data.equipment_id}`}
-                  className="hover:underline flex items-center"
+                  className="flex items-center hover:underline"
                 >
                   {data.equipment_name}
                   <ExternalLink className="ml-1 h-4 w-4" />
@@ -43,8 +43,6 @@ function Content({ data, skill, link = false }: Props) {
             </CardTitle>
             <CardDescription>{skill.skill_name}</CardDescription>
           </CardHeader>
-
-          {/* <div className="mr-6 flex w-48 flex-col"> */}
 
           <CardHeader>
             <CardTitle className="w-32">Superimpose {promotion + 1}</CardTitle>
