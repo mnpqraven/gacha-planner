@@ -51,11 +51,11 @@ const SubstatSpreadConfig = forwardRef<HTMLDivElement, Props>(
             });
           }
         }),
-      []
+      [atomm, defaultSpreadRolls]
     );
     const spreadSplittedLocalAtom = useMemo(
       () => splitAtom(spreadLocalAtom),
-      []
+      [spreadLocalAtom]
     );
     const [readOnlySpread, setSpread] = useAtom(spreadLocalAtom);
     const spreadAtoms = useAtomValue(spreadSplittedLocalAtom);
@@ -193,25 +193,30 @@ function getDefaultTextValue(
 /**
  * take the substat value and return the corresponding spread values
  */
-function calculateSpread({
+export function calculateSpread({
   value,
-  spreadData,
+  spreadData: spread,
 }: {
   value: number | undefined;
   spreadData: RelicSubAffixConfig;
 }): { valid: boolean; rolls: number[]; message?: string } {
+  const { property } = spread;
+
+  // 5% correction
+  const absMin = getSpreadValues(spread).minRoll.value * 0.95;
+  const absMax = getSpreadValues(spread).maxRoll.value * 1.05;
+
   if (!value)
     return {
       valid: false,
       rolls: Array.from(range(0, 5)).fill(0),
       message: "Value is empty",
     };
+
   // calculates how many rolls would it take for @params value
-  const absMin = getSpreadValues(spreadData).minRoll.value;
-  const absMax = getSpreadValues(spreadData).maxRoll.value;
   let approxRolls = 0;
   let dummyVal = { min: 0, max: 0 };
-  while (true) {
+  while (value > dummyVal.max) {
     approxRolls += 1;
     dummyVal.max += absMax;
     dummyVal.min += absMin;
@@ -223,15 +228,15 @@ function calculateSpread({
       valid: false,
       rolls: Array.from(range(0, 5)).fill(0),
       message: `Please enter value between ${
-        prettyProperty(spreadData.property, absMin * 1).prettyValue
-      } and ${prettyProperty(spreadData.property, absMax * 6).prettyValue}`,
+        prettyProperty(property, absMin * 1).prettyValue
+      } and ${prettyProperty(property, absMax * 6).prettyValue}`,
     };
 
   // INFO: top down strategy
   let toUpdate: number[] = [];
   let tempVal = value;
   while (tempVal > 0) {
-    const maxRoll = getSpreadValues(spreadData).maxRoll.value;
+    const maxRoll = getSpreadValues(spread).maxRoll.value;
     toUpdate.push(tempVal >= maxRoll ? maxRoll : tempVal);
     tempVal -= maxRoll;
   }
@@ -260,10 +265,8 @@ function calculateSpread({
     message: valid
       ? undefined
       : `Please enter value between ${
-          prettyProperty(spreadData.property, absMin * approxRolls).prettyValue
-        } and ${
-          prettyProperty(spreadData.property, absMax * approxRolls).prettyValue
-        }`,
+          prettyProperty(property, absMin * approxRolls).prettyValue
+        } and ${prettyProperty(property, absMax * approxRolls).prettyValue}`,
   };
 }
 

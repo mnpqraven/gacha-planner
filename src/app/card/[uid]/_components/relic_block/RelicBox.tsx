@@ -1,4 +1,4 @@
-import { HTMLAttributes, forwardRef } from "react";
+import { HTMLAttributes, forwardRef, useCallback } from "react";
 import SVG from "react-inlinesvg";
 import { cn, img, range } from "@/lib/utils";
 import { Badge } from "@/app/components/ui/Badge";
@@ -11,6 +11,11 @@ import { CircleSlash, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { PrimitiveAtom, useAtomValue } from "jotai";
 import { MarkerIcon } from "./MarkerIcon";
+import { useSubStatSpread } from "@/hooks/queries/useSubStatSpread";
+import { calculateSpread } from "@/app/card/custom/_editor/_relic/SubstatSpreadConfig";
+import { SubStatSchema } from "@/hooks/useStatParser";
+import { judgeRollValue } from "@/app/card/custom/_editor/_relic/SpreadConfigBar";
+import { RelicSubAffixConfig } from "@/bindings/RelicSubAffixConfig";
 
 interface RelicProps extends HTMLAttributes<HTMLDivElement> {
   atom: PrimitiveAtom<RelicInput>;
@@ -19,8 +24,31 @@ export const RelicBox = forwardRef<HTMLDivElement, RelicProps>(
   ({ atom, className, ...props }, ref) => {
     const data = useAtomValue(atom);
     const { data: mainstatSpread } = useMainStatSpread();
+    const { data: substatSpread } = useSubStatSpread();
+    const splitSubstatValue = useCallback(
+      (sub: SubStatSchema, spread: RelicSubAffixConfig) =>
+        calculateSpread({ value: sub.value, spreadData: spread }),
+      []
+    );
+    const judge = useCallback(
+      (roll: number, spread: RelicSubAffixConfig) =>
+        judgeRollValue(roll, spread),
+      []
+    );
 
     if (!mainstatSpread) return null;
+
+    const cal = (sub: SubStatSchema | undefined) => {
+      const spreadInfo = substatSpread?.find(
+        (e) => e.property == sub?.property
+      );
+      if (!!sub && !!spreadInfo) {
+        return splitSubstatValue(sub, spreadInfo).rolls.map((roll) =>
+          judge(roll, spreadInfo)
+        );
+      }
+      return [];
+    };
 
     const promotionConfig = mainstatSpread[data.type].find(
       (e) => e.property == data.property
@@ -32,7 +60,7 @@ export const RelicBox = forwardRef<HTMLDivElement, RelicProps>(
     return (
       <div
         className={cn(
-          "flex h-[134px] gap-1 rounded-md border p-2 shadow-md shadow-border",
+          "flex h-fit gap-1 rounded-md border p-2 shadow-md shadow-border",
           className
         )}
         ref={ref}
@@ -82,13 +110,14 @@ export const RelicBox = forwardRef<HTMLDivElement, RelicProps>(
               </div>
 
               <div id="substat-counter" className="flex gap-1">
-                {Array.from(range(1, data.rarity + 1)).map((num) => (
+                {Array.from(range(1, data.rarity + 1)).map((num, index) => (
                   <div
                     key={num}
                     className={substatVariant({
                       currentCount: num,
                       substatCount: sub?.step ?? 0,
-                      rarity: data.rarity as 3 | 4 | 5,
+                      // rarity: data.rarity as 3 | 4 | 5,
+                      type: cal(sub).at(index) ?? "ERROR",
                     })}
                   />
                 ))}
@@ -132,13 +161,15 @@ function getUrl(setId: number, type: RelicType | undefined) {
 function substatVariant({
   substatCount,
   currentCount,
-  rarity,
+  // rarity,
+  type,
 }: {
   substatCount: number;
   currentCount: number;
-  rarity: 3 | 4 | 5;
+  // rarity: 3 | 4 | 5;
+  type: "LOW" | "MID" | "HIGH" | "ERROR";
 }) {
-  const variant = cva("h-[2px] w-4 border-skewed", {
+  const variant = cva("h-[3px] w-4 border-skewed", {
     variants: {
       placement: {
         first: "",
@@ -150,11 +181,18 @@ function substatVariant({
         reached5: "bg-[#ffc870]",
         notReached: "bg-gray-600",
       },
+      type: {
+        LOW: "bg-[#4f79b2]",
+        MID: "bg-[#c199fd]",
+        HIGH: "bg-[#ffc870]",
+        ERROR: "bg-red-500",
+        NONE: "bg-gray-600",
+      },
     },
-    defaultVariants: { placement: "first", level: "notReached" },
+    defaultVariants: { placement: "first", type: "NONE" },
   });
   return variant({
     placement: currentCount == 1 ? "first" : "notFirst",
-    level: substatCount >= currentCount ? `reached${rarity}` : "notReached",
+    type: substatCount >= currentCount ? type : "NONE",
   });
 }

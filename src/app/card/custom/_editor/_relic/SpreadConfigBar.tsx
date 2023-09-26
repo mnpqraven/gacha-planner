@@ -16,7 +16,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   spreadInfo: RelicSubAffixConfig;
 }
 
-const variant = cva("h-1.5 w-8 border-skewed mb-2", {
+const variant = cva("mb-2 h-1.5 w-8 border-skewed", {
   variants: {
     status: {
       LOW: "bg-[#4f79b2]",
@@ -70,13 +70,14 @@ const SpreadConfigBar = forwardRef<HTMLDivElement, Props>(
 SpreadConfigBar.displayName = "SpreadConfigBar";
 export { SpreadConfigBar };
 
-function judgeRollValue(
+export function judgeRollValue(
   value: number,
   spreadInfo: RelicSubAffixConfig
 ): "LOW" | "MID" | "HIGH" | "ERROR" {
-  const lowerBound = spreadInfo.base_value;
+  // 5% correction
+  const lowerBound = spreadInfo.base_value * 0.95;
   const upperBound =
-    spreadInfo.base_value + spreadInfo.step_num * spreadInfo.step_value;
+    spreadInfo.base_value + spreadInfo.step_num * spreadInfo.step_value * 1.05;
 
   const diffPool = upperBound - lowerBound;
   // this is supposed to never happen
