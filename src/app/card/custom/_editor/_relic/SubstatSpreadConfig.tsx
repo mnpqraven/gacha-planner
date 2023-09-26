@@ -247,7 +247,7 @@ function calculateSpread({
 
   // even strategy
   const mean = value / approxRolls;
-  const rolls = Array.from({ length: 5 }).map((_, i) =>
+  const rolls = Array.from({ length: 6 }).map((_, i) =>
     i < approxRolls ? mean : 0
   );
   const valid = rolls

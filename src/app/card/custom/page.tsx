@@ -47,26 +47,27 @@ export default async function ProfileCard() {
             <AccordionTrigger>Configuration</AccordionTrigger>
             <AccordionContent className="py-2">
               <Tabs defaultValue="charlc" className="w-full">
-                <TabsList>
-                  <TabsTrigger value="charlc">
-                    Character & Light Cone
-                  </TabsTrigger>
-                  <TabsTrigger value="relic">Relics</TabsTrigger>
+                <div className="flex">
+                  <TabsList>
+                    <TabsTrigger value="charlc">
+                      Character & Light Cone
+                    </TabsTrigger>
+                    <TabsTrigger value="relic">Relics</TabsTrigger>
+                  </TabsList>
 
                   <Tooltip>
                     <TooltipTrigger>
                       <AlertTriangle className="mx-2 text-yellow-600" />
                     </TooltipTrigger>
                     <TooltipContent>
-                      Substat roll window is still under development and won
-                      {"'"}t verify if the value you{"'"}ve inputted is valid.
+                      Substat roll window is still under development, expect
+                      bugs here and there.
                       <br />
-                      For now if you want accurate substat roll values please
-                      click on the roll buttons one by one instead of inputting
-                      specific value
+                      If you encounter a bug when setting up relics, contact
+                      Othi with a rough step-by-step on how you got the bug
                     </TooltipContent>
                   </Tooltip>
-                </TabsList>
+                </div>
 
                 <TabsContent
                   value="charlc"
