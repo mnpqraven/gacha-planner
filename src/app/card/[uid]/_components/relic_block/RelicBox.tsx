@@ -4,18 +4,17 @@ import { cn, img, range } from "@/lib/utils";
 import { Badge } from "@/app/components/ui/Badge";
 import { prettyProperty, propertyIconUrl } from "@/lib/propertyHelper";
 import { cva } from "class-variance-authority";
-import { useMainStatSpread } from "@/hooks/queries/useMainStatSpread";
 import { RelicType } from "@/bindings/RelicConfig";
 import { RelicInput } from "@/app/card/_store/relic";
 import { CircleSlash, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { PrimitiveAtom, useAtomValue } from "jotai";
 import { MarkerIcon } from "./MarkerIcon";
-import { useSubStatSpread } from "@/hooks/queries/useSubStatSpread";
 import { calculateSpread } from "@/app/card/custom/_editor/_relic/SubstatSpreadConfig";
 import { SubStatSchema } from "@/hooks/useStatParser";
 import { judgeRollValue } from "@/app/card/custom/_editor/_relic/SpreadConfigBar";
 import { RelicSubAffixConfig } from "@/bindings/RelicSubAffixConfig";
+import { mainstatSpreadAtom, substatSpreadAtom } from "@/store/queries";
 
 interface RelicProps extends HTMLAttributes<HTMLDivElement> {
   atom: PrimitiveAtom<RelicInput>;
@@ -23,8 +22,9 @@ interface RelicProps extends HTMLAttributes<HTMLDivElement> {
 export const RelicBox = forwardRef<HTMLDivElement, RelicProps>(
   ({ atom, className, ...props }, ref) => {
     const data = useAtomValue(atom);
-    const { data: mainstatSpread } = useMainStatSpread();
-    const { data: substatSpread } = useSubStatSpread();
+    const mainstatSpread = useAtomValue(mainstatSpreadAtom);
+    const substatSpread = useAtomValue(substatSpreadAtom);
+
     const splitSubstatValue = useCallback(
       (sub: SubStatSchema, spread: RelicSubAffixConfig) =>
         calculateSpread({ value: sub.value, spreadData: spread }),
@@ -36,9 +36,7 @@ export const RelicBox = forwardRef<HTMLDivElement, RelicProps>(
       []
     );
 
-    if (!mainstatSpread) return null;
-
-    const cal = (sub: SubStatSchema | undefined) => {
+    function cal(sub: SubStatSchema | undefined) {
       const spreadInfo = substatSpread?.find(
         (e) => e.property == sub?.property
       );
@@ -48,7 +46,7 @@ export const RelicBox = forwardRef<HTMLDivElement, RelicProps>(
         );
       }
       return [];
-    };
+    }
 
     const promotionConfig = mainstatSpread[data.type].find(
       (e) => e.property == data.property

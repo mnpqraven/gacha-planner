@@ -37,51 +37,48 @@ export function DisplayCard(props: DisplayCardProps) {
 
   useMihomoApiUpdate(props);
 
-  if (!!charMetadata) {
-    return (
-      <div className="h-fit w-fit p-4" ref={enkaRef}>
-        <div
-          id="enka-container"
-          className="grid h-[600px] w-[1496px] grid-cols-4 rounded-2xl border border-border bg-background p-3"
-          style={{
-            boxShadow: "0 1px 10px hsl(var(--border))",
-          }}
-        >
-          <CharacterInfo
-            id="block-1"
-            className="relative z-10"
-            characterId={charMetadata.avatar_id}
-          />
+  if (!charMetadata) return null;
 
-          <div id="block-2" className="flex justify-evenly">
-            <EidolonInfo
-              className="w-14"
-              characterId={charMetadata.avatar_id}
-            />
-            <div className="flex flex-col pb-2">
-              <LightConeInfo id="lightcone-2.1" className="grow" />
+  return (
+    <div className="h-fit w-fit p-4" ref={enkaRef}>
+      <div
+        id="enka-container"
+        className="grid h-[600px] w-[1496px] grid-cols-4 rounded-2xl border border-border bg-background p-3"
+        style={{
+          boxShadow: "0 1px 10px hsl(var(--border))",
+        }}
+      >
+        <CharacterInfo
+          id="block-1"
+          className="relative z-10"
+          characterId={charMetadata.avatar_id}
+        />
 
-              <SkillInfo id="skill-2.2" characterId={charMetadata.avatar_id} />
-            </div>
-          </div>
+        <div id="block-2" className="flex justify-evenly">
+          <EidolonInfo className="w-14" characterId={charMetadata.avatar_id} />
+          <div className="flex flex-col pb-2">
+            <LightConeInfo id="lightcone-2.1" className="grow" />
 
-          <div id="block-3" className="col-span-2 flex gap-4">
-            <div className="flex grow flex-col gap-2 place-self-end pb-2">
-              <SpiderChartWrapper element={charMetadata.damage_type} />
-
-              <StatTable
-                id="stat-3"
-                className="grid grid-cols-2 gap-x-2"
-                element={charMetadata.damage_type}
-              />
-            </div>
-
-            <RelicInfo id="relic-4" className="justify-end pb-2" />
+            <SkillInfo id="skill-2.2" characterId={charMetadata.avatar_id} />
           </div>
         </div>
+
+        <div id="block-3" className="col-span-2 flex gap-4">
+          <div className="flex grow flex-col gap-2 place-self-end pb-2">
+            <SpiderChartWrapper element={charMetadata.damage_type} />
+
+            <StatTable
+              id="stat-3"
+              className="grid grid-cols-2 gap-x-2"
+              element={charMetadata.damage_type}
+            />
+          </div>
+
+          <RelicInfo id="relic-4" className="justify-end pb-2" />
+        </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 function useEnkaRef() {

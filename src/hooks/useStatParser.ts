@@ -12,6 +12,8 @@ import {
 } from "@/app/card/[uid]/_components/useDataProcess";
 import { useMainStatSpread } from "./queries/useMainStatSpread";
 import { RelicType } from "@/bindings/RelicConfig";
+import { useAtomValue } from "jotai";
+import { mainstatSpreadAtom } from "@/store/queries";
 
 type BasicMetadata = { id: number; level: number; ascension: number };
 export interface SubStatSchema {
@@ -61,7 +63,9 @@ export function useStatParser(props?: StatParserConstructor) {
   const { data: lcPromotionData } = useLightConePromotion(props?.lightCone?.id);
   const { data: lcSkillData } = useLightConeSkill(props?.lightCone?.id);
   const { data: relicBonuses } = useRelicSetBonuses();
-  const { data: mainStatLevels } = useMainStatSpread();
+  // const { data: mainStatLevels } = useMainStatSpread();
+
+  const mainStatLevels = useAtomValue(mainstatSpreadAtom);
 
   if (
     !traceData ||

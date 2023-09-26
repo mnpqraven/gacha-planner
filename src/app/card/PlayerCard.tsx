@@ -16,7 +16,7 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
 export const PlayerCard = forwardRef<HTMLButtonElement, Props>(
   ({ atom, lang = "en", className, ...props }, ref) => {
     const player = useAtomValue(atom);
-    const la = !lang || lang == "en" ? "" : `?lang=${lang}`;
+    const la = lang == "en" ? "" : `?lang=${lang}`;
 
     if (!player) return null;
 

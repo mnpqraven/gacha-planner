@@ -1,23 +1,6 @@
 "use client";
 
-import {
-  ErrorOption,
-  Field,
-  FieldArray,
-  FieldArrayPath,
-  FieldError,
-  FieldErrors,
-  FieldValues,
-  FormState,
-  Path,
-  PathValue,
-  RegisterOptions,
-  SubmitErrorHandler,
-  SubmitHandler,
-  UseFormRegisterReturn,
-  UseFormReturn,
-  useForm,
-} from "react-hook-form";
+import { UseFormReturn, useForm } from "react-hook-form";
 import { Input } from "../components/ui/Input";
 import {
   Form,
@@ -25,22 +8,14 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "../components/ui/Form";
 import { LANG, LANGS } from "@/lib/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "../components/ui/Button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../components/ui/Select";
 import { Loader2, Pin, PinOff } from "lucide-react";
 import { useMihomoInfo } from "./[uid]/useMihomoInfo";
-import { BaseSyntheticEvent, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PlayerCard } from "./PlayerCard";
 import { useRouter } from "next/navigation";
 import {
@@ -162,9 +137,9 @@ function PinProfileButton({ atom }: PinProps) {
       <TooltipTrigger asChild>
         <Toggle onPressedChange={updatePin}>
           {pressed ? (
-            <PinOff className={"h-4 w-4"} />
+            <PinOff className="h-4 w-4" />
           ) : (
-            <Pin className={"h-4 w-4"} />
+            <Pin className="h-4 w-4" />
           )}
         </Toggle>
       </TooltipTrigger>
