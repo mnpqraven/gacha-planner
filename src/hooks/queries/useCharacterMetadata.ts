@@ -1,11 +1,11 @@
 import { AvatarConfig } from "@/bindings/AvatarConfig";
 import API from "@/server/typedEndpoints";
-import { UseQueryOptions, queryOptions, useQuery } from "@tanstack/react-query";
-
-type Options = Omit<
-  UseQueryOptions<AvatarConfig>,
-  "queryKey" | "queryFn" | "enabled"
->;
+import {
+  UseQueryOptions,
+  UseSuspenseQueryOptions,
+  queryOptions,
+  useQuery,
+} from "@tanstack/react-query";
 
 export const optionCharacterMetadata = (charId: number | undefined) =>
   queryOptions<AvatarConfig>({
@@ -25,3 +25,25 @@ export function useCharacterMetadata(
 
   return query;
 }
+
+export function useSuspendedCharacterMetadata(
+  characterId: number | undefined,
+  opt: SuspendedOptions = {}
+) {
+  const query = useQuery({
+    ...optionCharacterMetadata(characterId),
+    ...opt,
+  });
+
+  return query;
+}
+
+type Options = Omit<
+  UseQueryOptions<AvatarConfig>,
+  "queryKey" | "queryFn" | "enabled"
+>;
+
+type SuspendedOptions = Omit<
+  UseSuspenseQueryOptions<AvatarConfig>,
+  "queryKey" | "queryFn"
+>;

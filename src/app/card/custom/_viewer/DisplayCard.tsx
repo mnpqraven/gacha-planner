@@ -1,6 +1,5 @@
 "use client";
 
-import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
 import { useAtomValue, useSetAtom } from "jotai";
 import { LANGS } from "@/lib/constants";
 import { CharacterInfo } from "../../[uid]/_components/info_block/CharacterInfo";
@@ -13,7 +12,8 @@ import { RelicInfo } from "../../[uid]/_components/relic_block/RelicInfo";
 import { useMihomoApiUpdate } from "./useMihomoApiUpdate";
 import { useEffect, useRef } from "react";
 import { configAtom } from "../../_store/main";
-import { charIdAtom, enkaRefAtom } from "../../_store";
+import { enkaRefAtom } from "../../_store";
+import { charMetadataAtom } from "../../_store/character";
 
 type Lang = (typeof LANGS)[number];
 export type DisplayCardProps =
@@ -26,9 +26,8 @@ export type DisplayCardProps =
 
 export function DisplayCard(props: DisplayCardProps) {
   const updateConfig = useSetAtom(configAtom);
-  const charId = useAtomValue(charIdAtom);
   const { enkaRef } = useEnkaRef();
-  const { data: charMetadata } = useCharacterMetadata(charId);
+  const { data: charMetadata } = useAtomValue(charMetadataAtom);
 
   useEffect(() => {
     updateConfig({ type: "changeMode", payload: props.mode });
@@ -37,7 +36,7 @@ export function DisplayCard(props: DisplayCardProps) {
 
   useMihomoApiUpdate(props);
 
-  if (!charMetadata) return null;
+  if (!charMetadata) return "Please select a character";
 
   return (
     <div className="h-fit w-fit p-4" ref={enkaRef}>

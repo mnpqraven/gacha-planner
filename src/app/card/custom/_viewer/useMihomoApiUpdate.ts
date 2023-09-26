@@ -1,6 +1,5 @@
 "use client";
 
-import { LANGS } from "@/lib/constants";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { useRelics } from "@/hooks/queries/useRelic";

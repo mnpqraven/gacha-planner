@@ -1,25 +1,57 @@
 import { AvatarSkillConfig } from "@/bindings/AvatarSkillConfig";
 import { List } from "@/lib/generics";
 import API from "@/server/typedEndpoints";
-import { UseQueryOptions, useQuery } from "@tanstack/react-query";
+import {
+  UseQueryOptions,
+  UseSuspenseQueryOptions,
+  queryOptions,
+  useQuery,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 
-type Options = Omit<
-  UseQueryOptions<List<AvatarSkillConfig>, unknown, AvatarSkillConfig[]>,
-  "enabled" | "queryKey" | "queryFn" | "select" | "initialData"
->;
+export const optionCharacterSkill = (charId: number | undefined) =>
+  queryOptions<List<AvatarSkillConfig>, unknown, AvatarSkillConfig[]>({
+    queryKey: ["skill", charId],
+    queryFn: async () => await API.skillsByCharId.get({ characterId: charId! }),
+    select: (data) => data.list,
+    initialData: { list: [] },
+    enabled: !!charId,
+  });
+
 export function useCharacterSkill(
   characterId: number | undefined,
   opt: Options = {}
 ) {
   const query = useQuery({
-    queryKey: ["skill", characterId],
-    queryFn: async () =>
-      await API.skillsByCharId.get({ characterId: characterId! }),
-    select: (data) => data.list,
-    initialData: { list: [] },
-    enabled: !!characterId,
+    ...optionCharacterSkill(characterId),
     ...opt,
   });
 
   return query;
 }
+
+export function useSuspendedCharacterSkill(
+  characterId: number | undefined,
+  opt: SuspendedOptions = {}
+) {
+  const query = useSuspenseQuery({
+    ...optionCharacterSkill(characterId),
+    ...opt,
+  });
+
+  return query;
+}
+
+type Options = Omit<
+  UseQueryOptions<List<AvatarSkillConfig>, unknown, AvatarSkillConfig[]>,
+  "enabled" | "queryKey" | "queryFn" | "select" | "initialData"
+>;
+
+type SuspendedOptions = Omit<
+  UseSuspenseQueryOptions<
+    List<AvatarSkillConfig>,
+    unknown,
+    AvatarSkillConfig[]
+  >,
+  "enabled" | "queryKey" | "queryFn" | "select" | "initialData"
+>;

@@ -92,9 +92,6 @@ const LevelInput = forwardRef<
   const maxLevel = useAtomValue(maxLevelAtom);
   const [level, setLevel] = useAtom(charLevelAtom);
 
-  {
-    /* <span>/{maxLevel}</span> */
-  }
   return (
     <Input
       className={cn("w-12", className)}
@@ -103,7 +100,12 @@ const LevelInput = forwardRef<
       min={1}
       max={maxLevel}
       value={level}
-      onChange={(e) => setLevel(parseInt(e.target.value))}
+      onChange={(e) => {
+        const val = parseInt(e.currentTarget.value);
+        if (val >= 1 && val <= maxLevel) {
+          setLevel(val);
+        }
+      }}
       {...props}
       ref={ref}
     />
@@ -126,7 +128,7 @@ const PromotionInput = forwardRef<
       value={ascension}
       onChange={(e) => {
         const val = parseInt(e.currentTarget.value);
-        if (val >= 0 || val <= 6) setAscension(val);
+        if (val >= 0 && val <= 6) setAscension(val);
       }}
       {...props}
       ref={ref}
@@ -150,7 +152,7 @@ const EidolonInput = forwardRef<
       value={eidolon}
       onChange={(e) => {
         const val = parseInt(e.currentTarget.value);
-        if (val >= 0 || val <= 6) setEidolon(val);
+        if (val >= 0 && val <= 6) setEidolon(val);
       }}
       {...props}
       ref={ref}

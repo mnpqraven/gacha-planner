@@ -1,5 +1,7 @@
+import { optionCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
 import { atom } from "jotai";
 import { atomWithImmer } from "jotai-immer";
+import { atomsWithQuery } from "jotai-tanstack-query";
 
 type CharacterSchema = {
   id: number | undefined;
@@ -55,4 +57,8 @@ export const charStructAtom = atom(
     set(charTraceAtom, next.trace);
     set(charSkillAtom, next.skills);
   }
+);
+
+export const [, charMetadataAtom] = atomsWithQuery((get) =>
+  optionCharacterMetadata(get(charIdAtom))
 );
