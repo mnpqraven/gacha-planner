@@ -14,7 +14,7 @@ import { useCharacterList } from "@/hooks/queries/useCharacterList";
 import { cn, img } from "@/lib/utils";
 import { useAtom, useSetAtom } from "jotai";
 import Image from "next/image";
-import { HTMLAttributes, forwardRef, useState } from "react";
+import { HTMLAttributes, Suspense, forwardRef, useState } from "react";
 import { useCharacterMetadata } from "@/hooks/queries/useCharacterMetadata";
 import { CharacterCard } from "@/app/character-db/CharacterCardWrapper";
 import { CharacterUpdater } from "../_editor/CharacterUpdater";
@@ -80,7 +80,11 @@ export const CharacterEditorTab = forwardRef<
         {chara?.avatar_name}
       </div>
 
-      <CharacterUpdater />
+      {charId && (
+        <Suspense fallback={<div>loading state..</div>}>
+          <CharacterUpdater />
+        </Suspense>
+      )}
 
       {!!chara && <TraceTableUpdater path={chara.avatar_base_type} />}
     </div>

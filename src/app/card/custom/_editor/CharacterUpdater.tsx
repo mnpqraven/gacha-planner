@@ -9,7 +9,10 @@ import {
   maxLevelAtom,
 } from "../../_store/character";
 import { Input } from "@/app/components/ui/Input";
-import { useCharacterSkill } from "@/hooks/queries/useCharacterSkill";
+import {
+  useCharacterSkill,
+  useSuspendedCharacterSkill,
+} from "@/hooks/queries/useCharacterSkill";
 import { AvatarSkillConfig, SkillType } from "@/bindings/AvatarSkillConfig";
 import { cn, getImagePath } from "@/lib/utils";
 import Image from "next/image";
@@ -27,7 +30,9 @@ const skillTypeMap = [
 
 export function CharacterUpdater() {
   const charId = useAtomValue(charIdAtom);
-  const { data: skills } = useCharacterSkill(charId);
+  const { data: skills } = useSuspendedCharacterSkill(charId);
+  const maxLevel = useAtomValue(charMaxLevelAtom);
+
   const sortedSkills = skills
     .filter(
       ({ attack_type }) =>
@@ -47,7 +52,6 @@ export function CharacterUpdater() {
         toInt(b.attack_type, b.skill_type_desc)
       );
     });
-  const maxLevel = useAtomValue(charMaxLevelAtom);
 
   return (
     <div className="flex gap-4">

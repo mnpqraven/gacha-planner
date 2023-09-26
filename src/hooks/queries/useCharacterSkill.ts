@@ -18,6 +18,13 @@ export const optionCharacterSkill = (charId: number | undefined) =>
     enabled: !!charId,
   });
 
+export const suspendedOptionCharacterSkill = (charId: number | undefined) =>
+  queryOptions<List<AvatarSkillConfig>, unknown, AvatarSkillConfig[]>({
+    queryKey: ["skill", charId],
+    queryFn: async () => await API.skillsByCharId.get({ characterId: charId! }),
+    select: (data) => data.list,
+  });
+
 export function useCharacterSkill(
   characterId: number | undefined,
   opt: Options = {}
@@ -35,7 +42,7 @@ export function useSuspendedCharacterSkill(
   opt: SuspendedOptions = {}
 ) {
   const query = useSuspenseQuery({
-    ...optionCharacterSkill(characterId),
+    ...suspendedOptionCharacterSkill(characterId),
     ...opt,
   });
 

@@ -8,7 +8,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
-import { useCharacterSkill } from "@/hooks/queries/useCharacterSkill";
+import {
+  useCharacterSkill,
+  useSuspendedCharacterSkill,
+} from "@/hooks/queries/useCharacterSkill";
 import { SkillDescription } from "@/app/components/Db/SkillDescription";
 import { useAtomValue } from "jotai";
 import { charEidAtom, charSkillAtom } from "@/app/card/_store";
@@ -23,7 +26,7 @@ export const SkillInfo = forwardRef<HTMLDivElement, Props>(
     const skList = useAtomValue(charSkillAtom);
     const eidolon = useAtomValue(charEidAtom);
 
-    const { data } = useCharacterSkill(characterId);
+    const { data } = useSuspendedCharacterSkill(characterId);
 
     const skills = data
       .filter(
