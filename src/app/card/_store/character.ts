@@ -15,6 +15,8 @@ export const charLevelAtom = atom(1);
 
 export const charPromotionAtom = atom(0);
 
+export const charMaxLevelAtom = atom((get) => get(charPromotionAtom) * 10 + 20);
+
 export const charEidAtom = atom(0);
 
 export const charSkillAtom = atomWithImmer<Record<string, number>>({});
@@ -54,12 +56,3 @@ export const charStructAtom = atom(
     set(charSkillAtom, next.skills);
   }
 );
-
-charIdAtom.debugLabel = "charIdAtom";
-charLevelAtom.debugLabel = "charLevelAtom";
-charPromotionAtom.debugLabel = "charPromotionAtom";
-charEidAtom.debugLabel = "charEidAtom";
-charSkillAtom.debugLabel = "charSkillAtom";
-charTraceAtom.debugLabel = "charTraceAtom";
-maxLevelAtom.debugLabel = "maxLevelAtom";
-charStructAtom.debugLabel = "charStructAtom";

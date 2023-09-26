@@ -75,7 +75,3 @@ export const cachedProfilesAtom = atomWithStorage<MihomoPlayer[]>(
   []
 );
 export const cachedProfileAtoms = splitAtom(cachedProfilesAtom);
-
-configAtom.debugLabel = "configAtom";
-statParseParam.debugLabel = "statParseParam";
-armoryStructAtom.debugLabel = "armoryStructAtom";

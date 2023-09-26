@@ -22,7 +22,10 @@ const nextConfig = {
     ],
   },
   experimental: {
-    swcPlugins: [["@swc-jotai/react-refresh", {}]],
+    swcPlugins: [
+      ["@swc-jotai/react-refresh", {}],
+      ["@swc-jotai/debug-label", {}],
+    ],
   },
   transpilePackages: ["jotai-devtools"],
 };

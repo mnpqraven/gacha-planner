@@ -39,7 +39,3 @@ export const selectedCalendarDateAtom = atom(
 );
 
 export const selectedMonthAtom = atom(new Date());
-
-estimateFormAtom.debugLabel = "estimateFormAtom";
-selectedCalendarDateAtom.debugLabel = "selectedCalendarDateAtom";
-selectedMonthAtom.debugLabel = "selectedMonthAtom";

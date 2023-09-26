@@ -1,5 +1,5 @@
 import { RelicInput } from "@/app/card/_store/relic";
-import { PrimitiveAtom, useAtomValue, useSetAtom } from "jotai";
+import { PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { PropertySelect } from "../PropertySelect";
 import { relicMainstatOptions } from "./relicConfig";
 import { Property } from "@/bindings/RelicMainAffixConfig";
@@ -14,24 +14,25 @@ interface Props {
   atom: PrimitiveAtom<RelicInput>;
 }
 export function MainstatEditor({ atom }: Props) {
-  const setMainstat = useSetAtom(
-    useMemo(() => focusAtom(atom, (o) => o.prop("property")), [atom])
+  const mainstatPropertyAtom = useMemo(
+    () => focusAtom(atom, (o) => o.prop("property")),
+    [atom]
   );
-  const setSubstats = useSetAtom(
-    useMemo(() => focusAtom(atom, (o) => o.prop("subStats")), [atom])
+  const substatsAtom = useMemo(
+    () => focusAtom(atom, (o) => o.prop("subStats")),
+    [atom]
   );
-  const type = useAtomValue(
-    useMemo(() => selectAtom(atom, (o) => o.type), [atom])
-  );
-  const property = useAtomValue(
-    useMemo(() => selectAtom(atom, (o) => o.property), [atom])
-  );
+  const typeAtom = useMemo(() => selectAtom(atom, (o) => o.type), [atom]);
+
+  const [property, setMainstatProperty] = useAtom(mainstatPropertyAtom);
+  const setSubstats = useSetAtom(substatsAtom);
+  const type = useAtomValue(typeAtom);
 
   const mainStatOptions =
     relicMainstatOptions.find((e) => e.type == type)?.options ?? [];
 
   function updateMainstat(prop: Property) {
-    setMainstat(prop);
+    setMainstatProperty(prop);
     setSubstats((prev) =>
       prev.map((substat) => {
         if (substat?.property == prop) return undefined;

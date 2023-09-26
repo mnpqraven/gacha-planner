@@ -1,17 +1,15 @@
 "use client";
 
-import { atom, useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { lcImpositionAtom, lcLevelAtom, lcPromotionAtom } from "../../_store";
 import { Input } from "@/app/components/ui/Input";
 import { Label } from "@/app/components/ui/Label";
-import { HTMLAttributes, forwardRef, useMemo } from "react";
+import { HTMLAttributes, forwardRef } from "react";
 import { cn } from "@/lib/utils";
 import { maxLevelAtom } from "../../_store/lightcone";
 
 export function LightConeUpdater() {
-  const maxLevel = useAtomValue(
-    useMemo(() => atom((get) => get(lcPromotionAtom) * 10 + 20), [])
-  );
+  const maxLevel = useAtomValue(maxLevelAtom);
 
   return (
     <div className="flex flex-col gap-2">

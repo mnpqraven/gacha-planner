@@ -30,9 +30,3 @@ export const lcStructAtom = atom(
     set(lcImpositionAtom, next.imposition);
   }
 );
-
-lcIdAtom.debugLabel = "lcIdAtom";
-lcLevelAtom.debugLabel = "lcLevelAtom";
-lcPromotionAtom.debugLabel = "lcPromotionAtom";
-lcImpositionAtom.debugLabel = "lcImpositionAtom";
-lcStructAtom.debugLabel = "lcStructAtom";

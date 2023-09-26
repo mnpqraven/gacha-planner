@@ -1,8 +1,9 @@
-import { atom, useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import {
   charEidAtom,
   charIdAtom,
   charLevelAtom,
+  charMaxLevelAtom,
   charPromotionAtom,
   charSkillAtom,
   maxLevelAtom,
@@ -46,9 +47,7 @@ export function CharacterUpdater() {
         toInt(b.attack_type, b.skill_type_desc)
       );
     });
-  const maxLevel = useAtomValue(
-    useMemo(() => atom((get) => get(charPromotionAtom) * 10 + 20), [])
-  );
+  const maxLevel = useAtomValue(charMaxLevelAtom);
 
   return (
     <div className="flex gap-4">
