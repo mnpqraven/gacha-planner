@@ -14,17 +14,16 @@ interface Props {
 }
 
 const SignatureLightCone = ({ characterId }: Props) => {
-  console.log(characterId);
   const { data: atlas } = useSuspendedSignatureAtlas();
   const lc_ids = atlas?.find((e) => e.charId === characterId)?.lcId;
+
+  const [selectedLcId, setSelectedLcId] = useState(lc_ids?.at(0));
 
   const { data: lcSkills } = useSuspendedLightConeSkills(lc_ids ?? []);
   const { data: lcMetadatas } = useSuspendedLightConeMetadatas(lc_ids ?? []);
 
   const metadata = lcMetadatas.find((e) => e.equipment_id == selectedLcId);
   const skill = lcSkills.find((e) => e.skill_id == metadata?.skill_id);
-
-  const [selectedLcId, setSelectedLcId] = useState(lc_ids?.at(0));
 
   if (!metadata || !skill) return null;
 
