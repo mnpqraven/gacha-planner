@@ -9,12 +9,14 @@ import { selectAtom } from "jotai/utils";
 interface Props extends HTMLAttributes<HTMLDivElement> {}
 export const RelicInfo = forwardRef<HTMLDivElement, Props>(
   ({ className, ...props }, ref) => {
-    const showBaseUrl = useAtomValue(
-      useMemo(() => selectAtom(configAtom, (atom) => atom.showBaseUrl), [])
+    const baseUrlAtom = useMemo(
+      () => selectAtom(configAtom, (o) => o.showBaseUrl),
+      []
     );
-    const uid = useAtomValue(
-      useMemo(() => selectAtom(configAtom, (atom) => atom.uid), [])
-    );
+    const uidAtom = useMemo(() => selectAtom(configAtom, (o) => o.uid), []);
+
+    const showBaseUrl = useAtomValue(baseUrlAtom);
+    const uid = useAtomValue(uidAtom);
     const splittedRelics = useAtomValue(splitRelicAtom);
 
     return (
