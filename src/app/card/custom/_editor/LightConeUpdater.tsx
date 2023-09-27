@@ -47,7 +47,11 @@ const LevelInput = forwardRef<
       min={1}
       max={maxLevel}
       value={level}
-      onChange={(e) => setLevel(parseInt(e.target.value))}
+      onChange={(e) => {
+        const val = Number(e.target.value);
+        if (val >= 1 && val <= maxLevel) setLevel(val);
+        else if (val == 0) setLevel(1);
+      }}
       {...props}
       ref={ref}
     />
@@ -69,8 +73,8 @@ const PromotionInput = forwardRef<
       max={6}
       value={ascension}
       onChange={(e) => {
-        const val = parseInt(e.currentTarget.value);
-        if (val >= 0 || val <= 6) setAscension(val);
+        const val = Number(e.currentTarget.value);
+        if (val >= 0 && val <= 6) setAscension(val);
       }}
       {...props}
       ref={ref}
@@ -93,8 +97,8 @@ const ImpositionInput = forwardRef<
       max={5}
       value={rank}
       onChange={(e) => {
-        const val = parseInt(e.currentTarget.value);
-        if (val >= 0 || val <= 6) setRank(val);
+        const val = Number(e.currentTarget.value);
+        if (val >= 0 && val <= 6) setRank(val);
       }}
       {...props}
       ref={ref}

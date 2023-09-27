@@ -26,6 +26,12 @@ import {
 } from "@/app/components/ui/Tooltip";
 import { Separator } from "@/app/components/ui/Separator";
 import { StateProvider } from "@/app/components/StateProvider";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Honkai Star Rail Card Maker",
+  description: "Custom card maker for your Honkai Star Rail characters",
+};
 
 export default async function ProfileCard() {
   return (

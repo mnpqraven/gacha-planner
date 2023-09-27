@@ -8,10 +8,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/app/components/ui/Tooltip";
-import {
-  useCharacterSkill,
-  useSuspendedCharacterSkill,
-} from "@/hooks/queries/useCharacterSkill";
+import { useSuspendedCharacterSkill } from "@/hooks/queries/useCharacterSkill";
 import { SkillDescription } from "@/app/components/Db/SkillDescription";
 import { useAtomValue } from "jotai";
 import { charEidAtom, charSkillAtom } from "@/app/card/_store";
@@ -33,6 +30,7 @@ export const SkillInfo = forwardRef<HTMLDivElement, Props>(
         ({ attack_type }) =>
           attack_type !== "MazeNormal" && attack_type !== "Maze"
       )
+      .filter(({ skill_tag }) => skill_tag !== "Cancel")
       .sort((a, b) => {
         const toInt = (
           ttype: SkillType | null | undefined,

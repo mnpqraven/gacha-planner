@@ -9,10 +9,7 @@ import {
   maxLevelAtom,
 } from "../../_store/character";
 import { Input } from "@/app/components/ui/Input";
-import {
-  useCharacterSkill,
-  useSuspendedCharacterSkill,
-} from "@/hooks/queries/useCharacterSkill";
+import { useSuspendedCharacterSkill } from "@/hooks/queries/useCharacterSkill";
 import { AvatarSkillConfig, SkillType } from "@/bindings/AvatarSkillConfig";
 import { cn, getImagePath } from "@/lib/utils";
 import Image from "next/image";
@@ -105,10 +102,9 @@ const LevelInput = forwardRef<
       max={maxLevel}
       value={level}
       onChange={(e) => {
-        const val = parseInt(e.currentTarget.value);
-        if (val >= 1 && val <= maxLevel) {
-          setLevel(val);
-        }
+        const val = Number(e.currentTarget.value);
+        if (val >= 1 && val <= maxLevel) setLevel(val);
+        else if (val == 0) setLevel(1);
       }}
       {...props}
       ref={ref}
@@ -131,7 +127,7 @@ const PromotionInput = forwardRef<
       max={6}
       value={ascension}
       onChange={(e) => {
-        const val = parseInt(e.currentTarget.value);
+        const val = Number(e.currentTarget.value);
         if (val >= 0 && val <= 6) setAscension(val);
       }}
       {...props}
@@ -155,7 +151,7 @@ const EidolonInput = forwardRef<
       max={6}
       value={eidolon}
       onChange={(e) => {
-        const val = parseInt(e.currentTarget.value);
+        const val = Number(e.currentTarget.value);
         if (val >= 0 && val <= 6) setEidolon(val);
       }}
       {...props}
@@ -231,10 +227,9 @@ function SkillInput({ id, maxLv }: { id: number; maxLv: number }) {
         max={maxLv}
         value={charSkill[id]}
         onChange={(e) => {
-          if (parseInt(e.target.value)) {
-            const asInt = parseInt(e.target.value);
-            updateSkill(asInt);
-          }
+          const val = Number(e.target.value);
+          if (val > 0) updateSkill(val);
+          else if (val == 0) updateSkill(1);
         }}
       />
       <span> / {maxLv}</span>

@@ -5,11 +5,18 @@ import { Share } from "./_components/Share";
 import { LANGS } from "@/lib/constants";
 import { DisplayCard } from "../custom/_viewer/DisplayCard";
 import { StateProvider } from "@/app/components/StateProvider";
+import { Metadata } from "next";
 
 interface Props {
   params: { uid: string };
   searchParams: { lang: (typeof LANGS)[number] | undefined };
 }
+
+export const metadata: Metadata = {
+  title: "Honkai Star Rail Character Card",
+  description: "Honkai Star Rail Character Card",
+};
+
 export default async function ProfileCard({
   params: { uid },
   searchParams: { lang },
