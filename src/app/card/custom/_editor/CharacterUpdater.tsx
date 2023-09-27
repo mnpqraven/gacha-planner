@@ -192,7 +192,7 @@ function SkillSection({
             alt={`${data[0].skill_id}`}
             width={64}
             height={64}
-            className="h-16 w-16"
+            className="h-16 w-16 invert dark:invert-0"
           />
           <div className="flex flex-col gap-2">
             <Badge className="w-fit">{label}</Badge>
