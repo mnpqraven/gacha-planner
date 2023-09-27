@@ -53,9 +53,9 @@ export class SignatureReturn extends Message<SignatureReturn> {
   charId = 0;
 
   /**
-   * @generated from field: repeated uint32 lc_id = 2;
+   * @generated from field: repeated uint32 lc_ids = 2;
    */
-  lcId: number[] = [];
+  lcIds: number[] = [];
 
   constructor(data?: PartialMessage<SignatureReturn>) {
     super();
@@ -66,7 +66,7 @@ export class SignatureReturn extends Message<SignatureReturn> {
   static readonly typeName = "dm.atlas.SignatureReturn";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "char_id", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 2, name: "lc_id", kind: "scalar", T: 13 /* ScalarType.UINT32 */, repeated: true },
+    { no: 2, name: "lc_ids", kind: "scalar", T: 13 /* ScalarType.UINT32 */, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SignatureReturn {

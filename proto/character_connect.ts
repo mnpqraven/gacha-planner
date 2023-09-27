@@ -3,9 +3,9 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CharacterId, CharacterMetadata, CharacterMetadatas } from "./character_pb";
-import { MethodKind } from "@bufbuild/protobuf";
-import { Empty } from "./shared_pb";
+import { CharId } from "./shared_pb";
+import { CharacterMetadata, CharacterMetadatas } from "./character_pb";
+import { Empty, MethodKind } from "@bufbuild/protobuf";
 
 /**
  * @generated from service dm.character.CharacterMetadataService
@@ -18,7 +18,7 @@ export const CharacterMetadataService = {
      */
     byId: {
       name: "ById",
-      I: CharacterId,
+      I: CharId,
       O: CharacterMetadata,
       kind: MethodKind.Unary,
     },

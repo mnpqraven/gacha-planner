@@ -173,7 +173,7 @@ export function rpc<T extends ServiceType>(service: T) {
   const client = createPromiseClient(
     service,
     createGrpcWebTransport({
-      baseUrl: `${env.NEXT_PUBLIC_WORKER_API}/rpc`,
+      baseUrl: env.NEXT_PUBLIC_WORKER_API,
     })
   );
   return client;

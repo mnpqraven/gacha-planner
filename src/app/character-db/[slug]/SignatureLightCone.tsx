@@ -14,13 +14,13 @@ interface Props {
 }
 
 const SignatureLightCone = ({ characterId }: Props) => {
-  const { data: atlas } = useSuspendedFeaturedLc(characterId);
-  const lc_ids = atlas?.find((e) => e.charId === characterId)?.lcId;
+  const { data } = useSuspendedFeaturedLc(characterId);
+  const { lcIds } = data;
 
-  const [selectedLcId, setSelectedLcId] = useState(lc_ids?.at(0));
+  const [selectedLcId, setSelectedLcId] = useState(lcIds?.at(0));
 
-  const { data: lcSkills } = useSuspendedLightConeSkills(lc_ids ?? []);
-  const { data: lcMetadatas } = useSuspendedLightConeMetadatas(lc_ids ?? []);
+  const { data: lcSkills } = useSuspendedLightConeSkills(lcIds);
+  const { data: lcMetadatas } = useSuspendedLightConeMetadatas(lcIds);
 
   const metadata = lcMetadatas.find((e) => e.equipment_id == selectedLcId);
   const skill = lcSkills.find((e) => e.skill_id == metadata?.skill_id);

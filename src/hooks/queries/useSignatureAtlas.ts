@@ -17,10 +17,9 @@ export const optionsFeaturedLcList = () =>
   });
 
 export const optionsFeaturedLc = (charId: number | undefined) =>
-  queryOptions<SignatureReturns, unknown, SignatureReturn[]>({
+  queryOptions<SignatureReturn, unknown, SignatureReturn>({
     queryKey: ["signatures", charId],
     queryFn: async () => await rpc(SignatureAtlasService).byCharId({ charId }),
-    select: (data) => data.list,
     enabled: !!charId,
   });
 
@@ -39,7 +38,7 @@ export function useSuspendedFeaturedLcList(opt: SuspendedOptions = {}) {
   });
 }
 
-export function useFeaturedLc(charId: number | undefined, opt: Options = {}) {
+export function useFeaturedLc(charId: number | undefined, opt: Option = {}) {
   return useQuery({
     ...optionsFeaturedLc(charId),
     ...opt,
@@ -48,13 +47,23 @@ export function useFeaturedLc(charId: number | undefined, opt: Options = {}) {
 
 export function useSuspendedFeaturedLc(
   charId: number | undefined,
-  opt: SuspendedOptions = {}
+  opt: SuspendedOption = {}
 ) {
   return useSuspenseQuery({
     ...optionsFeaturedLc(charId),
     ...opt,
   });
 }
+
+type Option = Omit<
+  UseQueryOptions<SignatureReturn, unknown, SignatureReturn>,
+  "queryKey" | "queryFn" | "select"
+>;
+
+type SuspendedOption = Omit<
+  UseSuspenseQueryOptions<SignatureReturn, unknown, SignatureReturn>,
+  "queryKey" | "queryFn" | "select"
+>;
 
 type Options = Omit<
   UseQueryOptions<SignatureReturns, unknown, SignatureReturn[]>,

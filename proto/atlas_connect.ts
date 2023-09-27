@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { Empty, MethodKind } from "@bufbuild/protobuf";
-import { SignatureReturns } from "./atlas_pb";
+import { SignatureReturn, SignatureReturns } from "./atlas_pb";
 import { CharId } from "./shared_pb";
 
 /**
@@ -28,7 +28,7 @@ export const SignatureAtlasService = {
     byCharId: {
       name: "ByCharId",
       I: CharId,
-      O: SignatureReturns,
+      O: SignatureReturn,
       kind: MethodKind.Unary,
     },
   }

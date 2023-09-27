@@ -7,43 +7,6 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Message, proto3 } from "@bufbuild/protobuf";
 
 /**
- * @generated from message dm.character.CharacterId
- */
-export class CharacterId extends Message<CharacterId> {
-  /**
-   * @generated from field: uint32 char_id = 1;
-   */
-  charId = 0;
-
-  constructor(data?: PartialMessage<CharacterId>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "dm.character.CharacterId";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "char_id", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CharacterId {
-    return new CharacterId().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CharacterId {
-    return new CharacterId().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CharacterId {
-    return new CharacterId().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: CharacterId | PlainMessage<CharacterId> | undefined, b: CharacterId | PlainMessage<CharacterId> | undefined): boolean {
-    return proto3.util.equals(CharacterId, a, b);
-  }
-}
-
-/**
  * @generated from message dm.character.CharacterMetadatas
  */
 export class CharacterMetadatas extends Message<CharacterMetadatas> {
