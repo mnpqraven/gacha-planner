@@ -8,29 +8,52 @@ import {
 } from "@tanstack/react-query";
 import { SignatureAtlasService } from "@grpc/atlas_connect";
 import { SignatureReturn, SignatureReturns } from "@grpc/atlas_pb";
-import { PlainMessage } from "@bufbuild/protobuf";
 
-export const optionsSignatureAtlas = () =>
+export const optionsFeaturedLcList = () =>
   queryOptions<SignatureReturns, unknown, SignatureReturn[]>({
     queryKey: ["signatures"],
     queryFn: async () => await rpc(SignatureAtlasService).list({}),
     select: (data) => data.list,
   });
 
-export function useSignatureAtlas(opt: Options = {}) {
+export const optionsFeaturedLc = (charId: number | undefined) =>
+  queryOptions<SignatureReturns, unknown, SignatureReturn[]>({
+    queryKey: ["signatures", charId],
+    queryFn: async () => await rpc(SignatureAtlasService).byCharId({ charId }),
+    select: (data) => data.list,
+    enabled: !!charId,
+  });
+
+export function useFeaturedLcList(opt: Options = {}) {
   const query = useQuery({
-    ...optionsSignatureAtlas(),
+    ...optionsFeaturedLcList(),
     ...opt,
   });
   return query;
 }
 
-export function useSuspendedSignatureAtlas(opt: SuspendedOptions = {}) {
-  const query = useSuspenseQuery({
-    ...optionsSignatureAtlas(),
+export function useSuspendedFeaturedLcList(opt: SuspendedOptions = {}) {
+  return useSuspenseQuery({
+    ...optionsFeaturedLcList(),
     ...opt,
   });
-  return query;
+}
+
+export function useFeaturedLc(charId: number | undefined, opt: Options = {}) {
+  return useQuery({
+    ...optionsFeaturedLc(charId),
+    ...opt,
+  });
+}
+
+export function useSuspendedFeaturedLc(
+  charId: number | undefined,
+  opt: SuspendedOptions = {}
+) {
+  return useSuspenseQuery({
+    ...optionsFeaturedLc(charId),
+    ...opt,
+  });
 }
 
 type Options = Omit<

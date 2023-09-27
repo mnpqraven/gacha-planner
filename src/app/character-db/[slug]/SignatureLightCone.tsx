@@ -5,7 +5,7 @@ import { Content } from "@/app/lightcone-db/[slug]/Content";
 import { Portrait } from "@/app/lightcone-db/[slug]/Portrait";
 import { useSuspendedLightConeMetadatas } from "@/hooks/queries/useLightConeMetadatas";
 import { useSuspendedLightConeSkills } from "@/hooks/queries/useLightConeSkills";
-import { useSuspendedSignatureAtlas } from "@/hooks/queries/useSignatureAtlas";
+import { useSuspendedFeaturedLc } from "@/hooks/queries/useSignatureAtlas";
 import { IMAGE_URL } from "@/lib/constants";
 import { useState } from "react";
 
@@ -14,7 +14,7 @@ interface Props {
 }
 
 const SignatureLightCone = ({ characterId }: Props) => {
-  const { data: atlas } = useSuspendedSignatureAtlas();
+  const { data: atlas } = useSuspendedFeaturedLc(characterId);
   const lc_ids = atlas?.find((e) => e.charId === characterId)?.lcId;
 
   const [selectedLcId, setSelectedLcId] = useState(lc_ids?.at(0));

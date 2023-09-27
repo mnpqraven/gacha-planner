@@ -37,3 +37,40 @@ export class Empty extends Message<Empty> {
   }
 }
 
+/**
+ * @generated from message dm.shared.CharId
+ */
+export class CharId extends Message<CharId> {
+  /**
+   * @generated from field: uint32 char_id = 1;
+   */
+  charId = 0;
+
+  constructor(data?: PartialMessage<CharId>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "dm.shared.CharId";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "char_id", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CharId {
+    return new CharId().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CharId {
+    return new CharId().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CharId {
+    return new CharId().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CharId | PlainMessage<CharId> | undefined, b: CharId | PlainMessage<CharId> | undefined): boolean {
+    return proto3.util.equals(CharId, a, b);
+  }
+}
+

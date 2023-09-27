@@ -3,9 +3,9 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { Empty } from "./shared_pb";
+import { Empty, MethodKind } from "@bufbuild/protobuf";
 import { SignatureReturns } from "./atlas_pb";
-import { MethodKind } from "@bufbuild/protobuf";
+import { CharId } from "./shared_pb";
 
 /**
  * @generated from service dm.atlas.SignatureAtlasService
@@ -19,6 +19,15 @@ export const SignatureAtlasService = {
     list: {
       name: "List",
       I: Empty,
+      O: SignatureReturns,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc dm.atlas.SignatureAtlasService.ByCharId
+     */
+    byCharId: {
+      name: "ByCharId",
+      I: CharId,
       O: SignatureReturns,
       kind: MethodKind.Unary,
     },
