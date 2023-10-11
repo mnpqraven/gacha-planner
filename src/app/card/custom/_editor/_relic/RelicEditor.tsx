@@ -102,7 +102,7 @@ export function RelicEditor({ atom }: { atom: PrimitiveAtom<RelicInput> }) {
                 <Button
                   variant="outline"
                   className="px-2"
-                  onClick={() => warnProperty(substats.at(index)?.property)}
+                  disabled={!substats.at(index)?.property}
                 >
                   <AlignHorizontalDistributeCenter />
                 </Button>
