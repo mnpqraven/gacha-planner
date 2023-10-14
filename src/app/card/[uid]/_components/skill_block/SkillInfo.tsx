@@ -37,7 +37,7 @@ export const SkillInfo = forwardRef<HTMLDivElement, Props>(
         {Object.entries(splitGroupByType(data, { technique: false })).map(
           ([type, [first, ...rest]]) => (
             <div key={type} className="flex flex-col items-center">
-              <span>{getLabel2(first.skill_type_desc)}</span>
+              <span>{getLabel(first.skill_type_desc)}</span>
               <SkillIcon
                 src={getImagePath(characterId, first)}
                 skillInfo={first}
@@ -131,7 +131,7 @@ function SkillIcon({
   );
 }
 
-function getLabel2(typeDesc: string): string {
+function getLabel(typeDesc: string): string {
   switch (typeDesc) {
     case "Basic ATK":
       return "Basic";
@@ -139,20 +139,6 @@ function getLabel2(typeDesc: string): string {
       return "Ult";
     default:
       return typeDesc;
-  }
-}
-function getLabel(skillType: SkillType | null | undefined): string {
-  switch (skillType) {
-    case "Normal":
-      return "Basic";
-    case "BPSkill":
-      return "Skill";
-    case "Ultra":
-      return "Ult";
-    case "Talent":
-      return "Talent";
-    default:
-      return "";
   }
 }
 
