@@ -25,30 +25,6 @@ export const SkillInfo = forwardRef<HTMLDivElement, Props>(
 
     const { data } = useSuspendedCharacterSkill(characterId);
 
-    const skills = data
-      .filter(
-        ({ attack_type }) =>
-          attack_type !== "MazeNormal" && attack_type !== "Maze"
-      )
-      .filter(({ skill_tag }) => skill_tag !== "Cancel")
-      .sort((a, b) => {
-        const toInt = (
-          ttype: SkillType | null | undefined,
-          typeDesc: string
-        ) => {
-          if (ttype === "Maze") return 4;
-          if (ttype === "Ultra") return 3;
-          if (ttype === "BPSkill") return 2;
-          if (ttype === "Talent" || typeDesc === "Talent") return 1;
-          return 0;
-        };
-        return (
-          toInt(a.attack_type, a.skill_type_desc) -
-          toInt(b.attack_type, b.skill_type_desc)
-        );
-      })
-      .slice(-4);
-
     return (
       <div
         className={cn(
@@ -58,52 +34,47 @@ export const SkillInfo = forwardRef<HTMLDivElement, Props>(
         ref={ref}
         {...props}
       >
-        {skills.map((skillInfo) => (
-          <div key={skillInfo.skill_id} className="flex flex-col items-center">
-            <span>
-              {getLabel(
-                skillInfo.skill_type_desc == "Talent"
-                  ? skillInfo.skill_type_desc
-                  : skillInfo.attack_type
-              )}
-            </span>
-            <SkillIcon
-              src={getImagePath(characterId, skillInfo)}
-              skillInfo={skillInfo}
-              slv={skList[skillInfo.skill_id]}
-            />
-
-            <span
-              className={cn(
-                "w-full text-center font-bold",
-                isImprovedByEidolon(skillInfo.attack_type, eidolon)
-                  ? "text-[#6cfff7]"
-                  : ""
-              )}
-            >
-              {skList[skillInfo.skill_id] ==
-              getSkillMaxLevel(
-                skillInfo.attack_type,
-                skillInfo.skill_type_desc,
-                eidolon
-              ) ? (
-                <span className="flex items-center justify-end">
-                  {skList[skillInfo.skill_id] ?? 1}
-                  <ChevronsUp className="h-4 w-4 text-green-600" />
-                </span>
-              ) : (
-                <span>
-                  {skList[skillInfo.skill_id] ?? 1} /{" "}
-                  {getSkillMaxLevel(
-                    skillInfo.attack_type,
-                    skillInfo.skill_type_desc,
-                    eidolon
-                  )}
-                </span>
-              )}
-            </span>
-          </div>
-        ))}
+        {Object.entries(splitGroupByType(data, { technique: false })).map(
+          ([type, [first, ...rest]]) => (
+            <div key={type} className="flex flex-col items-center">
+              <span>{getLabel2(first.skill_type_desc)}</span>
+              <SkillIcon
+                src={getImagePath(characterId, first)}
+                skillInfo={first}
+                slv={skList[first.skill_id] ?? 1}
+              />
+              <span
+                className={cn(
+                  "w-full text-center font-bold",
+                  isImprovedByEidolon(first.attack_type, eidolon)
+                    ? "text-[#6cfff7]"
+                    : ""
+                )}
+              >
+                {skList[first.skill_id] ==
+                getSkillMaxLevel(
+                  first.attack_type,
+                  first.skill_type_desc,
+                  eidolon
+                ) ? (
+                  <span className="flex items-center justify-end">
+                    {skList[first.skill_id] ?? 1}
+                    <ChevronsUp className="h-4 w-4 text-green-600" />
+                  </span>
+                ) : (
+                  <span>
+                    {skList[first.skill_id] ?? 1} /{" "}
+                    {getSkillMaxLevel(
+                      first.attack_type,
+                      first.skill_type_desc,
+                      eidolon
+                    )}
+                  </span>
+                )}
+              </span>
+            </div>
+          )
+        )}
       </div>
     );
   }
@@ -129,7 +100,7 @@ function SkillIcon({
   const hoverVerbosity = useAtomValue(hoverVerbosityAtom);
 
   return (
-    <Tooltip>
+    <Tooltip delayDuration={0}>
       <TooltipTrigger disabled={hoverVerbosity === "none"}>
         {src && (
           <Image
@@ -160,6 +131,16 @@ function SkillIcon({
   );
 }
 
+function getLabel2(typeDesc: string): string {
+  switch (typeDesc) {
+    case "Basic ATK":
+      return "Basic";
+    case "Ultimate":
+      return "Ult";
+    default:
+      return typeDesc;
+  }
+}
 function getLabel(skillType: SkillType | null | undefined): string {
   switch (skillType) {
     case "Normal":
@@ -202,4 +183,33 @@ function isImprovedByEidolon(
   if (["Normal", "BPSkill"].includes(type) && eidolon >= 3) return true;
   if (["Ultra", "Talent"].includes(type) && eidolon >= 5) return true;
   return false;
+}
+
+type Keys = "basic" | "talent" | "skill" | "ult" | "technique";
+type ReturnConfig = Partial<Record<Keys, boolean>>;
+type Return = {
+  [Key in Keys]?: AvatarSkillConfig[];
+};
+function splitGroupByType(data: AvatarSkillConfig[], cfg?: ReturnConfig) {
+  const _config = {
+    basic: true,
+    talent: true,
+    skill: true,
+    ult: true,
+    technique: true,
+    ...cfg,
+  };
+  const basic = data.filter((e) => e.attack_type == "Normal");
+  const talent = data.filter((e) => e.skill_type_desc == "Talent");
+  const skill = data.filter((e) => e.skill_type_desc == "Skill");
+  const ult = data.filter((e) => e.skill_type_desc == "Ultimate");
+  const technique = data.filter((e) => e.skill_type_desc == "Technique");
+  let total: Return = {};
+  if (_config?.basic === true) total = { ...total, basic };
+  if (_config?.skill === true) total = { ...total, skill };
+  if (_config?.talent === true) total = { ...total, talent };
+  if (_config?.ult === true) total = { ...total, ult };
+  if (_config?.technique === true) total = { ...total, technique };
+
+  return total;
 }
